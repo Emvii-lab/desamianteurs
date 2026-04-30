@@ -10,14 +10,19 @@ import {
 import type { LucideIcon } from 'lucide-react'
 import { motion } from 'framer-motion'
 
+import { createClient } from '@/lib/supabase'
+import { useState, useEffect } from 'react'
+
 type SidebarItem = {
   label: string
   href: string
   Icon: LucideIcon
+  badge?: number
 }
 
 type Props = {
   role: 'client' | 'partenaire' | 'admin'
+  userId?: string
   userName?: string
   userInitials?: string
 }
@@ -72,9 +77,41 @@ const ROLE_LABELS: Record<string, string> = {
   admin: 'Admin entreprise',
 }
 
-export default function DashboardSidebar({ role, userName = 'Utilisateur', userInitials = 'U' }: Props) {
+const supabase = createClient()
+
+export default function DashboardSidebar({ role, userId, userName = 'Utilisateur', userInitials = 'U' }: Props) {
   const pathname = usePathname()
+  const [unreadTotal, setUnreadTotal] = useState(0)
   const menu = MENUS[role]
+
+  const fetchUnreadCount = async () => {
+    if (!userId) return
+    const { count } = await supabase
+      .from('messages')
+      .select('*', { count: 'exact', head: true })
+      .eq('is_read', false)
+      .neq('sender_id', userId)
+    
+    setUnreadTotal(count || 0)
+  }
+
+  useEffect(() => {
+    if (!userId) return
+    fetchUnreadCount()
+
+    const channel = supabase
+      .channel('sidebar-unread')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'messages' },
+        () => fetchUnreadCount()
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [userId])
 
   return (
     <motion.div 
@@ -115,12 +152,12 @@ export default function DashboardSidebar({ role, userName = 'Utilisateur', userI
       <div style={{ padding: '16px 0', flex: 1, overflowY: 'auto' }}>
         <p style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--gray-400)', padding: '0 24px', marginBottom: 8 }}>PRINCIPAL</p>
         {menu.main.map(item => (
-          <SidebarLink key={item.href} item={item} active={pathname === item.href} />
+          <SidebarLink key={item.href} item={item} active={pathname === item.href} unreadTotal={unreadTotal} />
         ))}
 
         <p style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--gray-400)', padding: '24px 24px 8px' }}>COMPTE</p>
         {menu.compte.map(item => (
-          <SidebarLink key={item.href} item={item} active={pathname === item.href} />
+          <SidebarLink key={item.href} item={item} active={pathname === item.href} unreadTotal={unreadTotal} />
         ))}
       </div>
       
@@ -134,8 +171,10 @@ export default function DashboardSidebar({ role, userName = 'Utilisateur', userI
   )
 }
 
-function SidebarLink({ item, active }: { item: SidebarItem; active: boolean }) {
+function SidebarLink({ item, active, unreadTotal }: { item: SidebarItem; active: boolean; unreadTotal: number }) {
   const { Icon } = item
+  const isMessagerie = item.label === 'Messagerie'
+
   return (
     <motion.div
       whileHover={{ x: 4 }}
@@ -149,9 +188,24 @@ function SidebarLink({ item, active }: { item: SidebarItem; active: boolean }) {
         fontWeight: active ? 700 : 500,
         borderLeft: active ? '4px solid var(--red)' : '4px solid transparent',
         transition: 'all 0.2s', textDecoration: 'none',
+        position: 'relative',
       }}>
         <Icon size={16} strokeWidth={active ? 2.5 : 2} />
-        {item.label}
+        <span style={{ flex: 1 }}>{item.label}</span>
+        {isMessagerie && unreadTotal > 0 && (
+          <span style={{
+            background: 'var(--red)',
+            color: 'white',
+            fontSize: '10px',
+            fontWeight: 700,
+            padding: '2px 6px',
+            borderRadius: '10px',
+            minWidth: '18px',
+            textAlign: 'center',
+          }}>
+            {unreadTotal}
+          </span>
+        )}
       </Link>
     </motion.div>
   )
