@@ -12,6 +12,7 @@ import { motion } from 'framer-motion'
 
 import { createClient } from '@/lib/supabase'
 import { useState, useEffect } from 'react'
+import { getInitials } from '@/lib/utils'
 
 type SidebarItem = {
   label: string
@@ -77,40 +78,33 @@ const ROLE_LABELS: Record<string, string> = {
   admin: 'Admin entreprise',
 }
 
-const supabase = createClient()
-
-export default function DashboardSidebar({ role, userId, userName = 'Utilisateur', userInitials = 'U' }: Props) {
+export default function DashboardSidebar({ role, userId, userName = 'Utilisateur' }: Props) {
   const pathname = usePathname()
   const [unreadTotal, setUnreadTotal] = useState(0)
   const menu = MENUS[role]
-
-  const fetchUnreadCount = async () => {
-    if (!userId) return
-    const { count } = await supabase
-      .from('messages')
-      .select('*', { count: 'exact', head: true })
-      .eq('is_read', false)
-      .neq('sender_id', userId)
-    
-    setUnreadTotal(count || 0)
-  }
+  const initials = getInitials(userName)
 
   useEffect(() => {
     if (!userId) return
+    const supabase = createClient()
+    
+    const fetchUnreadCount = async () => {
+      const { count } = await supabase
+        .from('messages')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_read', false)
+        .neq('sender_id', userId)
+      setUnreadTotal(count || 0)
+    }
+
     fetchUnreadCount()
 
     const channel = supabase
       .channel('sidebar-unread')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'messages' },
-        () => fetchUnreadCount()
-      )
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, fetchUnreadCount)
       .subscribe()
 
-    return () => {
-      supabase.removeChannel(channel)
-    }
+    return () => { supabase.removeChannel(channel) }
   }, [userId])
 
   return (
@@ -120,14 +114,12 @@ export default function DashboardSidebar({ role, userId, userName = 'Utilisateur
       className="sidebar" 
       style={{ display: 'flex', flexDirection: 'column' }}
     >
-      {/* Brand */}
       <div style={{ padding: '32px 24px' }}>
         <Link href="/" className="brand" style={{ fontSize: '18px' }}>
           Désamianteurs<span>.fr</span>
         </Link>
       </div>
 
-      {/* User info */}
       <div style={{ padding: '0 24px 24px', borderBottom: '1px solid var(--gray-100)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px', background: 'var(--gray-100)', borderRadius: 12 }}>
           <motion.div 
@@ -139,7 +131,7 @@ export default function DashboardSidebar({ role, userId, userName = 'Utilisateur
               fontSize: 12, fontWeight: 700, flexShrink: 0,
             }}
           >
-            {userInitials}
+            {initials}
           </motion.div>
           <div style={{ minWidth: 0 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--black)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{userName}</div>
@@ -148,23 +140,21 @@ export default function DashboardSidebar({ role, userId, userName = 'Utilisateur
         </div>
       </div>
 
-      {/* Main menu */}
       <div style={{ padding: '16px 0', flex: 1, overflowY: 'auto' }}>
-        <p style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--gray-400)', padding: '0 24px', marginBottom: 8 }}>PRINCIPAL</p>
+        <p style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1.2px', color: 'var(--gray-400)', padding: '16px 24px 8px' }}>PRINCIPAL</p>
         {menu.main.map(item => (
           <SidebarLink key={item.href} item={item} active={pathname === item.href} unreadTotal={unreadTotal} />
         ))}
 
-        <p style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--gray-400)', padding: '24px 24px 8px' }}>COMPTE</p>
+        <p style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1.2px', color: 'var(--gray-400)', padding: '24px 24px 8px' }}>COMPTE</p>
         {menu.compte.map(item => (
           <SidebarLink key={item.href} item={item} active={pathname === item.href} unreadTotal={unreadTotal} />
         ))}
       </div>
       
-      {/* Version or Help */}
       <div style={{ padding: '24px', borderTop: '1px solid var(--gray-100)' }}>
         <div style={{ fontSize: 11, color: 'var(--gray-400)', fontWeight: 500 }}>
-          v1.0.4 — Plateforme certifiée
+          v1.0.5 — Plateforme certifiée
         </div>
       </div>
     </motion.div>
@@ -176,21 +166,21 @@ function SidebarLink({ item, active, unreadTotal }: { item: SidebarItem; active:
   const isMessagerie = item.label === 'Messagerie'
 
   return (
-    <motion.div
-      whileHover={{ x: 4 }}
-      transition={{ duration: 0.2 }}
-    >
+    <motion.div whileHover={{ x: 4 }} transition={{ duration: 0.2 }}>
       <Link href={item.href} style={{
         display: 'flex', alignItems: 'center', gap: 12,
-        padding: '10px 24px', fontSize: 14,
+        padding: '12px 24px', fontSize: 14,
         color: active ? 'var(--red)' : 'var(--gray-600)',
         background: active ? 'var(--red-light)' : 'transparent',
         fontWeight: active ? 700 : 500,
-        borderLeft: active ? '4px solid var(--red)' : '4px solid transparent',
+        borderLeft: '4px solid',
+        borderLeftColor: active ? 'var(--red)' : 'transparent',
         transition: 'all 0.2s', textDecoration: 'none',
         position: 'relative',
       }}>
-        <Icon size={16} strokeWidth={active ? 2.5 : 2} />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 20 }}>
+          <Icon size={18} strokeWidth={active ? 2.5 : 2} />
+        </div>
         <span style={{ flex: 1 }}>{item.label}</span>
         {isMessagerie && unreadTotal > 0 && (
           <span style={{

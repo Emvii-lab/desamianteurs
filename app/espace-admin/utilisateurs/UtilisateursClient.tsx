@@ -4,8 +4,9 @@ import { useState, useMemo } from 'react'
 import { 
   Search, User, ShieldCheck, 
   Building2, Mail, Phone, Calendar,
-  MoreVertical, ChevronRight
+  MoreVertical, ChevronRight, Briefcase
 } from 'lucide-react'
+import { TYPE_LABEL } from '@/lib/constants'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { motion } from 'framer-motion'
@@ -20,6 +21,7 @@ type UserRow = {
   created_at: string
   role: string
   company_name?: string
+  partner_type?: string
 }
 
 type Props = {
@@ -154,6 +156,11 @@ export default function UtilisateursClient({ initialUsers }: Props) {
                     <div style={{ fontSize: '13px', color: '#374151', fontWeight: 500 }}>
                       {u.company_name || <span style={{ color: '#9CA3AF', fontStyle: 'italic' }}>Particulier</span>}
                     </div>
+                    {u.role === 'partenaire' && u.partner_type && (
+                      <div style={{ fontSize: '11px', color: '#6B7280', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+                        <Briefcase size={10} style={{ color: '#9CA3AF' }} /> {TYPE_LABEL[u.partner_type] || u.partner_type}
+                      </div>
+                    )}
                   </td>
                   <td style={tdStyle}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>

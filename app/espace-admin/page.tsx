@@ -1,6 +1,7 @@
 import { createServerSupabase } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
 import AdminDashboard from './AdminDashboard'
+import { AVATAR_COLORS, TYPE_LABEL } from '@/lib/constants'
 
 export const metadata = {
   title: 'Administration | Désamianteurs.fr',
@@ -72,7 +73,7 @@ export default async function EspaceAdminPage() {
     id: p.id,
     name: p.company_name ?? 'Inconnu',
     siret: p.siret ?? '—',
-    type: p.partner_type ?? '—',
+    type: TYPE_LABEL[p.partner_type as string] || p.partner_type || '—',
     date: new Date(p.created_at).toLocaleDateString('fr-FR'),
     docs: (p.docs as any[])?.length ?? 0,
   }))

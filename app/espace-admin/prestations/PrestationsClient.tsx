@@ -5,6 +5,7 @@ import {
   Wrench, Layers, Tag, 
   Hash, Activity
 } from 'lucide-react'
+import { TYPE_LABEL } from '@/lib/constants'
 import { motion } from 'framer-motion'
 import { fadeUp, staggerContainer, cardHover } from '@/lib/animations'
 
@@ -16,14 +17,6 @@ type Props = {
   domains: Domain[]
 }
 
-const PARTNER_TYPE_LABELS: Record<string, string> = {
-  asbestos_remover:   'Désamianteur',
-  diagnostician:      'Diagnostiqueur',
-  sampler_lab:        'Laboratoire',
-  project_manager:    'Maître d\'œuvre',
-  legal_expert:       'Expert Juridique',
-  specialized_lawyer: 'Avocat Spécialisé',
-}
 
 export default function PrestationsClient({ services, domains }: Props) {
   const [activeTab, setActiveTab] = useState<'services' | 'domains'>('services')
@@ -93,9 +86,6 @@ export default function PrestationsClient({ services, domains }: Props) {
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
                     <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#111827' }}>{s.label}</h3>
-                    <span style={{ fontSize: '10px', fontWeight: 800, color: '#9CA3AF', background: '#F3F4F6', padding: '2px 6px', borderRadius: '4px' }}>
-                      {s.code}
-                    </span>
                   </div>
                   <p style={{ fontSize: '13px', color: '#6B7280', lineHeight: '1.5', marginBottom: '16px' }}>
                     {s.description || 'Aucune description renseignée.'}
@@ -115,7 +105,7 @@ export default function PrestationsClient({ services, domains }: Props) {
           {Object.entries(groupBy(domains, 'partner_type')).map(([type, items]: [any, any]) => (
             <motion.div key={type} variants={fadeUp} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <h2 style={{ fontSize: '14px', fontWeight: 700, color: '#4B5563', textTransform: 'uppercase', letterSpacing: '0.05em', paddingLeft: '4px' }}>
-                {PARTNER_TYPE_LABELS[type] || type}
+                {TYPE_LABEL[type] || type}
               </h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {items.map((d: any) => (

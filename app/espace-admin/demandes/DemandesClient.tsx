@@ -15,17 +15,18 @@ type Quote = any
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; Icon: any }> = {
   draft:       { label: 'Brouillon',  color: '#6B7280', bg: '#F3F4F6', Icon: FileText },
-  pending:     { label: 'En attente',  color: '#D97706', bg: '#FEF3C7', Icon: Clock },
+  submitted:   { label: 'Envoyée',    color: '#D97706', bg: '#FEF3C7', Icon: Clock },
   in_progress: { label: 'En cours',   color: '#2563EB', bg: '#DBEAFE', Icon: Send },
-  completed:   { label: 'Terminé',    color: '#059669', bg: '#D1FAE5', Icon: CheckCircle2 },
-  cancelled:   { label: 'Annulé',     color: 'var(--red)', bg: 'var(--red-light)', Icon: AlertCircle },
+  completed:   { label: 'Terminée',   color: '#059669', bg: '#D1FAE5', Icon: CheckCircle2 },
+  cancelled:   { label: 'Annulée',    color: 'var(--red)', bg: 'var(--red-light)', Icon: AlertCircle },
+  published:   { label: 'Publiée',    color: '#059669', bg: '#D1FAE5', Icon: Send },
 }
 
 const TIMELINE_LABELS: Record<string, string> = {
-  urgent:      'Urgent',
-  asap:        'Dès que possible',
-  within_3m:   'Sous 3 mois',
-  planning:    'En planification',
+  emergency:       'Urgent',
+  within_1_month:  'Sous 1 mois',
+  within_3_months: 'Sous 3 mois',
+  over_3_months:   '+ 3 mois',
 }
 
 export default function DemandesClient({ initialQuotes }: { initialQuotes: Quote[] }) {
@@ -115,7 +116,7 @@ export default function DemandesClient({ initialQuotes }: { initialQuotes: Quote
               const status = STATUS_CONFIG[q.status] || STATUS_CONFIG.draft
               const StatusIcon = status.Icon
               const date = q.created_at ? format(new Date(q.created_at), 'dd/MM/yy', { locale: fr }) : '—'
-              const prosCount = q.assignments_count || 0
+              const prosCount = q.quote_assignments?.[0]?.count || 0
 
               return (
                 <motion.tr 
