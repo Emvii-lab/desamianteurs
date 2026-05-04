@@ -77,3 +77,7 @@ video/out/
 Thumbs.db
 Desktop.ini
 public/videos/
+
+# project docs
+Cahier_des_charges_Desamianteurs.docx
+DOC_ALGORITHME_MATCHING.md

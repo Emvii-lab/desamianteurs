@@ -18,18 +18,26 @@ interface Message {
 interface Conversation {
   assignment_id: string
   partner_name: string
-  last_message?: string
-  last_message_time?: string
+  last_message?: string | null
+  last_message_at?: string | null
   unread_count: number
   quote_id: string
+  title?: string
+  city?: string
 }
 
-export default function MessagerieClient({ userId }: { userId: string }) {
-  const [conversations, setConversations] = useState<Conversation[]>([])
-  const [activeConv, setActiveConv] = useState<string | null>(null)
+export default function MessagerieClient({ 
+  userId, 
+  initialConversations = [] 
+}: { 
+  userId: string,
+  initialConversations?: Conversation[]
+}) {
+  const [conversations, setConversations] = useState<Conversation[]>(initialConversations)
+  const [activeConv, setActiveConv] = useState<string | null>(initialConversations[0]?.assignment_id || null)
   const [messagesCache, setMessagesCache] = useState<Record<string, Message[]>>({})
   const [newMessage, setNewMessage] = useState('')
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(!initialConversations.length)
   const [clientId, setClientId] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -128,7 +136,7 @@ export default function MessagerieClient({ userId }: { userId: string }) {
           assignment_id: item.id,
           partner_name: item.partner?.company_name || 'Partenaire',
           last_message: lastMsg?.content,
-          last_message_time: lastMsg?.created_at,
+          last_message_at: lastMsg?.created_at,
           unread_count: unread,
           quote_id: item.quote_id
         }
@@ -145,7 +153,7 @@ export default function MessagerieClient({ userId }: { userId: string }) {
         return {
           ...c,
           last_message: msg.content,
-          last_message_time: msg.created_at,
+          last_message_at: msg.created_at,
           unread_count: msg.sender_id !== userId ? c.unread_count + 1 : c.unread_count
         }
       }
@@ -256,9 +264,9 @@ export default function MessagerieClient({ userId }: { userId: string }) {
                 </div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
-                {conv.last_message_time && (
+                {conv.last_message_at && (
                   <div className="conv-time">
-                    {format(new Date(conv.last_message_time), 'HH:mm', { locale: fr })}
+                    {format(new Date(conv.last_message_at), 'HH:mm', { locale: fr })}
                   </div>
                 )}
                 {conv.unread_count > 0 && <div className="unread-dot" />}

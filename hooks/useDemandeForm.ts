@@ -9,10 +9,10 @@ const demandeSchema = z.object({
   propertyType: z.string().min(1, "Veuillez choisir un type de bien"),
   surface: z.string().optional(),
   situationPhase: z.string().optional(),
-  situationContext: z.array(z.string()).default([]),
-  interventionTypes: z.array(z.string()).default([]),
+  situationContext: z.array(z.string()),
+  interventionTypes: z.array(z.string()),
   moePhase: z.string().optional(),
-  accreditations: z.array(z.string()).default([]),
+  accreditations: z.array(z.string()),
   timing: z.string().min(1, "Veuillez préciser le délai"),
   budget: z.string().min(1, "Veuillez choisir un budget"),
   addressSearch: z.string().optional(),
@@ -33,7 +33,7 @@ const demandeSchema = z.object({
   password: z.string().min(8, "8 caractères minimum").optional(),
   passwordConfirm: z.string().optional(),
   cgu: z.boolean().refine(v => v === true, "Vous devez accepter les CGU"),
-  notifs: z.boolean().default(false),
+  notifs: z.boolean(),
 }).refine(data => {
   if (data.password && data.password !== data.passwordConfirm) return false
   return true
@@ -49,12 +49,35 @@ export function useDemandeForm(defaultValues?: Partial<DemandeFormValues>) {
     resolver: zodResolver(demandeSchema),
     defaultValues: {
       serviceTypes: [],
+      userType: "",
+      propertyType: "",
+      surface: "",
+      situationPhase: "",
       situationContext: [],
       interventionTypes: [],
+      moePhase: "",
       accreditations: [],
+      timing: "",
+      budget: "",
+      addressSearch: "",
+      streetAddress: "",
+      city: "",
+      postalCode: "",
+      department: "",
+      complement: "",
+      accessibility: "",
+      floor: "",
+      elevator: "",
+      description: "",
+      prenom: "",
+      nom: "",
+      email: "",
+      telephone: "",
+      password: "",
+      passwordConfirm: "",
       cgu: false,
       notifs: false,
       ...defaultValues
-    }
+    } as any
   })
 }

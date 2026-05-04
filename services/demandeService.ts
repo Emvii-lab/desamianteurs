@@ -66,7 +66,7 @@ export const demandeService = {
       const supabase = createClient()
       const { data: { session } } = await supabase.auth.getSession()
       currentUser = session?.user
-      accessToken = session?.access_token
+      accessToken = session?.access_token || null
     }
 
     if (!currentUser || !accessToken) throw new Error('Utilisateur non identifié.')
@@ -125,7 +125,7 @@ export const demandeService = {
         timeline: data.timing,
         budget: data.budget,
         description: data.description,
-        surface_m2: parseFloat(data.surface) || 0,
+        surface_m2: parseFloat(data.surface || '0') || 0,
         contact_first_name: data.prenom || '',
         contact_last_name: data.nom || '',
         contact_email: data.email || currentUser.email,
