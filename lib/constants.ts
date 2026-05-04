@@ -95,7 +95,7 @@ export const PLANS = [
     features: [
       { category: 'VISIBILITÉ & MATCHING', items: ['Mise en avant régionale', 'Accès 2ème vague'] },
       { category: 'ZONE & DEMANDES', items: ['Quota de 5 dossiers simultanés'] },
-      { category: 'RÉCEPTION DES DEMANDES', items: [{ text: '2ème vague', success: true }] },
+      { category: 'RÉCEPTION DES DEMANDES', items: [{ text: '2ème vague', success: true, badge_text: 'Prioritaire' }] },
     ],
     cta: 'Choisir Performance', ctaStyle: 'btn-outline',
   },
@@ -105,7 +105,7 @@ export const PLANS = [
     features: [
       { category: 'VISIBILITÉ & MATCHING', items: ['Visibilité prioritaire', 'Priorité dans l\'algorithme'] },
       { category: 'ZONE & DEMANDES', items: ['Dossiers illimités'] },
-      { category: 'RÉCEPTION DES DEMANDES', items: [{ text: 'Temps réel - 1ère Vague', success: true, badge: 'En tête de liste pour chaque nouvelle demande' }] },
+      { category: 'RÉCEPTION DES DEMANDES', items: [{ text: 'Temps réel - 1ère Vague', success: true, badge_text: 'Temps réel', badge: 'En tête de liste pour chaque nouvelle demande' }] },
     ],
     cta: 'Choisir Premium', ctaStyle: 'btn-red',
   },

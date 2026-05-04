@@ -11,7 +11,7 @@ const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 24 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true, margin: '-60px' },
-  transition: { duration: 0.5, ease: [0.4, 0, 0.2, 1], delay },
+  transition: { duration: 0.5, ease: [0.4, 0, 0.2, 1] as any, delay },
 })
 
 export default function TarifsClient() {
@@ -60,7 +60,14 @@ export default function TarifsClient() {
         </motion.div>
 
         {/* Pricing cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24, marginBottom: 100, maxWidth: 1000, margin: '0 auto 100px' }}>
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+          gap: 24, 
+          marginBottom: 100, 
+          maxWidth: 1000, 
+          margin: '0 auto 100px' 
+        }}>
           {PLANS.map((plan, idx) => (
             <motion.div
               key={plan.id}
@@ -68,7 +75,7 @@ export default function TarifsClient() {
               style={{
                 background: 'white',
                 border: plan.highlight ? '2px solid var(--red)' : '1px solid var(--gray-100)',
-                borderRadius: 10,
+                borderRadius: 12,
                 padding: '40px 24px',
                 textAlign: 'center',
                 position: 'relative',
@@ -100,7 +107,7 @@ export default function TarifsClient() {
                           <div style={{ fontSize: 13, fontWeight: 600, color: typeof item === 'object' && item.disabled ? 'var(--gray-300)' : 'var(--black)' }}>
                             {typeof item === 'object' ? item.text : item}
                             {typeof item === 'object' && item.success && (
-                              <span style={{ marginLeft: 8, padding: '2px 8px', borderRadius: 4, background: 'rgba(52,211,153,0.1)', color: '#059669', fontSize: 10 }}>Temps réel</span>
+                              <span style={{ marginLeft: 8, padding: '2px 8px', borderRadius: 4, background: 'rgba(52,211,153,0.1)', color: '#059669', fontSize: 10 }}>{item.badge_text || 'Inclus'}</span>
                             )}
                           </div>
                           {typeof item === 'object' && item.badge && (
@@ -120,9 +127,9 @@ export default function TarifsClient() {
         </div>
 
         {/* Comparison table */}
-        <section style={{ marginBottom: 120 }}>
+        <section style={{ marginBottom: 120, overflowX: 'auto' }}>
           <motion.h2 {...fadeUp()} style={{ fontSize: 24, textAlign: 'center', marginBottom: 48 }}>Comparatif rapide</motion.h2>
-          <motion.div {...fadeUp(0.1)} style={{ background: 'white', border: '1px solid var(--gray-100)', borderRadius: 10, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+          <motion.div {...fadeUp(0.1)} style={{ minWidth: 800, background: 'white', border: '1px solid var(--gray-100)', borderRadius: 12, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ background: 'var(--black)', color: 'white' }}>
@@ -166,14 +173,18 @@ export default function TarifsClient() {
             <p style={{ color: 'var(--gray-400)', marginBottom: 48 }}>De l'inscription à l'activation de votre compte.</p>
           </motion.div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 16 }}>
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', 
+            gap: 16 
+          }}>
             {STEPS_PRICE.map((step, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1], delay: i * 0.1 }}
+                transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] as any, delay: i * 0.1 }}
                 className="step-price-card"
                 style={{
                   background: 'white',
@@ -181,7 +192,7 @@ export default function TarifsClient() {
                   borderLeft: '1px solid var(--gray-200)',
                   borderRight: '1px solid var(--gray-200)',
                   borderBottom: '1px solid var(--gray-200)',
-                  borderRadius: 10,
+                  borderRadius: 12,
                   boxShadow: '0 2px 12px rgba(0,0,0,0.05)',
                   position: 'relative',
                 }}
