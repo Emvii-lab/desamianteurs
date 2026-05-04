@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getStripe } from '@/lib/stripe'
+import Stripe from 'stripe'
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
@@ -15,7 +16,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ valid: false, error: 'Code invalide ou expiré' })
     }
 
-    const promo = list.data[0]
+    const promo = list.data[0] as any
     const coupon = promo.coupon as Stripe.Coupon
     const isFull = coupon.percent_off === 100
 
