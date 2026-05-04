@@ -37,7 +37,7 @@ const ROLE_CONFIG: Record<string, { label: string; color: string; bg: string; Ic
 export default function UtilisateursClient({ initialUsers }: Props) {
   const [users, setUsers] = useState(initialUsers)
   const [search, setSearch] = useState('')
-  const [filterRole, setFilterRole] = useState('')
+  const [activeTab, setActiveTab] = useState('all')
 
   const filteredUsers = useMemo(() => {
     return users.filter(u => {
@@ -47,11 +47,11 @@ export default function UtilisateursClient({ initialUsers }: Props) {
         u.email.toLowerCase().includes(search.toLowerCase()) ||
         u.company_name?.toLowerCase().includes(search.toLowerCase())
       
-      const matchesRole = !filterRole || u.role === filterRole
+      const matchesTab = activeTab === 'all' || u.role === activeTab
 
-      return matchesSearch && matchesRole
+      return matchesSearch && matchesTab
     })
-  }, [users, search, filterRole])
+  }, [users, search, activeTab])
 
   return (
     <motion.div 
@@ -71,15 +71,55 @@ export default function UtilisateursClient({ initialUsers }: Props) {
         </div>
       </motion.div>
 
-      <motion.div variants={fadeUp} style={{ 
-        background: 'white', padding: '16px', borderRadius: '12px', border: '1px solid #E5E7EB', 
-        display: 'flex', gap: '16px', marginBottom: '24px', alignItems: 'center'
-      }}>
-        <div style={{ position: 'relative', flex: 1 }}>
+      <motion.div variants={fadeUp} style={{ display: 'flex', alignItems: 'center', gap: '24px', marginBottom: '24px' }}>
+        <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid #E5E7EB', paddingBottom: '0', flex: 1 }}>
+          {[
+            { id: 'all',        label: 'Tous',        count: users.length },
+            { id: 'partenaire', label: 'Partenaires', count: users.filter(u => u.role === 'partenaire').length },
+            { id: 'client',     label: 'Clients',     count: users.filter(u => u.role === 'client').length },
+            { id: 'admin',      label: 'Admins',      count: users.filter(u => u.role === 'admin').length },
+          ].map(tab => {
+            const isActive = activeTab === tab.id
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                style={{
+                  padding: '12px 16px',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  color: isActive ? 'var(--red)' : '#6B7280',
+                  background: 'none',
+                  border: 'none',
+                  borderBottom: isActive ? '2px solid var(--red)' : '2px solid transparent', // Réserve l'espace
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  transition: 'background-color 0.2s, color 0.2s, border-color 0.2s',
+                  marginBottom: '-1px'
+                }}
+              >
+                {tab.label}
+                <span style={{ 
+                  fontSize: '11px', 
+                  background: isActive ? 'var(--red-light)' : '#F3F4F6', 
+                  color: isActive ? 'var(--red)' : '#9CA3AF',
+                  padding: '2px 8px',
+                  borderRadius: '10px'
+                }}>
+                  {tab.count}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+
+        <div style={{ position: 'relative', width: '300px' }}>
           <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
           <input 
             type="text" 
-            placeholder="Rechercher un nom, un email ou une entreprise..." 
+            placeholder="Rechercher..." 
             value={search}
             onChange={e => setSearch(e.target.value)}
             style={{ 
@@ -88,17 +128,6 @@ export default function UtilisateursClient({ initialUsers }: Props) {
             }}
           />
         </div>
-        
-        <select 
-          value={filterRole}
-          onChange={e => setFilterRole(e.target.value)}
-          style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #E5E7EB', fontSize: '14px', outline: 'none', background: 'white' }}
-        >
-          <option value="">Tous les rôles</option>
-          <option value="client">Clients</option>
-          <option value="partenaire">Partenaires</option>
-          <option value="admin">Admins</option>
-        </select>
       </motion.div>
 
       <motion.div variants={fadeUp} style={{ background: 'white', borderRadius: '12px', border: '1px solid #E5E7EB', overflow: 'hidden' }}>
@@ -180,17 +209,17 @@ export default function UtilisateursClient({ initialUsers }: Props) {
                     </div>
                   </td>
                   <td style={{ ...tdStyle, textAlign: 'right' }}>
-                    <motion.button 
-                      whileHover={{ scale: 1.02, backgroundColor: '#F9FAFB' }}
-                      whileTap={{ scale: 0.98 }}
+                    <button 
+                      className="btn-outline btn-sm"
                       style={{ 
-                        background: 'none', border: '1px solid #E5E7EB', padding: '6px 12px', borderRadius: '8px',
-                        fontSize: '12px', fontWeight: 600, color: '#374151', cursor: 'pointer',
-                        display: 'inline-flex', alignItems: 'center', gap: '4px'
+                        borderRadius: '8px',
+                        display: 'inline-flex', 
+                        alignItems: 'center', 
+                        gap: '4px'
                       }}
                     >
                       Détails <ChevronRight size={14} />
-                    </motion.button>
+                    </button>
                   </td>
                 </motion.tr>
               )
@@ -206,8 +235,8 @@ function StatCard({ label, value, color = '#111827' }: { label: string; value: n
   return (
     <motion.div 
       variants={fadeUp}
-      whileHover={{ y: -2, boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
-      style={{ background: 'white', padding: '12px 20px', borderRadius: '12px', border: '1px solid #E5E7EB', textAlign: 'center' }}
+      whileHover={{ boxShadow: '0 4px 12px rgba(0,0,0,0.05)', borderColor: '#D1D5DB' }}
+      style={{ background: 'white', padding: '12px 20px', borderRadius: '12px', border: '1px solid #E5E7EB', textAlign: 'center', transition: 'all 0.2s ease' }}
     >
       <div style={{ fontSize: '11px', fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', marginBottom: '2px' }}>{label}</div>
       <div style={{ fontSize: '18px', fontWeight: 700, color }}>{value}</div>

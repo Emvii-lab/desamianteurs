@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { StatGrid } from '@/components/ui/StatGrid'
 import { DashboardCard } from '@/components/ui/DashboardCard'
 import { DataTable } from '@/components/ui/DataTable'
+// import { AlgoMatchingSection } from './components/AlgoMatchingSection'
 
 type Stat = {
   demandes: number
@@ -33,14 +34,31 @@ type Avis = {
   color: string
 }
 
+type Diagnostic = {
+  rank: number
+  total_eligible: number
+  is_top_3: boolean
+  main_reason: 'ok' | 'too_slow' | 'too_many_dossiers' | 'zone_inactive' | 'competition' | 'new_partner' | 'no_zones'
+  dept_code: string
+  reactivity_score: number
+  non_selected_30d: number
+  quotes_in_zone_30d: number
+  gap_alert_level: 'none' | 'j5' | 'j7'
+  reactivation_active: boolean
+}
+
+
 type PartnerDashboardProps = {
   isValid: boolean
   demandes: Demande[]
   avis: Avis[]
   stats: Stat
+  diagnostic?: Diagnostic
 }
 
-export default function PartnerDashboard({ isValid, demandes, avis, stats }: PartnerDashboardProps) {
+
+export default function PartnerDashboard({ isValid, demandes, avis, stats, diagnostic }: PartnerDashboardProps) {
+
   return (
     <motion.div 
       initial="hidden"
@@ -72,6 +90,85 @@ export default function PartnerDashboard({ isValid, demandes, avis, stats }: Par
           { label: 'Avis reçus',          value: stats.reviewCount, sub: 'au total' },
         ]}
       />
+
+      {diagnostic && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24, marginBottom: 24 }}>
+          <motion.div 
+            whileHover={{ y: -6, boxShadow: '0 12px 32px rgba(0,0,0,0.08)' }}
+            className="card" 
+            style={{ padding: 20, textAlign: 'center', borderBottom: '4px solid var(--red)' }}
+          >
+            <div style={{ fontSize: 12, color: '#6B7280', fontWeight: 700, textTransform: 'uppercase', marginBottom: 8 }}>Score Réactivité</div>
+            <div style={{ fontSize: 32, fontWeight: 800, color: '#111827' }}>{diagnostic.reactivity_score.toFixed(1)} / 36</div>
+            <div style={{ fontSize: 12, color: '#9CA3AF', marginTop: 4 }}>Sur les 20 derniers dossiers</div>
+          </motion.div>
+          
+          <motion.div 
+            whileHover={{ y: -6, boxShadow: '0 12px 32px rgba(0,0,0,0.08)' }}
+            className="card" 
+            style={{ padding: 20, textAlign: 'center', borderBottom: '4px solid #111827' }}
+          >
+            <div style={{ fontSize: 12, color: '#6B7280', fontWeight: 700, textTransform: 'uppercase', marginBottom: 8 }}>Position Moyenne</div>
+            <div style={{ fontSize: 32, fontWeight: 800, color: '#111827' }}>#{diagnostic.rank}</div>
+            <div style={{ fontSize: 12, color: '#9CA3AF', marginTop: 4 }}>sur {diagnostic.total_eligible} pros (Dept {diagnostic.dept_code})</div>
+          </motion.div>
+
+          <motion.div 
+            whileHover={{ y: -6, boxShadow: '0 12px 32px rgba(0,0,0,0.08)' }}
+            className="card" 
+            style={{ padding: 20, textAlign: 'center', borderBottom: `4px solid ${diagnostic.non_selected_30d > 0 ? '#F59E0B' : '#059669'}` }}
+          >
+            <div style={{ fontSize: 12, color: '#6B7280', fontWeight: 700, textTransform: 'uppercase', marginBottom: 8 }}>Non Sélectionné</div>
+            <div style={{ fontSize: 32, fontWeight: 800, color: '#111827' }}>{diagnostic.non_selected_30d} fois</div>
+            <div style={{ fontSize: 12, color: '#9CA3AF', marginTop: 4 }}>sur {diagnostic.quotes_in_zone_30d} opportunités (30j)</div>
+          </motion.div>
+        </div>
+      )}
+
+      {diagnostic && !diagnostic.is_top_3 && (
+        <div style={{ 
+          background: '#FFFBEB', 
+          border: '1px solid #FEF3C7', 
+          borderRadius: 12, 
+          padding: '20px 24px', 
+          marginBottom: 32,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 20
+        }}>
+          <div style={{ 
+            width: 48, height: 48, borderRadius: '50%', background: '#F59E0B', 
+            display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white',
+            fontSize: 24, fontWeight: 800, flexShrink: 0
+          }}>!</div>
+          <div style={{ flex: 1 }}>
+            <h4 style={{ fontSize: 15, fontWeight: 700, color: '#92400E', marginBottom: 4 }}>
+              Cause principale de non-sélection : 
+              <span style={{ color: '#B45309', marginLeft: 8, textTransform: 'uppercase' }}>
+                {diagnostic.main_reason === 'new_partner' ? 'Bienvenue parmi nous !' :
+                 diagnostic.main_reason === 'no_zones' ? 'Zones d\'intervention non définies' :
+                 diagnostic.main_reason === 'too_slow' ? 'Vitesse de réponse insuffisante' :
+                 diagnostic.main_reason === 'too_many_dossiers' ? 'Quota de dossiers atteint' :
+                 diagnostic.main_reason === 'zone_inactive' ? 'Faible volume dans la zone' :
+                 'Compétition élevée'}
+              </span>
+            </h4>
+            <p style={{ fontSize: 13, color: '#B45309', margin: 0, opacity: 0.8 }}>
+              {diagnostic.main_reason === 'new_partner' ? "Votre compte est prêt. Dès qu'un client fera une demande dans votre zone, vous recevrez une notification. Votre score se calculera après vos 3 premiers dossiers." :
+               diagnostic.main_reason === 'no_zones' ? "Vous n'apparaissez pas encore dans les recherches car vos zones d'intervention ne sont pas configurées. Contactez le support pour les définir." :
+               diagnostic.main_reason === 'too_slow' ? "Les autres pros répondent en moyenne 2x plus vite que vous. Améliorez votre score pour repasser dans le Top 3." :
+               diagnostic.main_reason === 'too_many_dossiers' ? "Vous avez 5 dossiers en attente. Finalisez-en un pour débloquer de nouvelles attributions." :
+               diagnostic.main_reason === 'zone_inactive' ? "Il y a eu peu de demandes dans le département " + (diagnostic.dept_code || 'non défini') + " ce mois-ci. Pensez à élargir votre zone." :
+               "Vos scores sont bons, mais 3 confrères ont actuellement un léger avantage. Continuez vos efforts !"}
+            </p>
+          </div>
+          {diagnostic.reactivation_active && (
+            <div className="badge badge-red" style={{ padding: '8px 12px' }}>BOOST ACTIF</div>
+          )}
+        </div>
+      )}
+
+
 
       <DashboardCard 
         title="Nouvelles demandes dans votre zone" 
@@ -111,6 +208,8 @@ export default function PartnerDashboard({ isValid, demandes, avis, stats }: Par
           ]}
         />
       </DashboardCard>
+
+      {/* <AlgoMatchingSection /> */}
 
       <DashboardCard title="Avis récents">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>

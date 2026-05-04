@@ -95,33 +95,35 @@ function ReviewCard({ review, onAction }: { review: any; onAction: any }) {
       padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px',
       boxShadow: '0 1px 2px rgba(0,0,0,0.05)', position: 'relative', height: '100%'
     }}>
-      {/* Status Ribbon (only for non-pending) */}
-      {review.status !== 'pending' && (
-        <div style={{ 
-          position: 'absolute', top: '12px', right: '12px',
-          padding: '4px 8px', borderRadius: '6px', fontSize: '10px', fontWeight: 800,
-          textTransform: 'uppercase',
-          background: review.status === 'published' ? '#D1FAE5' : 'var(--red-light)',
-          color: review.status === 'published' ? '#059669' : 'var(--red)'
-        }}>
-          {review.status === 'published' ? 'Publié' : 'Refusé'}
-        </div>
-      )}
-
       {/* Header: Rating & Date */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', gap: '2px' }}>
-          {[1, 2, 3, 4, 5].map(star => (
-            <Star 
-              key={star} 
-              size={18} 
-              fill={star <= review.rating ? '#FBBF24' : 'none'} 
-              color={star <= review.rating ? '#FBBF24' : '#E5E7EB'} 
-            />
-          ))}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', gap: '2px' }}>
+            {[1, 2, 3, 4, 5].map(star => (
+              <Star 
+                key={star} 
+                size={18} 
+                fill={star <= review.rating ? '#FBBF24' : 'none'} 
+                color={star <= review.rating ? '#FBBF24' : '#E5E7EB'} 
+              />
+            ))}
+          </div>
+          <span style={{ fontSize: '14px', fontWeight: 700, color: '#111827' }}>{review.rating}/5</span>
         </div>
-        <div style={{ fontSize: '12px', color: '#9CA3AF', display: 'flex', alignItems: 'center', gap: '4px' }}>
-          <Calendar size={12} /> {date}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {review.status !== 'pending' && (
+            <div style={{ 
+              padding: '4px 8px', borderRadius: '6px', fontSize: '10px', fontWeight: 800,
+              textTransform: 'uppercase', 
+              background: review.status === 'published' ? '#D1FAE5' : 'var(--red-light)',
+              color: review.status === 'published' ? '#059669' : 'var(--red)'
+            }}>
+              {review.status === 'published' ? 'Publié' : 'Refusé'}
+            </div>
+          )}
+          <div style={{ fontSize: '12px', color: '#9CA3AF', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <Calendar size={12} /> {date}
+          </div>
         </div>
       </div>
 
@@ -162,30 +164,26 @@ function ReviewCard({ review, onAction }: { review: any; onAction: any }) {
       {/* Actions (only for pending) */}
       {review.status === 'pending' && (
         <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
-          <motion.button 
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+          <button 
             onClick={() => onAction(review.id, 'published')}
+            className="btn btn-red"
             style={{ 
               flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-              padding: '10px', borderRadius: '10px', background: '#059669', color: 'white',
-              border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '14px'
+              padding: '10px', borderRadius: '10px', fontWeight: 600, fontSize: '14px'
             }}
           >
             <Check size={18} /> Approuver
-          </motion.button>
-          <motion.button 
-            whileHover={{ scale: 1.02, backgroundColor: 'var(--red-light)' }}
-            whileTap={{ scale: 0.98 }}
+          </button>
+          <button 
             onClick={() => onAction(review.id, 'rejected')}
+            className="btn btn-outline"
             style={{ 
               flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-              padding: '10px', borderRadius: '10px', background: 'white', color: 'var(--red)',
-              border: '1px solid var(--red-light)', cursor: 'pointer', fontWeight: 600, fontSize: '14px'
+              padding: '10px', borderRadius: '10px', fontWeight: 600, fontSize: '14px'
             }}
           >
             <X size={18} /> Rejeter
-          </motion.button>
+          </button>
         </div>
       )}
     </div>

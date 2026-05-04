@@ -6,7 +6,7 @@ import { ACCESSIBILITY_OPTIONS, FLOOR_OPTIONS, ELEVATOR_OPTIONS } from '@/lib/co
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface Props {
-  form: UseFormReturn<DemandeFormValues>
+  form: UseFormReturn<DemandeFormValues, any, any>
   onNext: () => void
   onBack: () => void
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import Link from 'next/link'
 import { 
   Search, MapPin, ChevronRight, Clock,
   CheckCircle2, AlertCircle, FileText, Send,
@@ -130,10 +131,17 @@ export default function DemandesClient({ initialQuotes }: { initialQuotes: Quote
                     <div style={{ fontSize: '12px', color: '#6B7280' }}>{q.ref_property_types?.label || 'Propriété'}</div>
                   </td>
                   <td style={tdStyle}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#374151' }}>
-                      <MapPin size={12} style={{ color: '#9CA3AF' }} /> {q.address_city}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <MapPin size={14} style={{ color: '#9CA3AF', flexShrink: 0 }} />
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        {q.address_city && (
+                          <div style={{ fontSize: '13px', fontWeight: 500, color: '#374151' }}>{q.address_city}</div>
+                        )}
+                        <div style={{ fontSize: '12px', color: '#6B7280' }}>
+                          {q.address_department} {q.address_postal_code ? `(${q.address_postal_code})` : ''}
+                        </div>
+                      </div>
                     </div>
-                    <div style={{ fontSize: '11px', color: '#9CA3AF', marginLeft: '16px' }}>{q.address_department}</div>
                   </td>
                   <td style={tdStyle}>
                     <div style={{ fontSize: '13px', color: '#111827', fontWeight: 500 }}>{q.contact_first_name} {q.contact_last_name}</div>
@@ -166,17 +174,14 @@ export default function DemandesClient({ initialQuotes }: { initialQuotes: Quote
                     </div>
                   </td>
                   <td style={{ ...tdStyle, textAlign: 'right' }}>
-                    <motion.button 
-                      whileHover={{ scale: 1.02, backgroundColor: '#F9FAFB' }}
-                      whileTap={{ scale: 0.98 }}
-                      style={{ 
-                        background: 'none', border: '1px solid #E5E7EB', padding: '6px 12px', borderRadius: '8px',
-                        fontSize: '12px', fontWeight: 600, color: '#374151', cursor: 'pointer',
-                        display: 'inline-flex', alignItems: 'center', gap: '4px', transition: 'all 0.2s'
-                      }}
-                    >
-                      Détails <ChevronRight size={14} />
-                    </motion.button>
+                    <Link href={`/espace-admin/demandes/${q.id}`}>
+                      <button 
+                        className="btn btn-outline btn-sm"
+                        style={{ padding: '6px 12px' }}
+                      >
+                        Détails <ChevronRight size={14} />
+                      </button>
+                    </Link>
                   </td>
                 </motion.tr>
               )

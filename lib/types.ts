@@ -41,13 +41,21 @@ export interface AdminStats {
   reviews: number
 }
 
+export interface PartnerDoc {
+  code: string
+  label: string
+  status: 'missing' | 'pending' | 'verified' | 'rejected' | 'expired'
+  is_required: boolean
+}
+
 export interface PendingPartner {
   id: string
   name: string
   siret: string
   type: string
+  rawType: string
   date: string
-  docs: number
+  docs: PartnerDoc[]
 }
 
 export interface PendingReview {
@@ -114,24 +122,24 @@ export interface DemandeFormData {
   serviceTypes: string[]
   userType: string
   propertyType: string
-  surface: string
-  situationPhase: string
+  surface?: string
+  situationPhase?: string
   situationContext: string[]
   interventionTypes: string[]
-  moePhase: string
+  moePhase?: string
   accreditations: string[]
   timing: string
   budget: string
-  addressSearch: string
+  addressSearch?: string
   streetAddress: string
   city: string
   postalCode: string
-  department: string
-  complement: string
-  accessibility: string
+  department?: string
+  complement?: string
+  accessibility?: string
   floor: string
   elevator: string
-  description: string
+  description?: string
   // Auth/Contact
   prenom: string
   nom: string
@@ -142,3 +150,4 @@ export interface DemandeFormData {
   cgu: boolean
   notifs: boolean
 }
+

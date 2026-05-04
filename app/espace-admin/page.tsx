@@ -29,6 +29,7 @@ export default async function EspaceAdminPage() {
     quotesCount,
     reviewsCount,
     pendingPartnersData,
+    refDocsData,
     reviewsData,
     draftQuotesData
   ] = await Promise.all([
@@ -40,10 +41,15 @@ export default async function EspaceAdminPage() {
     supabase
       .from('partners')
       .select(`id, company_name, siret, partner_type, created_at,
-               docs:partner_documents(id)`)
+               docs:partner_documents(status, type:ref_document_types(code, label, is_required))`)
       .eq('is_verified', false)
       .order('created_at', { ascending: false })
       .limit(5),
+    supabase
+      .from('ref_document_types')
+      .select('*')
+      .eq('is_required', true)
+      .order('sort_order'),
     supabase
       .from('reviews')
       .select(`id, rating, comment,
@@ -69,14 +75,38 @@ export default async function EspaceAdminPage() {
     reviews:  reviewsCount.count  ?? 0,
   }
 
-  const pendingPartners = (pendingPartnersData.data ?? []).map(p => ({
-    id: p.id,
-    name: p.company_name ?? 'Inconnu',
-    siret: p.siret ?? '—',
-    type: TYPE_LABEL[p.partner_type as string] || p.partner_type || '—',
-    date: new Date(p.created_at).toLocaleDateString('fr-FR'),
-    docs: (p.docs as any[])?.length ?? 0,
-  }))
+  const refDocs = refDocsData.data ?? []
+
+  const pendingPartners = (pendingPartnersData.data ?? []).map(p => {
+    const partnerRefDocs = refDocs.filter(rd => rd.partner_type === p.partner_type)
+    const uploadedDocs = (p.docs as any[])?.map(d => ({
+      code: d.type?.code,
+      label: d.type?.label,
+      status: d.status,
+      is_required: d.type?.is_required
+    })) || []
+
+    // Mix required and uploaded
+    const allDocs = partnerRefDocs.map(rd => {
+      const found = uploadedDocs.find(ud => ud.code === rd.code)
+      return found || {
+        code: rd.code,
+        label: rd.label,
+        status: 'missing',
+        is_required: true
+      }
+    })
+
+    return {
+      id: p.id,
+      name: p.company_name ?? 'Inconnu',
+      siret: p.siret ?? '—',
+      type: TYPE_LABEL[p.partner_type as string] || p.partner_type || '—',
+      rawType: p.partner_type,
+      date: new Date(p.created_at).toLocaleDateString('fr-FR'),
+      docs: allDocs,
+    }
+  })
 
   const pendingReviews = (reviewsData.data ?? []).map(r => {
     const c = r.client as any

@@ -8,7 +8,7 @@ import { DemandeFormValues } from '@/hooks/useDemandeForm'
 import { formatSize } from '@/lib/utils'
 
 interface Props {
-  form: UseFormReturn<DemandeFormValues>
+  form: UseFormReturn<DemandeFormValues, any, any>
   services: ServiceType[]
   propertyTypes: PropertyType[]
   onNext: () => void

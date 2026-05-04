@@ -45,6 +45,7 @@ next-env.d.ts
 .claude/
 .kiro/
 .gemini/
+.windsurf/
 AGENTS.md
 CLAUDE.md
 CODESTRUCTURE.md
@@ -55,8 +56,8 @@ walkthrough.md
 
 # documents & mockups
 *.pdf
-*.docx
-*.docx
+
+
 *.png
 *.jpg
 *.jpeg
@@ -65,3 +66,14 @@ screenshots-weweb/
 scratch/
 scratch_pdf_reader/
 .tempmediaStorage/
+
+# video
+video/
+video/node_modules/
+video/out/
+
+# system
+.DS_Store
+Thumbs.db
+Desktop.ini
+public/videos/

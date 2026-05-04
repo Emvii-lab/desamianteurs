@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "remotion-best-practices": {
+      "source": "remotion-dev/skills",
+      "sourceType": "github",
+      "skillPath": "skills/remotion/SKILL.md",
+      "computedHash": "b29eac99d52825e2c4fdfb01b3455b2a6ebf6e98c85e12fcfaa4227a781882f9"
+    },
     "supabase": {
       "source": "supabase/agent-skills",
       "sourceType": "github",

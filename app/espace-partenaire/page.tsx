@@ -35,7 +35,8 @@ export default async function EspacePartenairePage() {
     redirect('/espace-client')
   }
 
-  const [assignRes, reviewsRes, countRes] = await Promise.all([
+  const [assignRes, reviewsRes, countRes, diagRes] = await Promise.all([
+
     // Nouvelles demandes
     supabase
       .from('quote_assignments')
@@ -58,8 +59,12 @@ export default async function EspacePartenairePage() {
       .from('quote_assignments')
       .select('id', { count: 'exact', head: true })
       .eq('partner_id', partner.id)
-      .eq('status', 'pending')
+      .eq('status', 'pending'),
+
+    // Diagnostic
+    supabase.rpc('get_partner_diagnostic', { p_partner_id: partner.id })
   ])
+
 
   const demandes = (assignRes.data ?? []).map(a => {
     const q = a.quote as any
@@ -99,6 +104,9 @@ export default async function EspacePartenairePage() {
       demandes={demandes}
       avis={avis}
       stats={stats}
+      diagnostic={diagRes.data as any}
+
+
     />
   )
 }

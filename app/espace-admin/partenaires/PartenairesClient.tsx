@@ -144,8 +144,11 @@ export default function PartenairesClient({ initialPartners, partnerTypes }: Pro
                     </div>
                   </td>
                   <td style={tdStyle}>
-                    <div style={{ fontSize: '13px', color: '#111827' }}>{p.email}</div>
-                    <div style={{ fontSize: '11px', color: '#6B7280' }}>{p.phone}</div>
+                    <div style={{ fontSize: '13px', fontWeight: 600, color: '#111827', marginBottom: '2px' }}>
+                      {p.first_name} {p.last_name}
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#6B7280' }}>{p.email}</div>
+                    <div style={{ fontSize: '11px', color: '#9CA3AF' }}>{p.phone}</div>
                   </td>
                   <td style={tdStyle}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#374151' }}>
@@ -164,17 +167,12 @@ export default function PartenairesClient({ initialPartners, partnerTypes }: Pro
                     </div>
                   </td>
                   <td style={{ ...tdStyle, textAlign: 'right' }}>
-                    <motion.button 
-                      whileHover={{ scale: 1.02, backgroundColor: '#F9FAFB' }}
-                      whileTap={{ scale: 0.98 }}
-                      style={{ 
-                        background: 'none', border: '1px solid #E5E7EB', padding: '6px 12px', borderRadius: '8px',
-                        fontSize: '12px', fontWeight: 600, color: '#374151', cursor: 'pointer',
-                        display: 'inline-flex', alignItems: 'center', gap: '4px', transition: 'all 0.2s'
-                      }}
+                    <button 
+                      className="btn btn-outline btn-sm"
+                      style={{ padding: '6px 12px' }}
                     >
                       Détails <ChevronRight size={14} />
-                    </motion.button>
+                    </button>
                   </td>
                 </motion.tr>
               )
@@ -197,7 +195,7 @@ function StatCard({ label, value, color = '#111827' }: { label: string; value: n
   return (
     <motion.div 
       variants={fadeUp}
-      whileHover={{ y: -2, boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
+      whileHover={{ y: -4, boxShadow: '0 12px 24px -10px rgba(0,0,0,0.1)', borderColor: 'var(--red)' }}
       style={{ background: 'white', padding: '12px 20px', borderRadius: '12px', border: '1px solid #E5E7EB', textAlign: 'center' }}
     >
       <div style={{ fontSize: '11px', fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', marginBottom: '2px' }}>{label}</div>

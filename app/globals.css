@@ -79,50 +79,57 @@ a {
   gap: 8px;
   text-decoration: none;
   font-family: var(--font-body);
+  cursor: pointer;
 }
 
 /* ── Rouge ── */
 .btn-red {
   background-color: var(--red);
   color: white;
-  transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease;
+  border: 1.5px solid var(--red); /* Même épaisseur pour la stabilité */
+  transition: all 0.2s ease;
 }
 .btn-red:hover {
-  background-color: var(--red-hover) !important;
-  box-shadow: 0 4px 18px rgba(192,57,43,0.38) !important;
-  transform: translateY(-1px) !important;
+  background-color: #8E2B1F !important;
+  border-color: #8E2B1F !important;
+  box-shadow: 0 4px 15px rgba(142, 43, 31, 0.3) !important;
+  transform: translateY(-2px) !important;
 }
 .btn-red:active {
-  transform: scale(0.97) !important;
-  box-shadow: none !important;
+  transform: translateY(0) !important;
 }
 
 /* ── Outline ── */
 .btn-outline {
   background-color: white;
-  border: 1.5px solid #E5E7EB;
-  color: #111111;
-  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.12s ease;
+  border: 1.5px solid var(--gray-200);
+  color: #111827;
+  transition: all 0.2s ease;
 }
 .btn-outline:hover {
-  border-color: #111111 !important;
-  background-color: #F3F4F6 !important;
+  border-color: var(--black) !important;
+  color: var(--black) !important;
+  background-color: #F9FAFB !important; /* Le léger fond gris */
+  transform: translateY(-2px) !important;
 }
-.btn-outline:active { transform: scale(0.97) !important; }
+.btn-outline:active { transform: translateY(0) !important; }
 
 /* ── Ghost ── */
 .btn-ghost {
   background-color: transparent;
-  border: 1.5px solid transparent;
-  color: #4B5563;
-  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease, transform 0.12s ease;
+  color: var(--gray-500);
+  transition: all 0.2s ease;
 }
 .btn-ghost:hover {
-  border-color: #D1D5DB !important;
-  background-color: #F3F4F6 !important;
-  color: #111111 !important;
+  background-color: var(--gray-100) !important;
+  color: var(--black) !important;
+  transform: translateY(-2px) !important;
 }
-.btn-ghost:active { transform: scale(0.97) !important; }
+.btn-ghost:active { transform: translateY(0) !important; }
+
+button {
+  cursor: pointer;
+}
 
 .btn-sm  { padding: 7px 16px !important; font-size: 13px !important; }
 .btn-lg  { padding: 16px 36px !important; font-size: 15px !important; }
@@ -322,6 +329,7 @@ a {
 
 .card:hover {
   box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  transform: translateY(-2px);
 }
 
 /* Steps Section */

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { User, CheckCircle2, Eye, EyeOff, Send, ChevronLeft } from 'lucide-react'
 
 interface Props {
-  form: UseFormReturn<DemandeFormValues>
+  form: UseFormReturn<DemandeFormValues, any, any>
   onBack: () => void
   onSubmit: () => void
   loading: boolean
