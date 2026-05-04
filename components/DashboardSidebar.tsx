@@ -83,6 +83,12 @@ export default function DashboardSidebar({ role, userId, userName = 'Utilisateur
   const [unreadTotal, setUnreadTotal] = useState(0)
   const menu = MENUS[role]
   const initials = getInitials(userName)
+  const supabase = createClient()
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    window.location.href = '/connexion'
+  }
 
   useEffect(() => {
     if (!userId) return
@@ -148,7 +154,13 @@ export default function DashboardSidebar({ role, userId, userName = 'Utilisateur
 
         <p style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1.2px', color: 'var(--gray-400)', padding: '24px 24px 8px' }}>COMPTE</p>
         {menu.compte.map(item => (
-          <SidebarLink key={item.href} item={item} active={pathname === item.href} unreadTotal={unreadTotal} />
+          <SidebarLink 
+            key={item.href} 
+            item={item} 
+            active={pathname === item.href} 
+            unreadTotal={unreadTotal} 
+            onLogout={item.label === 'Déconnexion' ? handleLogout : undefined}
+          />
         ))}
       </div>
       
@@ -161,13 +173,29 @@ export default function DashboardSidebar({ role, userId, userName = 'Utilisateur
   )
 }
 
-function SidebarLink({ item, active, unreadTotal }: { item: SidebarItem; active: boolean; unreadTotal: number }) {
+function SidebarLink({ item, active, unreadTotal, onLogout }: { item: SidebarItem; active: boolean; unreadTotal: number; onLogout?: () => void }) {
   const { Icon } = item
   const isMessagerie = item.label === 'Messagerie'
 
   return (
     <motion.div whileHover={{ x: 4 }} transition={{ duration: 0.2 }}>
-      <Link href={item.href} style={{
+      {onLogout ? (
+        <div onClick={onLogout} style={{
+          display: 'flex', alignItems: 'center', gap: 12,
+          padding: '12px 24px', fontSize: 14,
+          color: 'var(--gray-600)',
+          fontWeight: 500,
+          cursor: 'pointer',
+          transition: 'all 0.2s', textDecoration: 'none',
+          position: 'relative',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 20 }}>
+            <Icon size={18} />
+          </div>
+          <span style={{ flex: 1 }}>{item.label}</span>
+        </div>
+      ) : (
+        <Link href={item.href} style={{
         display: 'flex', alignItems: 'center', gap: 12,
         padding: '12px 24px', fontSize: 14,
         color: active ? 'var(--red)' : 'var(--gray-600)',
@@ -197,6 +225,7 @@ function SidebarLink({ item, active, unreadTotal }: { item: SidebarItem; active:
           </span>
         )}
       </Link>
+      )}
     </motion.div>
   )
 }

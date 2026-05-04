@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Lock, CheckCircle, MessageSquare } from 'lucide-react'
@@ -71,13 +72,25 @@ export default function ConnexionPage() {
       <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
 
         {/* Côté gauche — noir */}
-        <div style={{ background: '#111111', color: 'white', padding: '80px', display: 'flex', flexDirection: 'column', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', bottom: -200, right: -100, width: 600, height: 600, borderRadius: '50%', background: 'rgba(192,57,43,0.08)', pointerEvents: 'none' }} />
+        <div style={{ background: '#111111', color: 'white', padding: '80px', paddingTop: '100px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', position: 'relative', overflow: 'hidden' }}>
+          <motion.div
+            animate={{ y: [0, -14, 0], scale: [1, 1.02, 1] }}
+            transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+            style={{ position: 'absolute', bottom: -160, right: -120, width: 380, height: 380, borderRadius: '50%', background: 'rgba(192,57,43,0.20)', pointerEvents: 'none' }}
+          />
+          <motion.div
+            animate={{ y: [0, 10, 0], scale: [1, 1.03, 1] }}
+            transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
+            style={{ position: 'absolute', top: -160, left: -140, width: 300, height: 300, borderRadius: '50%', background: 'rgba(192,57,43,0.11)', pointerEvents: 'none' }}
+          />
 
           <div style={{ position: 'relative', zIndex: 10 }}>
-            <h1 style={{ fontFamily: SERIF, fontSize: 44, fontWeight: 400, marginBottom: 20, color: 'white', lineHeight: 1.2 }}>
-              Bon retour sur<br />
-              <span style={{ color: '#C0392B' }}>Désamianteurs.fr</span>
+            <h1 style={{ fontFamily: SERIF, fontSize: 44, fontWeight: 400, marginBottom: 20, lineHeight: 1.2, margin: '0 0 20px' }}>
+              <span style={{ display: 'block', fontSize: 13, fontWeight: 600, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)', marginBottom: 14, fontFamily: SANS }}>
+                Bon retour
+              </span>
+              <span style={{ color: 'white' }}>Désamianteurs</span>
+              <span style={{ color: '#C0392B' }}>.fr</span>
             </h1>
             <p style={{ fontFamily: SANS, fontSize: 16, color: 'rgba(255,255,255,0.5)', marginBottom: 56, maxWidth: 380, lineHeight: 1.7 }}>
               Accédez à votre espace personnel pour gérer vos demandes, devis et messages.

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { BtnRed, BtnOutline } from './ui/Btn'
 import { createClient } from '@/lib/supabase'
-import { User, Phone, ShieldCheck, ChevronDown, Menu } from 'lucide-react'
+
 
 type UserInfo = { initials: string; href: string } | null
 
@@ -67,20 +67,6 @@ export default function Navbar() {
 
   return (
     <div style={{ position: 'sticky', top: 0, zIndex: 1000 }}>
-      {/* Top Bar */}
-      <div style={{ background: '#0A0A0A', height: 32, padding: '0 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: 11, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 16 }}>
-          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><ShieldCheck size={12} color="var(--red)" /> Plateforme n°1 certifiée amiante & plomb</span>
-          <span style={{ color: 'rgba(255,255,255,0.2)' }}>|</span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Phone size={11} color="var(--red)" /> Service client : 01 84 60 66 00</span>
-        </div>
-        <div style={{ display: 'flex', gap: 20 }}>
-          <Link href="/inscription?tab=partenaire" style={{ color: 'white', fontSize: 11, fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
-            Vous êtes un pro ? <span style={{ color: 'var(--red)' }}>Espace partenaire</span>
-          </Link>
-        </div>
-      </div>
-
       <nav style={{
         background: '#FFFFFF', borderBottom: '1px solid #E5E7EB',
         height: 64, // Slightly taller for more air

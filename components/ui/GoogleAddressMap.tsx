@@ -41,8 +41,15 @@ export default function GoogleAddressMap({ onSelect, searchValue, onSearchChange
     setLoaded(true)
   }
 
+  // Si Google Maps est déjà chargé (remontage après navigation), initialiser immédiatement
   useEffect(() => {
-    if (!loaded || !inputRef.current || !window.google) return
+    if (typeof window !== 'undefined' && (window as any).google?.maps?.places) {
+      setLoaded(true)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!loaded || !inputRef.current || !window.google?.maps?.places) return
 
     const autocomplete = new window.google.maps.places.Autocomplete(inputRef.current, {
       componentRestrictions: { country: 'fr' },

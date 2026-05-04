@@ -332,6 +332,17 @@ button {
   transform: translateY(-2px);
 }
 
+/* Step price cards (page tarifs) */
+.step-price-card {
+  border-top: 3px solid var(--gray-200) !important;
+  transition: border-top-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
+.step-price-card:hover {
+  border-top-color: var(--red) !important;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.08) !important;
+  transform: translateY(-2px);
+}
+
 /* Steps Section */
 .step-card {
   position: relative;

@@ -16,6 +16,7 @@ type Props = {
 export default function CustomSelect({ options, value, onChange, placeholder = 'Sélectionner...', disabled = false }: Props) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
 
   const selected = options.find(o => o.id === value)
 
@@ -31,6 +32,7 @@ export default function CustomSelect({ options, value, onChange, placeholder = '
     <div ref={ref} style={{ position: 'relative' }}>
       {/* Trigger */}
       <button
+        ref={triggerRef}
         type="button"
         disabled={disabled}
         onClick={() => !disabled && setOpen(o => !o)}
@@ -68,7 +70,14 @@ export default function CustomSelect({ options, value, onChange, placeholder = '
             <button
               key={opt.id}
               type="button"
-              onClick={() => { onChange(opt.id); setOpen(false) }}
+              onClick={() => {
+                onChange(opt.id)
+                setOpen(false)
+                // Retour du focus sur le trigger sans scroll —
+                // évite que le browser scrolle vers le premier élément
+                // focusable de la nouvelle section conditionnelle
+                triggerRef.current?.focus({ preventScroll: true })
+              }}
               style={{
                 width: '100%', textAlign: 'left',
                 padding: '11px 16px', fontSize: 14,

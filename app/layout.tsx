@@ -24,6 +24,12 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr" className={`${dmSans.variable} ${dmSerifDisplay.variable}`}>
+      <head>
+        {/* Pré-connexions aux services externes pour réduire la latence */}
+        <link rel="preconnect" href="https://zpagogunyynnmysaglwr.supabase.co" />
+        <link rel="preconnect" href="https://js.stripe.com" />
+        <link rel="dns-prefetch" href="https://api-adresse.data.gouv.fr" />
+      </head>
       <body style={{ fontFamily: 'var(--font-sans), DM Sans, sans-serif', margin: 0 }}>
         {children}
       </body>

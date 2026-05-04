@@ -10,6 +10,7 @@ export const ICON_MAP: Record<string, any> = {
   mise_en_securite: Shield,
   desamiantage: Home,
   preleveur_air_materiaux: Microscope,
+  conseil_juridique: Search,
 }
 
 export const SITUATIONS_PHASE = [

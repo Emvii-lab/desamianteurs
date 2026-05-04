@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import { createClient } from '@/lib/supabase'
-import { CheckCircle2, Phone, LayoutDashboard, Mail, ShieldCheck } from 'lucide-react'
-import { TIMINGS, BUDGET_OPTIONS, ACCESSIBILITY_OPTIONS, FLOOR_OPTIONS, SITUATIONS_PHASE, SITUATIONS_CONTEXT } from '@/lib/constants'
+import { CheckCircle2, ShieldCheck } from 'lucide-react'
+import { TIMINGS, BUDGET_OPTIONS, FLOOR_OPTIONS } from '@/lib/constants'
 import { ServiceType, PropertyType } from '@/lib/types'
 import { useDemandeForm } from '@/hooks/useDemandeForm'
 import { demandeService } from '@/services/demandeService'
@@ -19,6 +19,8 @@ interface FormulaireClientProps {
   initialPropertyTypes: PropertyType[]
 }
 
+import { motion } from 'framer-motion'
+
 function StepIndicator({ current }: { current: number }) {
   const steps = [
     { n: 1, label: 'Votre besoin' },
@@ -27,28 +29,56 @@ function StepIndicator({ current }: { current: number }) {
   ]
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
-      {steps.map((s, i) => (
-        <div key={s.n} style={{ display: 'flex', alignItems: 'center', flex: i < 2 ? 1 : undefined }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
-            <div style={{
-              width: 30, height: 30, borderRadius: '50%',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 13, fontWeight: 700, flexShrink: 0,
-              background: current === s.n ? 'var(--red)' : current > s.n ? '#374151' : '#E5E7EB',
-              color: current === s.n || current > s.n ? 'white' : '#9CA3AF',
-            }}>
-              {current > s.n ? '✓' : s.n}
+      {steps.map((s, i) => {
+        const done   = current > s.n
+        const active = current === s.n
+        return (
+          <div key={s.n} style={{ display: 'flex', alignItems: 'center', flex: i < 2 ? 1 : undefined }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+              {/* Cercle animé */}
+              <motion.div
+                key={`${s.n}-${done ? 'done' : active ? 'active' : 'pending'}`}
+                initial={{ scale: 0.75, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                style={{
+                  width: 30, height: 30, borderRadius: '50%',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: done ? 15 : 13, fontWeight: 700, flexShrink: 0,
+                  background: active ? 'var(--red)' : done ? '#E5E7EB' : '#F3F4F6',
+                  color:  active ? 'white' : done ? '#6B7280' : '#9CA3AF',
+                  border: done ? '1.5px solid #D1D5DB' : 'none',
+                }}
+              >
+                {done ? '✓' : s.n}
+              </motion.div>
+
+              {/* Label animé */}
+              <motion.span
+                animate={{
+                  color: active ? '#C0392B' : done ? '#9CA3AF' : '#9CA3AF',
+                  fontWeight: active ? 700 : 500,
+                }}
+                transition={{ duration: 0.2 }}
+                style={{ fontSize: 14 }}
+              >
+                {s.label}
+              </motion.span>
             </div>
-            <span style={{
-              fontSize: 14, fontWeight: current === s.n ? 700 : 500,
-              color: current === s.n ? '#C0392B' : current > s.n ? '#374151' : '#9CA3AF',
-            }}>{s.label}</span>
+
+            {/* Connecteur */}
+            {i < 2 && (
+              <div style={{ flex: 1, height: 2, margin: '0 16px', background: '#E5E7EB', borderRadius: 1, overflow: 'hidden' }}>
+                <motion.div
+                  animate={{ width: done ? '100%' : '0%' }}
+                  transition={{ duration: 0.4, ease: 'easeInOut' }}
+                  style={{ height: '100%', background: '#D1D5DB', borderRadius: 1 }}
+                />
+              </div>
+            )}
           </div>
-          {i < 2 && (
-            <div style={{ flex: 1, height: 2, margin: '0 16px', background: current > s.n ? '#111' : '#E5E7EB' }} />
-          )}
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }
@@ -63,9 +93,19 @@ export default function FormulaireClient({ initialServices, initialPropertyTypes
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const stepperRef = useRef<HTMLElement>(null)
 
   const form = useDemandeForm()
   const { watch, trigger, getValues } = form
+
+  // Scroll vers le stepper à chaque changement d'étape (sauf au premier rendu)
+  const isFirstRender = useRef(true)
+  useEffect(() => {
+    if (isFirstRender.current) { isFirstRender.current = false; return }
+    if (!stepperRef.current) return
+    const top = stepperRef.current.getBoundingClientRect().top + window.scrollY - 80
+    window.scrollTo({ top, behavior: 'smooth' })
+  }, [step])
 
   useEffect(() => {
     const supabase = createClient()
@@ -78,16 +118,35 @@ export default function FormulaireClient({ initialServices, initialPropertyTypes
   }, [])
 
   useEffect(() => {
-    if (step === 3) {
-      const { postalCode, city } = getValues()
-      if (postalCode || city) {
-        const supabase = createClient()
-        supabase
-          .from('public_partners')
-          .select('id', { count: 'exact', head: true })
-          .then(({ count }) => setProsInZone(count ?? 0))
-      }
+    if (step !== 3) return
+
+    const { postalCode, department, serviceTypes } = getValues()
+
+    // Département : champ dédié ou 2 premiers chiffres du CP
+    const deptCode = department || (postalCode ? postalCode.slice(0, 2) : null)
+    if (!deptCode) return
+
+    // Mapping code service → type(s) partenaire
+    const SERVICE_TO_PARTNER: Record<string, string[]> = {
+      diagnostic_amiante:    ['diagnostician'],
+      moe_amiante_plomb:     ['project_manager'],
+      intervention_ss4:      ['asbestos_remover'],
+      mise_en_securite:      ['asbestos_remover'],
+      desamiantage:          ['asbestos_remover'],
+      preleveur_air_materiaux: ['sampler_lab'],
+      conseil_juridique:     ['legal_expert', 'specialized_lawyer'],
     }
+
+    const partnerTypes = [
+      ...new Set((serviceTypes ?? []).flatMap(st => SERVICE_TO_PARTNER[st] ?? [])),
+    ]
+
+    createClient()
+      .rpc('count_eligible_partners', {
+        dept_code: deptCode,
+        p_types:   partnerTypes.length > 0 ? partnerTypes : null,
+      })
+      .then(({ data }) => setProsInZone(typeof data === 'number' ? data : 0))
   }, [step])
 
   const nextStep = async () => {
@@ -121,17 +180,25 @@ export default function FormulaireClient({ initialServices, initialPropertyTypes
   const values = watch()
   const TIMING_MAP = Object.fromEntries(TIMINGS.map(o => [o.id, o.label]))
   const BUDGET_MAP = Object.fromEntries(BUDGET_OPTIONS.map(o => [o.id, o.label]))
-  const PHASE_MAP = Object.fromEntries([...SITUATIONS_PHASE, ...SITUATIONS_CONTEXT].map(o => [o.id, o.label]))
   const FLOOR_MAP = Object.fromEntries(FLOOR_OPTIONS.map(o => [o.id, o.label]))
+
+  const fullAddress = [
+    values.streetAddress,
+    values.complement,
+    [values.postalCode, values.city].filter(Boolean).join(' '),
+  ].filter(Boolean).join(', ')
 
   const recap = [
     values.serviceTypes?.length > 0 && { label: 'Prestation', value: initialServices.filter(s => values.serviceTypes.includes(s.id)).map(s => s.name).join(', ') },
     values.userType && { label: 'Profil', value: values.userType },
     values.propertyType && { label: 'Bien', value: initialPropertyTypes.find(p => p.id === values.propertyType)?.label ?? values.propertyType },
     values.surface && { label: 'Surface', value: `${values.surface} m²` },
-    values.city && { label: 'Ville', value: values.city },
+    fullAddress && { label: 'Adresse', value: fullAddress },
+    values.floor && { label: 'Étage', value: FLOOR_MAP[values.floor] ?? values.floor },
+    values.elevator && { label: 'Ascenseur', value: values.elevator === 'oui' ? 'Oui' : 'Non' },
     values.timing && { label: 'Délai', value: TIMING_MAP[values.timing] ?? values.timing },
     values.budget && { label: 'Budget', value: BUDGET_MAP[values.budget] ?? values.budget },
+    values.description && { label: 'Description', value: values.description },
   ].filter(Boolean) as { label: string; value: string }[]
 
   if (submitted) {
@@ -159,12 +226,12 @@ export default function FormulaireClient({ initialServices, initialPropertyTypes
       <Navbar />
       <section style={{ background: '#111', padding: '72px 40px 56px', textAlign: 'center' }}>
         <div className="badge badge-red" style={{ marginBottom: 28 }}>GRATUIT ET SANS ENGAGEMENT</div>
-        <h1 style={{ color: 'white', fontSize: 'clamp(32px, 5vw, 52px)', fontWeight: 700 }}>
+        <h1 style={{ color: 'white', fontSize: 'clamp(32px, 5vw, 52px)', fontWeight: 700, fontFamily: 'var(--font-serif, "DM Serif Display", Georgia, serif)' }}>
           Déposez votre demande<br /><em style={{ color: 'var(--red)', fontStyle: 'normal' }}>en quelques minutes</em>
         </h1>
       </section>
 
-      <section style={{ background: 'white', borderBottom: '1px solid #E5E7EB', padding: '20px 40px' }}>
+      <section ref={stepperRef} style={{ background: 'white', borderBottom: '1px solid #E5E7EB', padding: '20px 40px' }}>
         <div style={{ maxWidth: 600, margin: '0 auto' }}>
           <StepIndicator current={step} />
         </div>
@@ -205,42 +272,84 @@ export default function FormulaireClient({ initialServices, initialPropertyTypes
             )}
           </div>
 
-          <aside style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+          <aside style={{ display: 'flex', flexDirection: 'column', gap: 24, position: 'sticky', top: 96, alignSelf: 'start' }}>
             {step === 3 && (
-              <div style={{ background: '#111', borderRadius: 10, padding: '24px 20px', textAlign: 'center' }}>
+              <motion.div
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                style={{ background: '#111', borderRadius: 10, padding: '24px 20px', textAlign: 'center' }}
+              >
                 <div style={{ fontSize: 52, fontWeight: 800, color: 'var(--red)', lineHeight: 1 }}>{prosInZone ?? '—'}</div>
                 <div style={{ fontSize: 14, fontWeight: 700, color: 'white', marginTop: 8 }}>professionnels certifiés</div>
                 <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>dans votre zone recevront votre demande</div>
-              </div>
+              </motion.div>
             )}
 
             {recap.length > 0 && (
-              <div className="card" style={{ padding: '20px 24px' }}>
-                <h3 style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', color: '#9CA3AF', marginBottom: 20 }}>Votre demande</h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <motion.div
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1], delay: 0.05 }}
+                style={{
+                background: 'white',
+                borderRadius: 14,
+                border: '1px solid #E5E7EB',
+                padding: '20px 22px',
+                boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 18, paddingBottom: 14, borderBottom: '1px solid #F3F4F6' }}>
+                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--red)', flexShrink: 0 }} />
+                  <span style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', color: '#9CA3AF' }}>
+                    Votre demande
+                  </span>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                   {recap.map((r, i) => (
-                    <div key={i}>
-                      <div style={{ fontSize: 12, color: '#9CA3AF', fontWeight: 500 }}>{r.label}</div>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: '#111' }}>{r.value}</div>
+                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+                      <span style={{ fontSize: 12, color: '#9CA3AF', fontWeight: 500, flexShrink: 0, paddingTop: 1 }}>
+                        {r.label}
+                      </span>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: '#111', textAlign: 'right', lineHeight: 1.4, maxWidth: '62%' }}>
+                        {r.label === 'Prestation'
+                          ? r.value.split(', ').map((v, j) => <span key={j} style={{ display: 'block' }}>{v}</span>)
+                          : r.value}
+                      </span>
                     </div>
                   ))}
                 </div>
-              </div>
+              </motion.div>
             )}
 
-            <div className="card" style={{ padding: '20px 24px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-                <ShieldCheck size={16} color="var(--red)" />
-                <span style={{ fontSize: 14, fontWeight: 700 }}>Vos garanties</span>
+            {/* Garanties */}
+            <motion.div
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1], delay: 0.1 }}
+              style={{
+                background: 'white',
+                borderRadius: 14,
+                border: '1px solid #E5E7EB',
+                padding: '18px 22px',
+                boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, paddingBottom: 14, borderBottom: '1px solid #F3F4F6' }}>
+                <ShieldCheck size={13} color="var(--red)" strokeWidth={2.5} />
+                <span style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', color: '#9CA3AF' }}>
+                  Vos garanties
+                </span>
               </div>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 11 }}>
                 {['Devis 100% gratuits', 'Pros certifiés vérifiés', 'Réponse sous 48h'].map(g => (
-                  <li key={g} style={{ fontSize: 13, color: '#4B5563', display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <CheckCircle2 size={14} color="#059669" /> {g}
-                  </li>
+                  <div key={g} style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+                    <CheckCircle2 size={14} color="#059669" strokeWidth={2.5} style={{ flexShrink: 0 }} />
+                    <span style={{ fontSize: 13, color: '#374151', fontWeight: 500 }}>{g}</span>
+                  </div>
                 ))}
-              </ul>
-            </div>
+              </div>
+            </motion.div>
           </aside>
         </div>
       </div>

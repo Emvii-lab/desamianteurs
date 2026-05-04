@@ -4,6 +4,7 @@ import { useRef, useEffect, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { ShieldCheck, MapPin, FileText, Inbox, CheckCircle, Star, ChevronDown } from 'lucide-react'
 import Navbar from '@/components/Navbar'
+import PromoBar from '@/components/PromoBar'
 import Footer from '@/components/Footer'
 import { useRouter } from 'next/navigation'
 import { BtnRed, BtnOutline } from '@/components/ui/Btn'
@@ -98,12 +99,24 @@ export default function HomeClient({ kpis, pros }: { kpis: KpiData; pros: ProCar
 
   return (
     <div style={{ fontFamily: 'var(--font-sans), DM Sans, sans-serif', color: '#111' }}>
-      <Navbar />
+      {/* Header sticky — PromoBar + Navbar collent ensemble en haut au scroll */}
+      <div style={{ position: 'sticky', top: 0, zIndex: 1100 }}>
+        <PromoBar />
+        <Navbar />
+      </div>
 
       <div style={{ position: 'relative' }}>
         <section style={{ background: '#111111', color: 'white', padding: '72px 40px 56px', position: 'relative', overflow: 'hidden', textAlign: 'center' }}>
-          <div style={{ position: 'absolute', bottom: -180, left: -180, width: 480, height: 480, borderRadius: '50%', background: 'rgba(192,57,43,0.22)', pointerEvents: 'none' }} />
-          <div style={{ position: 'absolute', top: -120, right: -120, width: 380, height: 380, borderRadius: '50%', background: 'rgba(192,57,43,0.22)', pointerEvents: 'none' }} />
+          <motion.div
+            animate={{ y: [0, -18, 0], scale: [1, 1.03, 1] }}
+            transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+            style={{ position: 'absolute', bottom: -180, left: -180, width: 480, height: 480, borderRadius: '50%', background: 'rgba(192,57,43,0.22)', pointerEvents: 'none' }}
+          />
+          <motion.div
+            animate={{ y: [0, 14, 0], scale: [1, 1.04, 1] }}
+            transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
+            style={{ position: 'absolute', top: -120, right: -120, width: 380, height: 380, borderRadius: '50%', background: 'rgba(192,57,43,0.22)', pointerEvents: 'none' }}
+          />
 
           <div style={{ maxWidth: 1200, margin: '0 auto', position: 'relative' }}>
             <motion.div initial="hidden" animate="visible" variants={stagger} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

@@ -1,4 +1,5 @@
 import { UseFormReturn } from 'react-hook-form'
+import { motion } from 'framer-motion'
 import { DemandeFormValues } from '@/hooks/useDemandeForm'
 import GoogleAddressMap from '@/components/ui/GoogleAddressMap'
 import CustomSelect from '@/components/ui/CustomSelect'
@@ -14,9 +15,6 @@ interface Props {
 export function Step2Localisation({ form, onNext, onBack }: Props) {
   const { register, watch, setValue, formState: { errors } } = form
   const addressSearch = watch('addressSearch')
-  const streetAddress = watch('streetAddress')
-  const city = watch('city')
-  const postalCode = watch('postalCode')
   const accessibility = watch('accessibility')
   const floor = watch('floor')
   const elevator = watch('elevator')
@@ -59,14 +57,24 @@ export function Step2Localisation({ form, onNext, onBack }: Props) {
           {ACCESSIBILITY_OPTIONS.map(opt => {
             const active = accessibility === opt.id
             return (
-              <button key={opt.id} type="button"
+              <motion.button
+                key={opt.id}
+                type="button"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => setValue('accessibility', active ? '' : opt.id)}
                 style={{
-                  padding: '12px 8px', border: `1.5px solid ${active ? '#C0392B' : '#E5E7EB'}`,
-                  borderRadius: 8, background: active ? 'rgba(192,57,43,0.04)' : 'white',
-                  fontSize: 13, fontWeight: 700, cursor: 'pointer', color: active ? '#C0392B' : '#374151',
+                  padding: '12px 8px',
+                  border: `1.5px solid ${active ? '#C0392B' : '#E5E7EB'}`,
+                  borderRadius: 8,
+                  background: active ? 'rgba(192,57,43,0.04)' : 'white',
+                  fontSize: 13, fontWeight: 700, cursor: 'pointer',
+                  color: active ? '#C0392B' : '#374151',
+                  transition: 'border-color 0.15s, background 0.15s, color 0.15s',
                 }}
-              >{opt.label}</button>
+              >
+                {opt.label}
+              </motion.button>
             )
           })}
         </div>
@@ -102,12 +110,26 @@ export function Step2Localisation({ form, onNext, onBack }: Props) {
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <button type="button" className="btn btn-outline" onClick={onBack} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '14px 28px' }}>
+        <motion.button
+          type="button"
+          whileHover={{ scale: 1.01, translateY: -1 }}
+          whileTap={{ scale: 0.98 }}
+          className="btn btn-outline"
+          onClick={onBack}
+          style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '14px 28px' }}
+        >
           <ChevronLeft size={18} /> Retour
-        </button>
-        <button type="button" className="btn btn-red" onClick={onNext} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '14px 28px' }}>
+        </motion.button>
+        <motion.button
+          type="button"
+          whileHover={{ scale: 1.01, translateY: -1 }}
+          whileTap={{ scale: 0.98 }}
+          className="btn btn-red"
+          onClick={onNext}
+          style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '14px 28px' }}
+        >
           Étape suivante <ChevronRight size={18} />
-        </button>
+        </motion.button>
       </div>
     </div>
   )

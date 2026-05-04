@@ -24,7 +24,7 @@ export default async function ProfessionalsPage({ searchParams }: { searchParams
   const { data } = await supabase
     .from('partners')
     .select('id, company_name, city, zip_code, company_address, description, partner_type, average_rating, review_count, average_response_hours, is_verified, lat, lng')
-    .eq('is_active', true)
+    .eq('status', 'active')
     .order('company_name', { ascending: true })
 
   const allPros = (data ?? []).map(p => ({

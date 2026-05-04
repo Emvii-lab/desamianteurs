@@ -54,6 +54,15 @@ export default function CompleterClient({
   const [geoScope, setGeoScope]   = useState<'international' | 'national' | 'region' | 'department' | ''>('')
   const [selectedGeo, setSelectedGeo] = useState<string[]>([])
 
+  // Champs adresse éditables (pré-remplis par SIRET)
+  const [manualAddress, setManualAddress] = useState('')
+  const [manualCity, setManualCity]       = useState('')
+  const [manualZip, setManualZip]         = useState('')
+  const [promoCode, setPromoCode]         = useState('')
+  const [promoValid, setPromoValid]       = useState(false)
+  const [promoChecking, setPromoChecking] = useState(false)
+  const [promoMsg, setPromoMsg]           = useState<{ type: 'success' | 'error' | null; text: string }>({ type: null, text: '' })
+
   // Client
   const [clientAccountType, setClientAccountType] = useState('')
 
@@ -91,7 +100,7 @@ export default function CompleterClient({
               const props = geoData.features[0].properties
               const coords = geoData.features[0].geometry.coordinates
               if (coords?.length === 2) { finalLng = coords[0]; finalLat = coords[1] }
-              if (props.label)    finalAdresse = props.label
+              if (props.name)     finalAdresse = props.name
               if (props.city)     finalVille   = props.city.toUpperCase()
               if (props.postcode) finalCp      = props.postcode
             }
@@ -100,6 +109,9 @@ export default function CompleterClient({
           setSiretData({ raison_sociale: data.raison_sociale, activite: data.activite ?? '',
             adresse: finalAdresse, ville: finalVille, cp: finalCp,
             est_actif: data.est_actif ?? true, lat: finalLat, lng: finalLng })
+          setManualAddress(finalAdresse)
+          setManualCity(finalVille)
+          setManualZip(finalCp)
           if (data.activite) setCompanyDescription(data.activite)
           setSiretStatus('ok')
         } else {
@@ -110,12 +122,48 @@ export default function CompleterClient({
     return () => { if (siretTimer.current) clearTimeout(siretTimer.current) }
   }, [siret])
 
+  // Validation code promo via Stripe (debounced)
+  useEffect(() => {
+    if (!promoCode || promoCode.length < 4) {
+      setPromoValid(false)
+      setPromoMsg({ type: null, text: '' })
+      return
+    }
+    setPromoChecking(true)
+    const t = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/stripe/validate-promo?code=${encodeURIComponent(promoCode)}`)
+        const data = await res.json()
+        if (data.valid) {
+          setPromoValid(data.isFull)
+          setPromoMsg({ type: 'success', text: data.label })
+        } else {
+          setPromoValid(false)
+          setPromoMsg({ type: 'error', text: data.error || 'Code invalide ou expiré' })
+        }
+      } catch {
+        setPromoValid(false)
+        setPromoMsg({ type: 'error', text: 'Impossible de vérifier le code' })
+      } finally {
+        setPromoChecking(false)
+      }
+    }, 600)
+    return () => clearTimeout(t)
+  }, [promoCode])
+
   const toggle = (list: string[], set: (v: string[]) => void, item: string) => {
     set(list.includes(item) ? list.filter(i => i !== item) : [...list, item])
   }
 
   async function handleSubmit() {
     if (!cgu) { setError("Veuillez accepter les CGU."); return }
+    if (!tel) { setError("Le numéro de téléphone est obligatoire."); return }
+    
+    if (type === 'partenaire') {
+      if (needsSiret && !siretConfirmed) { setError("Veuillez confirmer votre SIRET."); return }
+      if (!manualAddress || !manualCity || !manualZip) { setError("L'adresse complète de l'entreprise est obligatoire."); return }
+    }
+
     setError('')
     setLoading(true)
 
@@ -154,15 +202,15 @@ export default function CompleterClient({
           company_name: siretData?.raison_sociale ?? '',
           description: companyDescription || siretData?.activite || '',
           siret: siret.replace(/\D/g, ''),
-          company_address: siretData?.adresse ?? '',
-          city: siretData?.ville ?? '',
-          zip_code: siretData?.cp ?? '',
+          company_address: manualAddress,
+          city: manualCity,
+          zip_code: manualZip,
           company_activity: siretData?.activite ?? '',
           certified_workers_count: nbCertified,
           lat: siretData?.lat ?? null,
           lng: siretData?.lng ?? null,
-          is_active: true,
           is_verified: false,
+          validation_fee_paid: promoValid,
           cgu_accepted_at: new Date().toISOString(),
         }).select('id').single()
         if (err) throw err
@@ -202,7 +250,19 @@ export default function CompleterClient({
           )
         }
 
-        router.push('/espace-partenaire')
+        // Stripe si pas de promo 100%, dashboard sinon
+        if (!promoValid && newPartner) {
+          const res = await fetch('/api/stripe/create-checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ partnerId: newPartner.id }),
+          })
+          const { url, error: checkoutError } = await res.json()
+          if (url) { window.location.href = url; return }
+          throw new Error(checkoutError || 'Erreur paiement')
+        } else {
+          router.push('/espace-partenaire')
+        }
       }
     } catch (e: any) {
       setError(e.message || "Erreur lors de l'enregistrement.")
@@ -601,12 +661,44 @@ export default function CompleterClient({
                 {siretStatus === 'ok' && siretData && (
                   <div style={{ marginTop: 12, background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 8, padding: '12px 16px' }}>
                     <div style={{ fontWeight: 700, fontSize: 14, color: '#166534', fontFamily: SANS }}>{siretData.raison_sociale}</div>
-                    <div style={{ fontSize: 12, color: '#4B7A5E', marginTop: 2, fontFamily: SANS }}>{siretData.adresse} — {siretData.cp} {siretData.ville}</div>
+                    <div style={{ fontSize: 12, color: '#4B7A5E', marginTop: 2, fontFamily: SANS }}>{siretData.adresse} {siretData.cp} {siretData.ville}</div>
                     <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10, cursor: 'pointer', fontSize: 13, color: '#374151', fontFamily: SANS }}>
                       <input type="checkbox" checked={siretConfirmed} onChange={e => setSiretConfirmed(e.target.checked)} style={{ accentColor: '#C0392B' }} />
-                      Je confirme que c'est bien mon entreprise
+                      Je confirme mon entreprise
                     </label>
-                  </div>
+
+                    {siretConfirmed && (
+                      <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 14, borderTop: '1px solid #F3F4F6', paddingTop: 16 }}>
+                        <div>
+                          <label style={lbl}>Adresse du siège <span style={{ color: '#C0392B' }}>*</span></label>
+                          <input className="input" value={manualAddress} onChange={e => setManualAddress(e.target.value)} placeholder="Adresse" required />
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 10 }}>
+                          <div>
+                            <label style={lbl}>Code Postal <span style={{ color: '#C0392B' }}>*</span></label>
+                            <input className="input" value={manualZip} onChange={e => setManualZip(e.target.value)} placeholder="CP" required />
+                          </div>
+                          <div>
+                            <label style={lbl}>Ville <span style={{ color: '#C0392B' }}>*</span></label>
+                            <input className="input" value={manualCity} onChange={e => setManualCity(e.target.value)} placeholder="Ville" required />
+                          </div>
+                        </div>
+                      </div>
+                )}
+              </div>
+
+              {/* Code Promo */}
+              <div style={{ marginTop: 24, padding: 16, background: 'rgba(0,0,0,0.02)', borderRadius: 12, border: '1px dashed #E5E7EB', marginBottom: 24 }}>
+                <label style={{ ...lbl, fontSize: 12, color: '#9CA3AF', marginBottom: 8 }}>Code Promo (Optionnel)</label>
+                <input 
+                  className="input" 
+                  placeholder="Ex: ASSO2026" 
+                  value={promoCode} 
+                  onChange={e => setPromoCode(e.target.value)}
+                  style={{ textTransform: 'uppercase', background: 'white' }}
+                />
+                {promoCode.toUpperCase() === 'ASSO2026' && (
+                  <p style={{ color: '#059669', fontSize: 11, marginTop: 6, fontWeight: 600 }}>✓ Code valide : Frais d'inscription offerts</p>
                 )}
               </div>
 

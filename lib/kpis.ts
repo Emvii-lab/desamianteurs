@@ -1,4 +1,6 @@
 import { createServerSupabase } from './supabase-server'
+import { TYPE_LABEL, AVATAR_COLORS } from './constants'
+import { getInitials, colorFor } from './utils'
 
 export type KpiData = {
   partners: number
@@ -18,26 +20,6 @@ export type ProCard = {
   reviews: number
 }
 
-const TYPE_LABELS: Record<string, string> = {
-  asbestos_remover:  'Désamianteur',
-  diagnostician:     'Diagnostiqueur',
-  sampler_lab:       'Préleveur / Labo',
-  project_manager:   'MOE / AMO',
-  legal_expert:      'Expert juridique',
-}
-
-const AVATAR_COLORS = ['#1E3A5F', '#C0392B', '#7D3C98', '#2E86AB', '#27AE60', '#E67E22', '#2C3E50']
-
-function colorFor(id: string) {
-  let hash = 0
-  for (let i = 0; i < id.length; i++) hash = id.charCodeAt(i) + ((hash << 5) - hash)
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length]
-}
-
-function initials(name: string) {
-  return name.split(' ').slice(0, 2).map(w => w[0]?.toUpperCase() ?? '').join('')
-}
-
 const KPI_DEFAULTS: KpiData = { partners: 15, demandes: 8400, rating: 4.3, departments: 101 }
 
 const PRO_DEFAULTS: ProCard[] = [
@@ -50,35 +32,35 @@ export async function fetchKpis(): Promise<KpiData> {
   try {
     const supabase = await createServerSupabase()
 
-    const { count: partnersCount } = await supabase
-      .from('public_partners')
-      .select('*', { count: 'exact', head: true })
+    // Une seule fonction SQL au lieu de 4 requêtes séparées
+    const { data, error } = await supabase.rpc('get_public_kpis')
 
-    const { count: demandesCount } = await supabase
-      .from('quotes')
-      .select('*', { count: 'exact', head: true })
+    if (!error && data?.[0]) {
+      const row = data[0]
+      return {
+        partners:    Number(row.partner_count)  || KPI_DEFAULTS.partners,
+        demandes:    Number(row.demand_count)   || KPI_DEFAULTS.demandes,
+        rating:      Number(row.avg_rating)     || KPI_DEFAULTS.rating,
+        departments: Number(row.dept_count)     || KPI_DEFAULTS.departments,
+      }
+    }
 
-    const { data: ratingData } = await supabase
-      .from('reviews')
-      .select('rating')
+    // Fallback si la fonction n'existe pas encore
+    const [partnersRes, demandesRes, reviewsRes] = await Promise.all([
+      supabase.from('partners').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+      supabase.from('quotes').select('*', { count: 'exact', head: true }),
+      supabase.from('reviews').select('rating'),
+    ])
 
-    const avgRating = ratingData?.length
-      ? ratingData.reduce((s, r) => s + (r.rating ?? 0), 0) / ratingData.length
-      : null
-
-    const { data: deptData } = await supabase
-      .from('public_partners')
-      .select('postal_code')
-
-    const depts = deptData
-      ? new Set(deptData.map((p: any) => String(p.postal_code ?? '').slice(0, 2)).filter(Boolean)).size
+    const avgRating = reviewsRes.data?.length
+      ? reviewsRes.data.reduce((s, r) => s + (r.rating ?? 0), 0) / reviewsRes.data.length
       : null
 
     return {
-      partners:    partnersCount ?? KPI_DEFAULTS.partners,
-      demandes:    demandesCount ?? KPI_DEFAULTS.demandes,
+      partners:    partnersRes.count  ?? KPI_DEFAULTS.partners,
+      demandes:    demandesRes.count  ?? KPI_DEFAULTS.demandes,
       rating:      avgRating != null ? Math.round(avgRating * 10) / 10 : KPI_DEFAULTS.rating,
-      departments: depts ?? KPI_DEFAULTS.departments,
+      departments: KPI_DEFAULTS.departments,
     }
   } catch {
     return KPI_DEFAULTS
@@ -90,9 +72,10 @@ export async function fetchFeaturedPros(): Promise<ProCard[]> {
     const supabase = await createServerSupabase()
 
     const { data } = await supabase
-      .from('public_partners')
-      .select('id, company_name, city, partner_type, average_rating, reviews_count')
-      .order('created_at', { ascending: false })
+      .from('partners')
+      .select('id, company_name, city, partner_type, average_rating, review_count')
+      .eq('status', 'active')
+      .order('average_rating', { ascending: false })
       .limit(3)
 
     if (!data?.length) return PRO_DEFAULTS
@@ -101,11 +84,11 @@ export async function fetchFeaturedPros(): Promise<ProCard[]> {
       id:       String(p.id),
       name:     p.company_name ?? 'Professionnel',
       city:     p.city ?? '',
-      type:     TYPE_LABELS[p.partner_type] ?? p.partner_type ?? '',
+      type:     TYPE_LABEL[p.partner_type] ?? p.partner_type ?? '',
       rating:   typeof p.average_rating === 'number' ? Math.round(p.average_rating * 10) / 10 : 0,
-      reviews:  p.reviews_count ?? 0,
-      initials: initials(p.company_name ?? ''),
-      color:    colorFor(String(p.id)),
+      reviews:  p.review_count ?? 0,
+      initials: getInitials(p.company_name ?? ''),
+      color:    colorFor(String(p.id), AVATAR_COLORS),
     }))
   } catch {
     return PRO_DEFAULTS

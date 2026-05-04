@@ -1,13 +1,15 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef } from 'react'
+import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
-import { ArrowLeft, User, Building2, ShieldCheck, FileCheck, Info, Eye, EyeOff, CheckCircle, Loader } from 'lucide-react'
+import { ArrowLeft, User, Building2, ShieldCheck, FileCheck, Info, Eye, EyeOff, CheckCircle, Loader, Gift, Search, Star } from 'lucide-react'
 import CustomSelect from '@/components/ui/CustomSelect'
 import CustomMultiSelect from '@/components/ui/CustomMultiSelect'
 import { INSCRIPTION_CLIENT_TYPES, INSCRIPTION_PARTNER_TYPES, NEEDS_SIRET } from '@/lib/constants'
+import { parseLocation } from '@/lib/utils'
 
 
 
@@ -43,48 +45,76 @@ export function InscriptionContent({
       <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
         
         {/* Left Side - Black */}
-        <div style={{ background: 'var(--black)', color: 'white', padding: '80px', display: 'flex', flexDirection: 'column', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
-          <div style={{
-            position: 'absolute',
-            bottom: -200,
-            right: -100,
-            width: 600,
-            height: 600,
-            borderRadius: '50%',
-            background: 'rgba(255,255,255,0.03)',
-            pointerEvents: 'none'
-          }} />
-          
-          <div style={{ position: 'relative', zIndex: 10 }}>
-            <h1 style={{ fontSize: 48, fontWeight: 600, marginBottom: 24 }}>
-              Rejoignez<br />
-              <span style={{ color: 'var(--red)' }}>Désamianteurs.fr</span>
+        <div style={{ background: 'var(--black)', color: 'white', padding: '80px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', paddingTop: '100px', position: 'relative', overflow: 'hidden' }}>
+
+          {/* Cercle 1 — bas droite, flottant lentement */}
+          <motion.div
+            animate={{ y: [0, -14, 0], scale: [1, 1.02, 1] }}
+            transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+            style={{
+              position: 'absolute', bottom: -160, right: -120,
+              width: 380, height: 380, borderRadius: '50%',
+              background: 'rgba(192,57,43,0.20)', pointerEvents: 'none',
+            }}
+          />
+          {/* Cercle 2 — haut gauche, déphasé */}
+          <motion.div
+            animate={{ y: [0, 10, 0], scale: [1, 1.03, 1] }}
+            transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
+            style={{
+              position: 'absolute', top: -160, left: -140,
+              width: 300, height: 300, borderRadius: '50%',
+              background: 'rgba(192,57,43,0.11)', pointerEvents: 'none',
+            }}
+          />
+
+          <motion.div
+            key={userType}
+            initial={{ opacity: 0, x: -12 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+            style={{ position: 'relative', zIndex: 10 }}
+          >
+            <h1 style={{ margin: '0 0 20px', lineHeight: 1.1 }}>
+              <span style={{ display: 'block', fontSize: 13, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 16, fontFamily: 'var(--font-sans)' }}>
+                {userType === 'client' ? 'Vous êtes client' : 'Vous êtes professionnel'}
+              </span>
+              <span style={{ fontFamily: 'var(--font-serif, "DM Serif Display", Georgia, serif)', fontSize: 52, fontWeight: 400, color: 'white', letterSpacing: '-0.5px' }}>
+                Désamianteurs
+              </span>
+              <span style={{ fontFamily: 'var(--font-serif, "DM Serif Display", Georgia, serif)', fontSize: 52, fontWeight: 400, color: 'var(--red)' }}>
+                .fr
+              </span>
             </h1>
-            <p style={{ fontSize: 18, color: 'rgba(255,255,255,0.5)', marginBottom: 64, maxWidth: 450 }}>
-              Client particulier ou professionnel, créez votre compte gratuitement et accédez à toutes les fonctionnalités de la plateforme.
+
+            <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.5)', marginBottom: 56, maxWidth: 420, lineHeight: 1.65 }}>
+              {userType === 'client'
+                ? "Décrivez votre projet amiante et / ou plomb, recevez des devis gratuits de professionnels certifiés et choisissez sereinement."
+                : "Accédez à un flux régulier de demandes qualifiées dans votre zone. Votre 1ère affaire est offerte — sans engagement."}
             </p>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-                <div style={{ width: 40, height: 40, borderRadius: 8, background: 'rgba(192, 57, 43, 0.1)', color: 'var(--red)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <ShieldCheck size={20} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+              {(userType === 'client'
+                ? [
+                    { Icon: Search,     label: 'Devis gratuits et sans engagement' },
+                    { Icon: ShieldCheck, label: 'Professionnels certifiés et vérifiés' },
+                    { Icon: Info,        label: 'Données protégées (RGPD)' },
+                  ]
+                : [
+                    { Icon: Gift,        label: '1ère affaire offerte — frais d\'inscription aussi' },
+                    { Icon: Star,        label: 'Réseau de professionnels qualifiés' },
+                    { Icon: Info,        label: 'Données protégées (RGPD)' },
+                  ]
+              ).map(({ Icon, label }) => (
+                <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 8, background: 'rgba(192,57,43,0.12)', color: 'var(--red)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <Icon size={18} strokeWidth={1.8} />
+                  </div>
+                  <span style={{ fontSize: 15, color: 'rgba(255,255,255,0.8)', lineHeight: 1.4 }}>{label}</span>
                 </div>
-                <span style={{ fontSize: 16, color: 'rgba(255,255,255,0.8)' }}>Inscription 100% gratuite</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-                <div style={{ width: 40, height: 40, borderRadius: 8, background: 'rgba(192, 57, 43, 0.1)', color: 'var(--red)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <FileCheck size={20} />
-                </div>
-                <span style={{ fontSize: 16, color: 'rgba(255,255,255,0.8)' }}>Devis gratuits et sans engagement</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-                <div style={{ width: 40, height: 40, borderRadius: 8, background: 'rgba(192, 57, 43, 0.1)', color: 'var(--red)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Info size={20} />
-                </div>
-                <span style={{ fontSize: 16, color: 'rgba(255,255,255,0.8)' }}>Données protégées (RGPD)</span>
-              </div>
+              ))}
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* Right Side - White */}
@@ -203,11 +233,21 @@ function InscriptionForm({
   const [geoScope, setGeoScope]         = useState<'international' | 'national' | 'region' | 'department' | ''>('')
   const [selectedGeo, setSelectedGeo]   = useState<string[]>([])
   const [siretConfirmed, setSiretConfirmed] = useState(false)
+  
+  // Champs adresse éditables (pré-remplis par SIRET)
+  const [manualAddress, setManualAddress] = useState('')
+  const [manualCity, setManualCity]       = useState('')
+  const [manualZip, setManualZip]         = useState('')
+  const [promoCode, setPromoCode]         = useState('')
+  const [promoValid, setPromoValid]       = useState(false) // true = 100% off confirmé via Stripe
+  const [promoChecking, setPromoChecking] = useState(false)
+  const [promoMsg, setPromoMsg]           = useState<{ type: 'success' | 'error' | null; text: string }>({ type: null, text: '' })
   const [cgu, setCgu]                 = useState(false)
   const [loading, setLoading]         = useState(false)
   const [error, setError]             = useState('')
   const [companyDescription, setCompanyDescription] = useState('')
   const siretTimer                    = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const savedScrollY                  = useRef<number | null>(null)
 
   // États pour les sélections spécifiques
   const [selectedCerts, setSelectedCerts] = useState<string[]>([])
@@ -220,29 +260,7 @@ function InscriptionForm({
     else set([...list, item])
   }
 
-  // Helper pour scinder l'adresse si elle est mal formatée
-  const parseLocation = (v: string, a: string, c: string) => {
-    const full = `${v} ${a}`.trim()
-    const cpMatch = full.match(/\b(\d{5})\b/)
-    if (cpMatch) {
-      const extractedCp = cpMatch[1]
-      const parts = full.split(extractedCp)
-      let extractedVille = parts[parts.length - 1].trim()
-      
-      // Nettoyage final de la ville (supprimer les résidus d'adresse si présents)
-      if (/\d/.test(extractedVille)) {
-        const words = extractedVille.split(/\s+/)
-        const last = words[words.length - 1]
-        if (!/\d/.test(last)) extractedVille = last
-      }
-      
-      return { 
-        city: extractedVille.toUpperCase() || v.toUpperCase(), 
-        zip:  extractedCp 
-      }
-    }
-    return { city: v.toUpperCase(), zip: c }
-  }
+  // parseLocation importé depuis @/lib/utils
 
   useEffect(() => {
     const digits = siret.replace(/\D/g, '')
@@ -291,7 +309,7 @@ function InscriptionForm({
               }
               
               // On privilégie les données BAN (propres) mais on garde l'adresse complète si demandée
-              if (props.label)    finalAdresse = props.label
+              if (props.name)     finalAdresse = props.name
               if (props.city)     finalVille   = props.city.toUpperCase()
               if (props.postcode) finalCp      = props.postcode
             }
@@ -311,6 +329,9 @@ function InscriptionForm({
             lat:            finalLat,
             lng:            finalLng
           })
+          setManualAddress(finalAdresse)
+          setManualCity(finalVille)
+          setManualZip(finalCp)
           if (data.activite) setCompanyDescription(data.activite)
           setSiretStatus('ok')
         } else {
@@ -324,12 +345,55 @@ function InscriptionForm({
     return () => { if (siretTimer.current) clearTimeout(siretTimer.current) }
   }, [siret])
 
+  // Validation du code promo via Stripe (debounced 600ms)
+  useEffect(() => {
+    if (!promoCode || promoCode.length < 4) {
+      setPromoValid(false)
+      setPromoMsg({ type: null, text: '' })
+      return
+    }
+    setPromoChecking(true)
+    const t = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/stripe/validate-promo?code=${encodeURIComponent(promoCode)}`)
+        const data = await res.json()
+        if (data.valid) {
+          setPromoValid(data.isFull)
+          setPromoMsg({ type: 'success', text: data.label })
+        } else {
+          setPromoValid(false)
+          setPromoMsg({ type: 'error', text: data.error || 'Code invalide ou expiré' })
+        }
+      } catch {
+        setPromoValid(false)
+        setPromoMsg({ type: 'error', text: 'Impossible de vérifier le code' })
+      } finally {
+        setPromoChecking(false)
+      }
+    }, 600)
+    return () => clearTimeout(t)
+  }, [promoCode])
+
+  // Restaure la position de scroll après que React insère le bloc conditionnel
+  useLayoutEffect(() => {
+    if (savedScrollY.current !== null) {
+      window.scrollTo(0, savedScrollY.current)
+      savedScrollY.current = null
+    }
+  }, [clientType])
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
     if (pwd !== pwdConfirm) { setError('Les mots de passe ne correspondent pas.'); return }
     if (pwd.length < 8)     { setError('Le mot de passe doit contenir au moins 8 caractères.'); return }
+    if (!tel)               { setError('Le numéro de téléphone est obligatoire.'); return }
     if (!cgu)               { setError('Veuillez accepter les Conditions Générales d\'Utilisation.'); return }
+
+    if (type === 'partenaire') {
+      if (needsSiret && !siretConfirmed) { setError('Veuillez confirmer votre SIRET.'); return }
+      if (!manualAddress || !manualCity || !manualZip) { setError('L\'adresse complète de l\'entreprise est obligatoire.'); return }
+    }
 
     setLoading(true)
     const supabase = createClient()
@@ -402,15 +466,15 @@ function InscriptionForm({
           company_name: siretData?.raison_sociale || '',
           description: companyDescription || siretData?.activite || '',
           siret: siret,
-          company_address: siretData?.adresse || '',
-          city: city,
-          zip_code: zip,
+          company_address: manualAddress,
+          city: manualCity,
+          zip_code: manualZip,
           company_activity: siretData?.activite || '',
           certified_workers_count: nbCertified,
           lat: lat,
           lng: lng,
-          is_active: true,
           is_verified: false,
+          validation_fee_paid: promoValid,
           cgu_accepted_at: new Date().toISOString()
         }).select('id').single()
         if (insErr) throw insErr
@@ -467,11 +531,26 @@ function InscriptionForm({
           const { error: domainErr } = await supabase.from('partner_domains').insert(domainsToInsert)
           if (domainErr) console.error("Error inserting domains:", domainErr.message, domainErr.details)
         }
+
+        // Redirect : Stripe si pas de promo 100%, dashboard sinon
+        if (!promoValid && newPartner) {
+          const res = await fetch('/api/stripe/create-checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ partnerId: newPartner.id }),
+          })
+          const { url, error: checkoutError } = await res.json()
+          if (url) {
+            window.location.href = url
+            return
+          }
+          throw new Error(checkoutError || 'Erreur lors de la création de la session de paiement')
+        } else {
+          router.push('/espace-partenaire')
+        }
       }
 
-      if (type === 'partenaire') {
-        router.push('/espace-partenaire')
-      } else {
+      if (type === 'client') {
         router.push('/espace-client')
       }
     } catch (e: any) {
@@ -493,7 +572,7 @@ function InscriptionForm({
       </div>
 
       <div><label style={lbl}>Adresse email</label><input type="email" className="input" placeholder="jean.dupont@email.com" value={email} onChange={e => setEmail(e.target.value)} required /></div>
-      <div><label style={lbl}>Téléphone</label><input type="tel" className="input" placeholder="00 00 00 00 00" value={tel} onChange={e => setTel(e.target.value)} /></div>
+      <div><label style={lbl}>Téléphone <span style={{ color: 'var(--red)' }}>*</span></label><input type="tel" className="input" placeholder="06 00 00 00 00" value={tel} onChange={e => setTel(e.target.value)} required /></div>
 
       {/* Mots de passe */}
       <div>
@@ -524,7 +603,14 @@ function InscriptionForm({
         <CustomSelect
           options={type === 'client' ? INSCRIPTION_CLIENT_TYPES : INSCRIPTION_PARTNER_TYPES}
           value={clientType}
-          onChange={v => { setClientType(v); setSiret(''); setSiretStatus('idle'); setSiretData(null); setSiretConfirmed(false) }}
+          onChange={v => {
+            savedScrollY.current = window.scrollY
+            setClientType(v)
+            setSiret('')
+            setSiretStatus('idle')
+            setSiretData(null)
+            setSiretConfirmed(false)
+          }}
           placeholder="Choisir votre activité principale..."
         />
       </div>
@@ -980,6 +1066,32 @@ function InscriptionForm({
       {/* Section spécifique Expert Judiciaire / Avocat */}
       {type === 'partenaire' && (clientType === 'legal_expert' || clientType === 'specialized_lawyer') && (
         <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 24, marginTop: 12 }}>
+
+          {/* Compétences */}
+          {domains.filter(d => d.partner_type === clientType && d.category === 'domain').length > 0 && (
+            <div>
+              <p style={{ fontSize: 11, fontWeight: 800, color: 'var(--gray-400)', letterSpacing: '0.5px', fontFamily: SANS, marginBottom: 16, textTransform: 'uppercase' }}>
+                {clientType === 'legal_expert' ? 'COMPÉTENCES EXPERT JUDICIAIRE' : 'COMPÉTENCES AVOCAT'}
+              </p>
+              <label style={{ ...lbl, marginBottom: 12 }}>Compétences exercées</label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {domains
+                  .filter(d => d.partner_type === clientType && d.category === 'domain')
+                  .map(d => (
+                    <label key={d.id} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        style={{ accentColor: 'var(--red)' }}
+                        checked={selectedComp.includes(d.id)}
+                        onChange={() => toggle(selectedComp, setSelectedComp, d.id)}
+                      />
+                      {d.label}
+                    </label>
+                  ))}
+              </div>
+            </div>
+          )}
+
           <div style={{ borderTop: '1px solid var(--gray-100)', paddingTop: 20 }}>
             <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--gray-400)', letterSpacing: '0.8px', fontFamily: SANS, marginBottom: 20, textTransform: 'uppercase' }}>
               ZONE GÉOGRAPHIQUE D'INTERVENTION
@@ -1082,7 +1194,7 @@ function InscriptionForm({
                 </span>
               </div>
               <p style={{ fontSize: 12, color: 'var(--gray-400)', marginBottom: 4 }}>{siretData.activite}</p>
-              <p style={{ fontSize: 12, color: 'var(--gray-400)' }}>{siretData.adresse}</p>
+              <p style={{ fontSize: 12, color: 'var(--gray-400)' }}>{siretData.adresse} {siretData.cp} {siretData.ville}</p>
               
               {!siretConfirmed && (
                 <button 
@@ -1115,8 +1227,26 @@ function InscriptionForm({
               <p style={{ fontSize: 11, color: 'var(--gray-400)', marginTop: 6, lineHeight: 1.4 }}>
                 Cette description sera visible par les clients sur votre profil.
               </p>
+
+              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 14, borderTop: '1px solid rgba(0,0,0,0.05)', paddingTop: 16 }}>
+                <div>
+                  <label style={lbl}>Adresse du siège <span style={{ color: 'var(--red)' }}>*</span></label>
+                  <input className="input" value={manualAddress} onChange={e => setManualAddress(e.target.value)} placeholder="Adresse" required />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 10 }}>
+                  <div>
+                    <label style={lbl}>Code Postal <span style={{ color: 'var(--red)' }}>*</span></label>
+                    <input className="input" value={manualZip} onChange={e => setManualZip(e.target.value)} placeholder="CP" required />
+                  </div>
+                  <div>
+                    <label style={lbl}>Ville <span style={{ color: 'var(--red)' }}>*</span></label>
+                    <input className="input" value={manualCity} onChange={e => setManualCity(e.target.value)} placeholder="Ville" required />
+                  </div>
+                </div>
+              </motion.div>
             </div>
           )}
+          
         </div>
       )}
 
