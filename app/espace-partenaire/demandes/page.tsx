@@ -40,7 +40,7 @@ export default async function DemandesPartenairePage() {
   return (
     <div className="dashboard-content">
       <DemandesPartenaireClient
-        initialAssignments={assignments ?? []}
+        initialAssignments={(assignments ?? []) as any}
         stats={stats}
       />
     </div>
