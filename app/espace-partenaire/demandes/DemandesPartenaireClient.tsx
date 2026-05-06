@@ -62,7 +62,7 @@ function timeRemaining(sentAt: string): { text: string; urgent: boolean } {
   return { text: `${h}h ${m}min`, urgent: h < 6 }
 }
 
-function serviceLabels(qs: Assignment['quotes']['quote_service_types']): string {
+function serviceLabels(qs: QuoteData['quote_service_types']): string {
   return qs.map(x => x.service?.label).filter(Boolean).join(', ') || 'Prestation amiante'
 }
 
