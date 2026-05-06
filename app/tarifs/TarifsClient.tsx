@@ -173,11 +173,7 @@ export default function TarifsClient() {
             <p style={{ color: 'var(--gray-400)', marginBottom: 48 }}>De l'inscription à l'activation de votre compte.</p>
           </motion.div>
 
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', 
-            gap: 16 
-          }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 16 }}>
             {STEPS_PRICE.map((step, i) => (
               <motion.div
                 key={i}
