@@ -10,6 +10,17 @@ import { fr } from 'date-fns/locale'
 import { fadeUp, staggerContainer } from '@/lib/animations'
 import { createClient } from '@/lib/supabase'
 
+type QuoteData = {
+  id: string
+  address_city: string
+  address_postal_code: string
+  address_department: string
+  surface_m2: number | null
+  timeline: string
+  description: string | null
+  quote_service_types: Array<{ service: { label: string; code: string } }>
+}
+
 type Assignment = {
   id: string
   wave: number
@@ -18,16 +29,7 @@ type Assignment = {
   quote_sent_date: string | null
   status: 'pending' | 'accepted' | 'quote_sent' | 'refused' | 'expired'
   is_exception: boolean
-  quotes: {
-    id: string
-    address_city: string
-    address_postal_code: string
-    address_department: string
-    surface_m2: number | null
-    timeline: string
-    description: string | null
-    quote_service_types: Array<{ service: { label: string; code: string } }>
-  }
+  quotes: QuoteData | QuoteData[]
 }
 
 const STATUS_CONFIG = {
@@ -79,7 +81,7 @@ export default function DemandesPartenaireClient({
 
   const filtered = useMemo(() => {
     return assignments.filter(a => {
-      const q = a.quotes
+      const q: QuoteData = Array.isArray(a.quotes) ? a.quotes[0] : a.quotes
       const matchSearch = !search ||
         q.address_city?.toLowerCase().includes(search.toLowerCase()) ||
         q.address_postal_code?.includes(search) ||
@@ -188,7 +190,7 @@ export default function DemandesPartenaireClient({
                 </td>
               </tr>
             ) : filtered.map(a => {
-              const q = a.quotes
+              const q: QuoteData = Array.isArray(a.quotes) ? a.quotes[0] : a.quotes
               const wave = WAVE_CONFIG[a.wave] ?? WAVE_CONFIG[3]
               const status = STATUS_CONFIG[a.status] ?? STATUS_CONFIG.expired
               const remaining = a.status === 'pending' ? timeRemaining(a.sent_at) : null
