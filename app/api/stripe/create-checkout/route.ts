@@ -10,6 +10,16 @@ export async function POST(req: Request) {
 
   const { partnerId } = await req.json()
 
+  // Vérifie que le partenaire appartient bien à l'utilisateur courant
+  const { data: partnerCheck } = await supabase
+    .from('partners')
+    .select('id')
+    .eq('id', partnerId)
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  if (!partnerCheck) return NextResponse.json({ error: 'Partenaire introuvable' }, { status: 403 })
+
   const origin = req.headers.get('origin') ?? 'http://localhost:3000'
   const stripe = getStripe()
 

@@ -47,18 +47,16 @@ export async function fetchKpis(): Promise<KpiData> {
 
     // Fallback si la fonction n'existe pas encore
     const [partnersRes, demandesRes, reviewsRes] = await Promise.all([
-      supabase.from('partners').select('*', { count: 'exact', head: true }).eq('status', 'active'),
-      supabase.from('quotes').select('*', { count: 'exact', head: true }),
-      supabase.from('reviews').select('rating'),
+      supabase.from('partners').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+      supabase.from('quotes').select('id', { count: 'exact', head: true }),
+      supabase.rpc('get_avg_rating'),
     ])
 
-    const avgRating = reviewsRes.data?.length
-      ? reviewsRes.data.reduce((s, r) => s + (r.rating ?? 0), 0) / reviewsRes.data.length
-      : null
+    const avgRating = typeof reviewsRes.data === 'number' ? reviewsRes.data : null
 
     return {
-      partners:    partnersRes.count  ?? KPI_DEFAULTS.partners,
-      demandes:    demandesRes.count  ?? KPI_DEFAULTS.demandes,
+      partners:    partnersRes.count ?? KPI_DEFAULTS.partners,
+      demandes:    demandesRes.count ?? KPI_DEFAULTS.demandes,
       rating:      avgRating != null ? Math.round(avgRating * 10) / 10 : KPI_DEFAULTS.rating,
       departments: KPI_DEFAULTS.departments,
     }

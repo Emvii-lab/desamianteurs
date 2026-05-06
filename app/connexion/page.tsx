@@ -12,20 +12,14 @@ const SERIF = 'var(--font-serif, "DM Serif Display", Georgia, serif)'
 const SANS  = 'var(--font-sans, DM Sans, sans-serif)'
 
 async function getRoleRedirect(supabase: any, userId: string): Promise<string> {
-  console.log('Checking role for user:', userId)
   try {
-    
-    // Check Admin
-    const { data: admin } = await supabase.from('admins').select('id').eq('user_id', userId).maybeSingle()
-    if (admin) return '/espace-admin'
-    
-    // Check Partner
-    const { data: partner } = await supabase.from('partners').select('id').eq('user_id', userId).maybeSingle()
-    if (partner) return '/espace-partenaire'
-    
-  } catch (err) { 
-    console.error('Role check error:', err)
-  }
+    const [adminRes, partnerRes] = await Promise.all([
+      supabase.from('admins').select('id').eq('user_id', userId).maybeSingle(),
+      supabase.from('partners').select('id').eq('user_id', userId).maybeSingle(),
+    ])
+    if (adminRes.data)   return '/espace-admin'
+    if (partnerRes.data) return '/espace-partenaire'
+  } catch {}
   return '/espace-client'
 }
 
@@ -48,9 +42,7 @@ export default function ConnexionPage() {
         setLoading(false)
         return
       }
-      console.log('Auth success, getting redirect...')
       const redirectPath = await getRoleRedirect(supabase, data.user.id)
-      console.log('Redirecting to:', redirectPath)
       router.push(redirectPath)
     } catch (err) {
       console.error('Login error:', err)

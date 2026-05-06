@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase'
 import { motion } from 'framer-motion'
 import { staggerContainer, fadeUp } from '@/lib/animations'
 import { StatGrid } from '@/components/ui/StatGrid'
@@ -25,30 +24,25 @@ export default function AdminDashboard({ stats, pendingPartners, pendingReviews,
   const [rejectionReason, setRejectionReason] = useState('')
   const [processing, setProcessing] = useState<string | null>(null)
 
-  const supabase = createClient()
-
   async function publishQuote(quoteId: string) {
     setPublishing(quoteId)
-    const { error } = await supabase
-      .from('quotes')
-      .update({ status: 'published' })
-      .eq('id', quoteId)
-    if (!error) setPublishedIds(prev => new Set([...prev, quoteId]))
+    const res = await fetch('/api/admin/quote', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ quoteId }),
+    })
+    if (res.ok) setPublishedIds(prev => new Set([...prev, quoteId]))
     setPublishing(null)
   }
 
   async function handlePartnerAction(id: string, action: 'verify' | 'reject', reason?: string) {
     setProcessing(id)
-    const update = action === 'verify' 
-      ? { is_verified: true, status: 'active', rejection_reason: null }
-      : { is_verified: false, status: 'rejected', rejection_reason: reason }
-
-    const { error } = await supabase
-      .from('partners')
-      .update(update)
-      .eq('id', id)
-
-    if (!error) {
+    const res = await fetch('/api/admin/partner', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ partnerId: id, action, reason }),
+    })
+    if (res.ok) {
       setHandledPartnerIds(prev => new Set([...prev, id]))
       setRejectionModal(null)
       setRejectionReason('')
@@ -56,14 +50,14 @@ export default function AdminDashboard({ stats, pendingPartners, pendingReviews,
     setProcessing(null)
   }
 
-  async function handleReviewAction(id: string, action: 'published' | 'rejected', reason?: string) {
+  async function handleReviewAction(id: string, action: 'approved' | 'rejected', reason?: string) {
     setProcessing(id)
-    const { error } = await supabase
-      .from('reviews')
-      .update({ status: action, rejection_reason: reason })
-      .eq('id', id)
-
-    if (!error) {
+    const res = await fetch('/api/admin/review', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reviewId: id, action, reason }),
+    })
+    if (res.ok) {
       setHandledReviewIds(prev => new Set([...prev, id]))
       setRejectionModal(null)
       setRejectionReason('')
@@ -271,7 +265,7 @@ export default function AdminDashboard({ stats, pendingPartners, pendingReviews,
                     <button 
                       className="btn btn-red btn-sm"
                       disabled={processing === r.id}
-                      onClick={() => handleReviewAction(r.id, 'published')}
+                      onClick={() => handleReviewAction(r.id, 'approved')}
                     >
                       {processing === r.id ? '...' : 'Approuver'}
                     </button>

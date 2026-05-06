@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
-import { ArrowLeft, User, Building2, ShieldCheck, FileCheck, Info, Eye, EyeOff, CheckCircle, Loader, Gift, Search, Star } from 'lucide-react'
+import { ArrowLeft, User, Building2, ShieldCheck, FileCheck, Info, Eye, EyeOff, CheckCircle, Loader, Gift, Search, Star, Camera } from 'lucide-react'
 import CustomSelect from '@/components/ui/CustomSelect'
 import CustomMultiSelect from '@/components/ui/CustomMultiSelect'
 import { INSCRIPTION_CLIENT_TYPES, INSCRIPTION_PARTNER_TYPES, NEEDS_SIRET } from '@/lib/constants'
@@ -196,8 +196,90 @@ export function InscriptionContent({
   )
 }
 
-function InscriptionForm({ 
-  type, 
+function GeoMarketSection({
+  geoScope, setGeoScope, selectedGeo, setSelectedGeo,
+  regions, departments, selectedMarkets, setSelectedMarkets, toggle,
+}: {
+  geoScope: string
+  setGeoScope: (v: 'international' | 'national' | 'region' | 'department' | '') => void
+  selectedGeo: string[]
+  setSelectedGeo: (v: string[]) => void
+  regions: any[]
+  departments: any[]
+  selectedMarkets: string[]
+  setSelectedMarkets: (v: string[]) => void
+  toggle: (list: string[], set: (v: string[]) => void, item: string) => void
+}) {
+  const SANS = 'var(--font-sans, DM Sans, sans-serif)'
+  const lbl: React.CSSProperties = { display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 7, fontFamily: SANS }
+  return (
+    <>
+      <div style={{ borderTop: '1px solid var(--gray-100)', paddingTop: 20 }}>
+        <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--gray-400)', letterSpacing: '0.8px', fontFamily: SANS, marginBottom: 20, textTransform: 'uppercase' }}>
+          ZONE GÉOGRAPHIQUE D'INTERVENTION
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div>
+            <label style={{ ...lbl, fontSize: 14, marginBottom: 8 }}>Couverture géographique</label>
+            <CustomSelect
+              options={[
+                { id: 'international', label: 'International' },
+                { id: 'national',   label: 'France entière (National)' },
+                { id: 'region',     label: 'Par Région' },
+                { id: 'department', label: 'Par Département' },
+              ]}
+              value={geoScope}
+              onChange={v => { setGeoScope(v as any); setSelectedGeo([]) }}
+              placeholder="Choisir l'échelle d'intervention..."
+            />
+          </div>
+          {geoScope === 'region' && (
+            <div className="fade-in">
+              <label style={{ ...lbl, fontSize: 14, marginBottom: 8 }}>Sélectionner la région</label>
+              <CustomMultiSelect
+                options={regions.map(r => ({ id: r.code, label: r.label }))}
+                value={selectedGeo}
+                onChange={setSelectedGeo}
+                placeholder="Choisir une ou plusieurs régions..."
+              />
+            </div>
+          )}
+          {geoScope === 'department' && (
+            <div className="fade-in">
+              <label style={{ ...lbl, fontSize: 14, marginBottom: 8 }}>Sélectionner le département</label>
+              <CustomMultiSelect
+                options={departments.map(d => ({ id: d.code, label: `${d.code} - ${d.label}` }))}
+                value={selectedGeo}
+                onChange={setSelectedGeo}
+                placeholder="Choisir un ou plusieurs départements..."
+              />
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div>
+        <label style={lbl}>Marchés couverts</label>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {['Marché public', 'Marché privé', 'Particulier'].map(m => (
+            <label key={m} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                style={{ accentColor: 'var(--red)' }}
+                checked={selectedMarkets.includes(m)}
+                onChange={() => toggle(selectedMarkets, setSelectedMarkets, m)}
+              />
+              {m}
+            </label>
+          ))}
+        </div>
+      </div>
+    </>
+  )
+}
+
+function InscriptionForm({
+  type,
   initialRegions, 
   initialDepartments, 
   initialDocTypes,
@@ -248,6 +330,10 @@ function InscriptionForm({
   const [companyDescription, setCompanyDescription] = useState('')
   const siretTimer                    = useRef<ReturnType<typeof setTimeout> | null>(null)
   const savedScrollY                  = useRef<number | null>(null)
+  const fileInputRef                  = useRef<HTMLInputElement>(null)
+  const [mediaFile, setMediaFile]     = useState<File | null>(null)
+  const [mediaPreview, setMediaPreview] = useState('')
+  const [mediaType, setMediaType]     = useState<'photo' | 'logo'>('photo')
 
   // États pour les sélections spécifiques
   const [selectedCerts, setSelectedCerts] = useState<string[]>([])
@@ -425,6 +511,21 @@ function InscriptionForm({
     if (authError) { setError(authError.message); setLoading(false); return }
     if (!authData.user) { setError("Erreur lors de la création du compte."); setLoading(false); return }
 
+    // Upload du fichier média si sélectionné
+    let avatarUrl: string | undefined
+    let logoUrl: string | undefined
+    if (mediaFile) {
+      const ext = mediaFile.name.split('.').pop()?.toLowerCase() || 'jpg'
+      const isLogo = type === 'partenaire' && mediaType === 'logo'
+      const path = `${authData.user.id}/${isLogo ? 'logo' : 'avatar'}.${ext}`
+      const { error: uploadErr } = await supabase.storage.from('user-media').upload(path, mediaFile, { upsert: true })
+      if (!uploadErr) {
+        const { data: { publicUrl } } = supabase.storage.from('user-media').getPublicUrl(path)
+        if (isLogo) logoUrl = publicUrl
+        else avatarUrl = publicUrl
+      }
+    }
+
     // Insertion dans la table correspondante
     try {
       if (type === 'client') {
@@ -435,6 +536,7 @@ function InscriptionForm({
           email: email,
           phone: tel,
           client_type: clientType,
+          avatar_url: avatarUrl,
           ...(siretConfirmed && siretData ? {
             siret: siret.replace(/\D/g, ''),
             company_name: siretData.raison_sociale,
@@ -473,6 +575,8 @@ function InscriptionForm({
           certified_workers_count: nbCertified,
           lat: lat,
           lng: lng,
+          avatar_url: avatarUrl,
+          logo_url: logoUrl,
           is_verified: false,
           validation_fee_paid: promoValid,
           cgu_accepted_at: new Date().toISOString()
@@ -571,6 +675,77 @@ function InscriptionForm({
         <div><label style={lbl}>Nom</label><input className="input" placeholder="Dupont" value={nom} onChange={e => setNom(e.target.value)} required /></div>
       </div>
 
+      {/* Visuel de profil — photo ou logo */}
+      <div>
+        <p style={{ fontSize: 11, fontWeight: 800, color: 'var(--gray-400)', letterSpacing: '0.5px', fontFamily: SANS, marginBottom: 12 }}>
+          {type === 'partenaire' ? 'VISUEL DE PROFIL' : 'PHOTO DE PROFIL'}
+        </p>
+
+        {type === 'partenaire' && (
+          <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+            {(['photo', 'logo'] as const).map(t => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => setMediaType(t)}
+                style={{
+                  padding: '5px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600,
+                  border: '1.5px solid', cursor: 'pointer', transition: 'all 0.15s',
+                  borderColor: mediaType === t ? 'var(--red)' : 'var(--gray-100)',
+                  background: mediaType === t ? 'rgba(192,57,43,0.05)' : 'white',
+                  color: mediaType === t ? 'var(--red)' : 'var(--gray-400)',
+                }}
+              >
+                {t === 'photo' ? 'Photo' : 'Logo entreprise'}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div
+          onClick={() => fileInputRef.current?.click()}
+          style={{ display: 'flex', alignItems: 'center', gap: 16, cursor: 'pointer' }}
+        >
+          <div style={{
+            width: 72, height: 72, flexShrink: 0, overflow: 'hidden',
+            borderRadius: type === 'partenaire' && mediaType === 'logo' ? 12 : '50%',
+            background: 'var(--gray-50)', border: '2px dashed var(--gray-200)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            transition: 'border-color 0.15s',
+          }}>
+            {mediaPreview
+              ? <img src={mediaPreview} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              : <Camera size={22} style={{ color: 'var(--gray-300)' }} />
+            }
+          </div>
+          <div>
+            <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--black)', marginBottom: 3 }}>
+              {mediaPreview
+                ? (type === 'partenaire' ? (mediaType === 'logo' ? 'Modifier le logo' : 'Modifier la photo') : 'Modifier la photo')
+                : (type === 'partenaire' ? (mediaType === 'logo' ? 'Ajouter un logo' : 'Ajouter une photo') : 'Ajouter une photo')
+              }
+              {' '}<span style={{ fontSize: 12, color: 'var(--gray-400)', fontWeight: 400 }}>(optionnel)</span>
+            </p>
+            <p style={{ fontSize: 12, color: 'var(--gray-400)' }}>JPG, PNG ou WEBP — 5 Mo max</p>
+          </div>
+        </div>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          style={{ display: 'none' }}
+          onChange={e => {
+            const file = e.target.files?.[0]
+            if (!file) return
+            if (file.size > 5 * 1024 * 1024) { setError('L\'image ne doit pas dépasser 5 Mo.'); return }
+            if (mediaPreview) URL.revokeObjectURL(mediaPreview)
+            setMediaFile(file)
+            setMediaPreview(URL.createObjectURL(file))
+          }}
+        />
+      </div>
+
       <div><label style={lbl}>Adresse email</label><input type="email" className="input" placeholder="jean.dupont@email.com" value={email} onChange={e => setEmail(e.target.value)} required /></div>
       <div><label style={lbl}>Téléphone <span style={{ color: 'var(--red)' }}>*</span></label><input type="tel" className="input" placeholder="06 00 00 00 00" value={tel} onChange={e => setTel(e.target.value)} required /></div>
 
@@ -658,68 +833,17 @@ function InscriptionForm({
             </div>
           </div>
 
-          <div style={{ borderTop: '1px solid var(--gray-100)', paddingTop: 20 }}>
-            <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--gray-400)', letterSpacing: '0.8px', fontFamily: SANS, marginBottom: 20, textTransform: 'uppercase' }}>
-              ZONE GÉOGRAPHIQUE D'INTERVENTION
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <div>
-                <label style={{ ...lbl, fontSize: 14, marginBottom: 8 }}>Couverture géographique</label>
-                <CustomSelect
-                  options={[
-                    { id: 'international', label: 'International' },
-                    { id: 'national',   label: 'France entière (National)' },
-                    { id: 'region',     label: 'Par Région' },
-                    { id: 'department', label: 'Par Département' },
-                  ]}
-                  value={geoScope}
-                  onChange={v => { setGeoScope(v as any); setSelectedGeo([]) }}
-                  placeholder="Choisir l'échelle d'intervention..."
-                />
-              </div>
-
-              {geoScope === 'region' && (
-                <div className="fade-in">
-                  <label style={{ ...lbl, fontSize: 14, marginBottom: 8 }}>Sélectionner la région</label>
-                  <CustomMultiSelect
-                    options={regions.map(r => ({ id: r.code, label: r.label }))}
-                    value={selectedGeo}
-                    onChange={setSelectedGeo}
-                    placeholder="Choisir une ou plusieurs régions..."
-                  />
-                </div>
-              )}
-
-              {geoScope === 'department' && (
-                <div className="fade-in">
-                  <label style={{ ...lbl, fontSize: 14, marginBottom: 8 }}>Sélectionner le département</label>
-                  <CustomMultiSelect
-                    options={departments.map(d => ({ id: d.code, label: `${d.code} - ${d.label}` }))}
-                    value={selectedGeo}
-                    onChange={setSelectedGeo}
-                    placeholder="Choisir un ou plusieurs départements..."
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <label style={lbl}>Marchés couverts</label>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {['Marché public', 'Marché privé', 'Particulier'].map(m => (
-                <label key={m} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, cursor: 'pointer' }}>
-                  <input 
-                    type="checkbox" 
-                    style={{ accentColor: 'var(--red)' }} 
-                    checked={selectedMarkets.includes(m)}
-                    onChange={() => toggle(selectedMarkets, setSelectedMarkets, m)}
-                  />
-                  {m}
-                </label>
-              ))}
-            </div>
-          </div>
+          <GeoMarketSection
+            geoScope={geoScope}
+            setGeoScope={setGeoScope}
+            selectedGeo={selectedGeo}
+            setSelectedGeo={setSelectedGeo}
+            regions={regions}
+            departments={departments}
+            selectedMarkets={selectedMarkets}
+            setSelectedMarkets={setSelectedMarkets}
+            toggle={toggle}
+          />
         </div>
       )}
 
@@ -777,68 +901,17 @@ function InscriptionForm({
             />
           </div>
 
-          <div style={{ borderTop: '1px solid var(--gray-100)', paddingTop: 20 }}>
-            <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--gray-400)', letterSpacing: '0.8px', fontFamily: SANS, marginBottom: 20, textTransform: 'uppercase' }}>
-              ZONE GÉOGRAPHIQUE D'INTERVENTION
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <div>
-                <label style={{ ...lbl, fontSize: 14, marginBottom: 8 }}>Couverture géographique</label>
-                <CustomSelect
-                  options={[
-                    { id: 'international', label: 'International' },
-                    { id: 'national',   label: 'France entière (National)' },
-                    { id: 'region',     label: 'Par Région' },
-                    { id: 'department', label: 'Par Département' },
-                  ]}
-                  value={geoScope}
-                  onChange={v => { setGeoScope(v as any); setSelectedGeo([]) }}
-                  placeholder="Choisir l'échelle d'intervention..."
-                />
-              </div>
-
-              {geoScope === 'region' && (
-                <div className="fade-in">
-                  <label style={{ ...lbl, fontSize: 14, marginBottom: 8 }}>Sélectionner la région</label>
-                  <CustomMultiSelect
-                    options={regions.map(r => ({ id: r.code, label: r.label }))}
-                    value={selectedGeo}
-                    onChange={setSelectedGeo}
-                    placeholder="Choisir une ou plusieurs régions..."
-                  />
-                </div>
-              )}
-
-              {geoScope === 'department' && (
-                <div className="fade-in">
-                  <label style={{ ...lbl, fontSize: 14, marginBottom: 8 }}>Sélectionner le département</label>
-                  <CustomMultiSelect
-                    options={departments.map(d => ({ id: d.code, label: `${d.code} - ${d.label}` }))}
-                    value={selectedGeo}
-                    onChange={setSelectedGeo}
-                    placeholder="Choisir un ou plusieurs départements..."
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <label style={lbl}>Marchés couverts</label>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {['Marché public', 'Marché privé', 'Particulier'].map(m => (
-                <label key={m} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, cursor: 'pointer' }}>
-                  <input 
-                    type="checkbox" 
-                    style={{ accentColor: 'var(--red)' }} 
-                    checked={selectedMarkets.includes(m)}
-                    onChange={() => toggle(selectedMarkets, setSelectedMarkets, m)}
-                  />
-                  {m}
-                </label>
-              ))}
-            </div>
-          </div>
+          <GeoMarketSection
+            geoScope={geoScope}
+            setGeoScope={setGeoScope}
+            selectedGeo={selectedGeo}
+            setSelectedGeo={setSelectedGeo}
+            regions={regions}
+            departments={departments}
+            selectedMarkets={selectedMarkets}
+            setSelectedMarkets={setSelectedMarkets}
+            toggle={toggle}
+          />
         </div>
       )}
 
@@ -878,68 +951,17 @@ function InscriptionForm({
             </div>
 
 
-          <div style={{ borderTop: '1px solid var(--gray-100)', paddingTop: 20 }}>
-            <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--gray-400)', letterSpacing: '0.8px', fontFamily: SANS, marginBottom: 20, textTransform: 'uppercase' }}>
-              ZONE GÉOGRAPHIQUE D'INTERVENTION
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <div>
-                <label style={{ ...lbl, fontSize: 14, marginBottom: 8 }}>Couverture géographique</label>
-                <CustomSelect
-                  options={[
-                    { id: 'international', label: 'International' },
-                    { id: 'national',   label: 'France entière (National)' },
-                    { id: 'region',     label: 'Par Région' },
-                    { id: 'department', label: 'Par Département' },
-                  ]}
-                  value={geoScope}
-                  onChange={v => { setGeoScope(v as any); setSelectedGeo([]) }}
-                  placeholder="Choisir l'échelle d'intervention..."
-                />
-              </div>
-
-              {geoScope === 'region' && (
-                <div className="fade-in">
-                  <label style={{ ...lbl, fontSize: 14, marginBottom: 8 }}>Sélectionner la région</label>
-                  <CustomMultiSelect
-                    options={regions.map(r => ({ id: r.code, label: r.label }))}
-                    value={selectedGeo}
-                    onChange={setSelectedGeo}
-                    placeholder="Choisir une ou plusieurs régions..."
-                  />
-                </div>
-              )}
-
-              {geoScope === 'department' && (
-                <div className="fade-in">
-                  <label style={{ ...lbl, fontSize: 14, marginBottom: 8 }}>Sélectionner le département</label>
-                  <CustomMultiSelect
-                    options={departments.map(d => ({ id: d.code, label: `${d.code} - ${d.label}` }))}
-                    value={selectedGeo}
-                    onChange={setSelectedGeo}
-                    placeholder="Choisir un ou plusieurs départements..."
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <label style={lbl}>Marchés couverts</label>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {['Marché public', 'Marché privé', 'Particulier'].map(m => (
-                <label key={m} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, cursor: 'pointer' }}>
-                  <input 
-                    type="checkbox" 
-                    style={{ accentColor: 'var(--red)' }} 
-                    checked={selectedMarkets.includes(m)}
-                    onChange={() => toggle(selectedMarkets, setSelectedMarkets, m)}
-                  />
-                  {m}
-                </label>
-              ))}
-            </div>
-          </div>
+          <GeoMarketSection
+            geoScope={geoScope}
+            setGeoScope={setGeoScope}
+            selectedGeo={selectedGeo}
+            setSelectedGeo={setSelectedGeo}
+            regions={regions}
+            departments={departments}
+            selectedMarkets={selectedMarkets}
+            setSelectedMarkets={setSelectedMarkets}
+            toggle={toggle}
+          />
         </div>
       )}
 
@@ -998,68 +1020,17 @@ function InscriptionForm({
             </div>
 
 
-          <div style={{ borderTop: '1px solid var(--gray-100)', paddingTop: 20 }}>
-            <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--gray-400)', letterSpacing: '0.8px', fontFamily: SANS, marginBottom: 20, textTransform: 'uppercase' }}>
-              ZONE GÉOGRAPHIQUE D'INTERVENTION
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <div>
-                <label style={{ ...lbl, fontSize: 14, marginBottom: 8 }}>Couverture géographique</label>
-                <CustomSelect
-                  options={[
-                    { id: 'international', label: 'International' },
-                    { id: 'national',   label: 'France entière (National)' },
-                    { id: 'region',     label: 'Par Région' },
-                    { id: 'department', label: 'Par Département' },
-                  ]}
-                  value={geoScope}
-                  onChange={v => { setGeoScope(v as any); setSelectedGeo([]) }}
-                  placeholder="Choisir l'échelle d'intervention..."
-                />
-              </div>
-
-              {geoScope === 'region' && (
-                <div className="fade-in">
-                  <label style={{ ...lbl, fontSize: 14, marginBottom: 8 }}>Sélectionner la région</label>
-                  <CustomMultiSelect
-                    options={regions.map(r => ({ id: r.code, label: r.label }))}
-                    value={selectedGeo}
-                    onChange={setSelectedGeo}
-                    placeholder="Choisir une ou plusieurs régions..."
-                  />
-                </div>
-              )}
-
-              {geoScope === 'department' && (
-                <div className="fade-in">
-                  <label style={{ ...lbl, fontSize: 14, marginBottom: 8 }}>Sélectionner le département</label>
-                  <CustomMultiSelect
-                    options={departments.map(d => ({ id: d.code, label: `${d.code} - ${d.label}` }))}
-                    value={selectedGeo}
-                    onChange={setSelectedGeo}
-                    placeholder="Choisir un ou plusieurs départements..."
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <label style={lbl}>Marchés couverts</label>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {['Marché public', 'Marché privé', 'Particulier'].map(m => (
-                <label key={m} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, cursor: 'pointer' }}>
-                  <input 
-                    type="checkbox" 
-                    style={{ accentColor: 'var(--red)' }} 
-                    checked={selectedMarkets.includes(m)}
-                    onChange={() => toggle(selectedMarkets, setSelectedMarkets, m)}
-                  />
-                  {m}
-                </label>
-              ))}
-            </div>
-          </div>
+          <GeoMarketSection
+            geoScope={geoScope}
+            setGeoScope={setGeoScope}
+            selectedGeo={selectedGeo}
+            setSelectedGeo={setSelectedGeo}
+            regions={regions}
+            departments={departments}
+            selectedMarkets={selectedMarkets}
+            setSelectedMarkets={setSelectedMarkets}
+            toggle={toggle}
+          />
         </div>
       )}
 
@@ -1092,68 +1063,17 @@ function InscriptionForm({
             </div>
           )}
 
-          <div style={{ borderTop: '1px solid var(--gray-100)', paddingTop: 20 }}>
-            <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--gray-400)', letterSpacing: '0.8px', fontFamily: SANS, marginBottom: 20, textTransform: 'uppercase' }}>
-              ZONE GÉOGRAPHIQUE D'INTERVENTION
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <div>
-                <label style={{ ...lbl, fontSize: 14, marginBottom: 8 }}>Couverture géographique</label>
-                <CustomSelect
-                  options={[
-                    { id: 'international', label: 'International' },
-                    { id: 'national',   label: 'France entière (National)' },
-                    { id: 'region',     label: 'Par Région' },
-                    { id: 'department', label: 'Par Département' },
-                  ]}
-                  value={geoScope}
-                  onChange={v => { setGeoScope(v as any); setSelectedGeo([]) }}
-                  placeholder="Choisir l'échelle d'intervention..."
-                />
-              </div>
-
-              {geoScope === 'region' && (
-                <div className="fade-in">
-                  <label style={{ ...lbl, fontSize: 14, marginBottom: 8 }}>Sélectionner la région</label>
-                  <CustomMultiSelect
-                    options={regions.map(r => ({ id: r.code, label: r.label }))}
-                    value={selectedGeo}
-                    onChange={setSelectedGeo}
-                    placeholder="Choisir une ou plusieurs régions..."
-                  />
-                </div>
-              )}
-
-              {geoScope === 'department' && (
-                <div className="fade-in">
-                  <label style={{ ...lbl, fontSize: 14, marginBottom: 8 }}>Sélectionner le département</label>
-                  <CustomMultiSelect
-                    options={departments.map(d => ({ id: d.code, label: `${d.code} - ${d.label}` }))}
-                    value={selectedGeo}
-                    onChange={setSelectedGeo}
-                    placeholder="Choisir un ou plusieurs départements..."
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <label style={lbl}>Marchés couverts</label>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {['Marché public', 'Marché privé', 'Particulier'].map(m => (
-                <label key={m} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, cursor: 'pointer' }}>
-                  <input 
-                    type="checkbox" 
-                    style={{ accentColor: 'var(--red)' }} 
-                    checked={selectedMarkets.includes(m)}
-                    onChange={() => toggle(selectedMarkets, setSelectedMarkets, m)}
-                  />
-                  {m}
-                </label>
-              ))}
-            </div>
-          </div>
+          <GeoMarketSection
+            geoScope={geoScope}
+            setGeoScope={setGeoScope}
+            selectedGeo={selectedGeo}
+            setSelectedGeo={setSelectedGeo}
+            regions={regions}
+            departments={departments}
+            selectedMarkets={selectedMarkets}
+            setSelectedMarkets={setSelectedMarkets}
+            toggle={toggle}
+          />
         </div>
       )}
 

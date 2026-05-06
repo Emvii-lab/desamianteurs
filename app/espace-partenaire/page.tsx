@@ -2,17 +2,10 @@ import { createServerSupabase } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
 import PartnerDashboard from './PartnerDashboard'
 import { AVATAR_COLORS } from '@/lib/constants'
+import { timeAgo } from '@/lib/utils'
 
 export const metadata = {
   title: 'Espace Partenaire | Désamianteurs.fr',
-}
-
-function timeAgo(date: string) {
-  const diff = Date.now() - new Date(date).getTime()
-  const h = Math.floor(diff / 3600000)
-  if (h < 1) return "Il y a moins d'1h"
-  if (h < 24) return `Il y a ${h}h`
-  return `Il y a ${Math.floor(h / 24)}j`
 }
 
 export default async function EspacePartenairePage() {

@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, ClipboardList, FileText, MessageSquare,
   User, Star, LogOut, Building2, Users, ShieldCheck,
-  Bell, Settings, Wrench, BadgeCheck,
+  Bell, Settings, Wrench, BadgeCheck, FileCheck,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { motion } from 'framer-motion'
@@ -51,6 +51,7 @@ const MENUS: Record<string, { main: SidebarItem[]; compte: SidebarItem[] }> = {
     ],
     compte: [
       { label: 'Mon profil partenaire', href: '/espace-partenaire/profil', Icon: User },
+      { label: 'Documents obligatoires', href: '/espace-partenaire/documents', Icon: FileCheck },
       { label: 'Certifications', href: '/espace-partenaire/certifications', Icon: BadgeCheck },
       { label: 'Mes avis', href: '/espace-partenaire/avis', Icon: Star },
       { label: 'Déconnexion', href: '/connexion', Icon: LogOut },

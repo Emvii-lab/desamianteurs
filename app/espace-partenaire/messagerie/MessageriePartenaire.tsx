@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase'
-const supabase = createClient()
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 
@@ -26,13 +25,15 @@ interface Conversation {
   city?: string
 }
 
-export default function MessageriePartenaire({ 
+export default function MessageriePartenaire({
   userId,
   initialConversations = []
-}: { 
+}: {
   userId: string,
   initialConversations?: Conversation[]
 }) {
+  const supabase = createClient()
+
   const [conversations, setConversations] = useState<Conversation[]>(initialConversations)
   const [activeConv, setActiveConv] = useState<string | null>(initialConversations[0]?.assignment_id || null)
   const [messagesCache, setMessagesCache] = useState<Record<string, Message[]>>({})
@@ -45,20 +46,28 @@ export default function MessageriePartenaire({
   useEffect(() => {
     fetchConversations()
 
+    // Filtre le channel sur les seuls assignments du partenaire
+    const assignmentIds = initialConversations.map(c => c.assignment_id)
+    const filter = assignmentIds.length === 1
+      ? `assignment_id=eq.${assignmentIds[0]}`
+      : assignmentIds.length > 1
+        ? `assignment_id=in.(${assignmentIds.join(',')})`
+        : undefined
+
+    const channelOpts = filter
+      ? { event: '*' as const, schema: 'public', table: 'messages', filter }
+      : { event: '*' as const, schema: 'public', table: 'messages' }
+
     const channel = supabase
-      .channel('public:messages')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, (payload) => {
+      .channel(`partner-messages-${userId}`)
+      .on('postgres_changes', channelOpts, (payload: any) => {
         if (payload.eventType === 'INSERT') {
           const msg = payload.new as Message
-          
+
           setMessagesCache(prev => {
-            const currentMessages = prev[msg.assignment_id] || []
-            if (currentMessages.some(m => m.id === msg.id)) return prev
-            
-            return {
-              ...prev,
-              [msg.assignment_id]: [...currentMessages, msg]
-            }
+            const current = prev[msg.assignment_id] || []
+            if (current.some(m => m.id === msg.id)) return prev
+            return { ...prev, [msg.assignment_id]: [...current, msg] }
           })
 
           if (msg.sender_id !== userId) {
@@ -69,21 +78,17 @@ export default function MessageriePartenaire({
           }
         } else if (payload.eventType === 'UPDATE') {
           const msg = payload.new as Message
-          if (msg.is_read) {
-            fetchConversations()
-          }
+          if (msg.is_read) fetchConversations()
         }
       })
       .subscribe()
 
     return () => { supabase.removeChannel(channel) }
-  }, [activeConv])
+  }, [activeConv, userId])
 
   useEffect(() => {
     if (activeConv) {
-      if (!messagesCache[activeConv]) {
-        fetchMessages(activeConv)
-      }
+      if (!messagesCache[activeConv]) fetchMessages(activeConv)
       markAsRead(activeConv)
     }
   }, [activeConv])
@@ -96,28 +101,26 @@ export default function MessageriePartenaire({
     const { data, error } = await supabase
       .from('quote_assignments')
       .select(`
-        id,
-        quote_id,
+        id, quote_id,
         quote:quotes!quote_id(id, client_id),
         messages(content, created_at, is_read, sender_id)
       `)
       .eq('partner_id', userId)
 
-    if (error) console.error("Erreur fetchConversations Partner:", error)
+    if (error) console.error('fetchConversations:', error.message)
 
     if (data) {
       const formatted: Conversation[] = data.map((item: any) => {
         const msgs = item.messages || []
         const lastMsg = msgs.length > 0 ? msgs[msgs.length - 1] : null
         const unread = msgs.filter((m: any) => !m.is_read && m.sender_id !== userId).length
-
         return {
           assignment_id: item.id,
-          client_name: 'Client #' + item.quote?.client_id?.substring(0, 5) || 'Client',
+          client_name: 'Client #' + (item.quote?.client_id?.substring(0, 5) || '?'),
           last_message: lastMsg?.content,
           last_message_at: lastMsg?.created_at,
           unread_count: unread,
-          quote_id: item.quote_id
+          quote_id: item.quote_id,
         }
       })
       setConversations(formatted)
@@ -127,38 +130,26 @@ export default function MessageriePartenaire({
   }
 
   const updateConversationPreview = (msg: Message) => {
-    setConversations(prev => prev.map(c => {
-      if (c.assignment_id === msg.assignment_id) {
-        return {
-          ...c,
-          last_message: msg.content,
-          last_message_at: msg.created_at,
-          unread_count: msg.sender_id !== userId ? c.unread_count + 1 : c.unread_count
-        }
-      }
-      return c
-    }))
+    setConversations(prev => prev.map(c =>
+      c.assignment_id === msg.assignment_id
+        ? { ...c, last_message: msg.content, last_message_at: msg.created_at, unread_count: msg.sender_id !== userId ? c.unread_count + 1 : c.unread_count }
+        : c
+    ))
   }
 
   const fetchMessages = async (assignmentId: string) => {
     const { data } = await supabase
       .from('messages')
-      .select('*')
+      .select('id, content, created_at, sender_id, assignment_id, is_read')
       .eq('assignment_id', assignmentId)
       .order('created_at', { ascending: true })
-    if (data) {
-      setMessagesCache(prev => ({
-        ...prev,
-        [assignmentId]: data
-      }))
-    }
+    if (data) setMessagesCache(prev => ({ ...prev, [assignmentId]: data }))
   }
 
   const markAsRead = async (assignmentId: string) => {
-    setConversations(prev => prev.map(c => 
+    setConversations(prev => prev.map(c =>
       c.assignment_id === assignmentId ? { ...c, unread_count: 0 } : c
     ))
-
     await supabase
       .from('messages')
       .update({ is_read: true })
@@ -174,35 +165,36 @@ export default function MessageriePartenaire({
     const currentConv = conversations.find(c => c.assignment_id === activeConv)
     if (!currentConv?.quote_id) return
 
+    const tempId = `temp-${Date.now()}`
     const tempMsg: Message = {
-      id: 'temp-' + Math.random().toString(),
+      id: tempId,
       content: newMessage.trim(),
       created_at: new Date().toISOString(),
       sender_id: userId,
       assignment_id: activeConv,
-      is_read: true
+      is_read: true,
     }
 
-    setMessagesCache(prev => ({
-      ...prev,
-      [activeConv]: [...(prev[activeConv] || []), tempMsg]
-    }))
-
+    setMessagesCache(prev => ({ ...prev, [activeConv]: [...(prev[activeConv] || []), tempMsg] }))
     setNewMessage('')
     updateConversationPreview(tempMsg)
 
-    const { error, data } = await supabase.from('messages').insert({
-      assignment_id: activeConv,
-      sender_id: userId,
-      content: tempMsg.content,
-      quote_id: currentConv.quote_id,
-      is_read: false
-    }).select().single()
+    const { error, data } = await supabase
+      .from('messages')
+      .insert({
+        assignment_id: activeConv,
+        sender_id: userId,
+        content: tempMsg.content,
+        quote_id: currentConv.quote_id,
+        is_read: false,
+      })
+      .select()
+      .single()
 
     if (!error && data) {
       setMessagesCache(prev => ({
         ...prev,
-        [activeConv]: (prev[activeConv] || []).map(m => m.id === tempMsg.id ? data : m)
+        [activeConv]: (prev[activeConv] || []).map(m => m.id === tempId ? data : m),
       }))
     }
   }
@@ -222,14 +214,12 @@ export default function MessageriePartenaire({
         </div>
         <div className="conv-items">
           {conversations.map((conv) => (
-            <div 
+            <div
               key={conv.assignment_id}
               className={`conv-item ${activeConv === conv.assignment_id ? 'active' : ''}`}
               onClick={() => setActiveConv(conv.assignment_id)}
             >
-              <div className={`conv-av ${activeConv === conv.assignment_id ? 'red' : ''}`}>
-                CL
-              </div>
+              <div className={`conv-av ${activeConv === conv.assignment_id ? 'red' : ''}`}>CL</div>
               <div className="conv-meta">
                 <div className="conv-name">{conv.client_name}</div>
                 <div className="conv-preview">
@@ -247,9 +237,7 @@ export default function MessageriePartenaire({
             </div>
           ))}
           {conversations.length === 0 && (
-            <div className="p-8 text-center text-gray-400 text-sm">
-              Aucun message client.
-            </div>
+            <div className="p-8 text-center text-gray-400 text-sm">Aucun message client.</div>
           )}
         </div>
       </div>
@@ -258,9 +246,7 @@ export default function MessageriePartenaire({
         {activeConv ? (
           <>
             <div className="chat-header">
-              <div className="conv-av red">
-                CL
-              </div>
+              <div className="conv-av red">CL</div>
               <div className="info">
                 <h3>{currentConv?.client_name}</h3>
                 <p>Dossier #{currentConv?.assignment_id.substring(0, 8)}</p>
@@ -270,9 +256,7 @@ export default function MessageriePartenaire({
             <div className="chat-messages">
               {activeMessages.map((msg) => (
                 <div key={msg.id} className={`msg-bubble ${msg.sender_id === userId ? 'me' : 'them'}`}>
-                  <div className="bubble">
-                    {msg.content}
-                  </div>
+                  <div className="bubble">{msg.content}</div>
                   <span className="time">
                     {format(new Date(msg.created_at), 'HH:mm', { locale: fr })}
                   </span>

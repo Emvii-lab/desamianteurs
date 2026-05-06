@@ -3,6 +3,7 @@
 import { useRef, useEffect, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { ShieldCheck, MapPin, FileText, Inbox, CheckCircle, Star, ChevronDown } from 'lucide-react'
+import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import PromoBar from '@/components/PromoBar'
 import Footer from '@/components/Footer'
@@ -382,21 +383,23 @@ export default function HomeClient({ kpis, pros }: { kpis: KpiData; pros: ProCar
 
             <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-60px' }} style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 32 }}>
               {pros.map((pro: ProCard) => (
-                <motion.div key={pro.name} variants={fadeUp} whileHover={{ y: -4, boxShadow: '0 12px 32px rgba(0,0,0,0.09)', transition: { duration: 0.2 } }} style={{ background: 'white', borderRadius: 8, border: '1px solid #E5E7EB', padding: '16px 20px', cursor: 'default' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-                    <div style={{ width: 34, height: 34, borderRadius: 8, background: pro.color, color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{pro.initials}</div>
-                    <div>
-                      <div style={{ fontWeight: 600, fontSize: 13, color: '#111', marginBottom: 1 }}>{pro.name}</div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#6B7280' }}><MapPin size={10} strokeWidth={2} />{pro.city}</div>
+                <Link key={pro.id} href={`/professionnels/${pro.id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
+                  <motion.div variants={fadeUp} whileHover={{ y: -4, boxShadow: '0 12px 32px rgba(0,0,0,0.09)', transition: { duration: 0.2 } }} style={{ background: 'white', borderRadius: 8, border: '1px solid #E5E7EB', padding: '16px 20px', cursor: 'pointer' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                      <div style={{ width: 34, height: 34, borderRadius: 8, background: pro.color, color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{pro.initials}</div>
+                      <div>
+                        <div style={{ fontWeight: 600, fontSize: 13, color: '#111', marginBottom: 1 }}>{pro.name}</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#6B7280' }}><MapPin size={10} strokeWidth={2} />{pro.city}</div>
+                      </div>
                     </div>
-                  </div>
-                  <span style={{ display: 'inline-block', background: 'rgba(192,57,43,0.08)', color: 'var(--red)', padding: '2px 10px', borderRadius: 20, fontSize: 10, fontWeight: 600, marginBottom: 8 }}>{pro.type}</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ color: '#F59E0B', fontSize: 12, letterSpacing: 1 }}>{'★'.repeat(Math.round(pro.rating))}{'☆'.repeat(5 - Math.round(pro.rating))}</span>
-                    <span style={{ fontSize: 12, fontWeight: 600 }}>{pro.rating}</span>
-                    <span style={{ fontSize: 11, color: '#9CA3AF' }}>({pro.reviews} avis)</span>
-                  </div>
-                </motion.div>
+                    <span style={{ display: 'inline-block', background: 'rgba(192,57,43,0.08)', color: 'var(--red)', padding: '2px 10px', borderRadius: 20, fontSize: 10, fontWeight: 600, marginBottom: 8 }}>{pro.type}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ color: '#F59E0B', fontSize: 12, letterSpacing: 1 }}>{'★'.repeat(Math.round(pro.rating))}{'☆'.repeat(5 - Math.round(pro.rating))}</span>
+                      <span style={{ fontSize: 12, fontWeight: 600 }}>{pro.rating}</span>
+                      <span style={{ fontSize: 11, color: '#9CA3AF' }}>({pro.reviews} avis)</span>
+                    </div>
+                  </motion.div>
+                </Link>
               ))}
             </motion.div>
 
