@@ -15,9 +15,6 @@ export async function POST(req: Request) {
   if (!user) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
 
   const { partnerId, plan, source } = await req.json()
-  const cancelUrl = source === 'dashboard'
-    ? `${origin}/espace-partenaire`
-    : `${origin}/inscription?tab=partenaire&cancelled=1`
 
   const { data: partnerCheck } = await supabase
     .from('partners')
@@ -29,6 +26,9 @@ export async function POST(req: Request) {
   if (!partnerCheck) return NextResponse.json({ error: 'Partenaire introuvable' }, { status: 403 })
 
   const origin = req.headers.get('origin') ?? 'http://localhost:3000'
+  const cancelUrl = source === 'dashboard'
+    ? `${origin}/espace-partenaire`
+    : `${origin}/inscription?tab=partenaire&cancelled=1`
   const stripe = getStripe()
   const planPrice = plan ? PLAN_PRICES[plan] : undefined
 
