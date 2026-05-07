@@ -69,7 +69,7 @@ export default function PartnerDashboard({ isValid, feePaid, partnerId, demandes
       const res = await fetch('/api/stripe/create-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ partnerId }),
+        body: JSON.stringify({ partnerId, source: 'dashboard' }),
       })
       const { url, error } = await res.json()
       if (url) window.location.href = url

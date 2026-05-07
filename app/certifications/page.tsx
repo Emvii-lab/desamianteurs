@@ -60,19 +60,12 @@ const TYPES = [
 export default async function CertificationsPage() {
   const supabase = await createServerSupabase()
 
-  const [docsRes, domainsRes] = await Promise.all([
-    supabase
-      .from('ref_document_types')
-      .select('partner_type, label, description, is_required, sort_order')
-      .order('sort_order'),
-    supabase
-      .from('ref_domains')
-      .select('partner_type, label, category, sort_order')
-      .order('sort_order'),
-  ])
+  const docsRes = await supabase
+    .from('ref_document_types')
+    .select('partner_type, label, description, is_required, sort_order')
+    .order('sort_order')
 
   const docs = docsRes.data ?? []
-  const domains = domainsRes.data ?? []
 
   return (
     <div style={{ background: '#F3F4F6', minHeight: '100vh' }}>
@@ -98,9 +91,6 @@ export default async function CertificationsPage() {
 
         {TYPES.map(t => {
           const typeDocs = docs.filter(d => d.partner_type === t.key)
-          const typeDomains = domains.filter(d => d.partner_type === t.key)
-          const certDomains = typeDomains.filter(d => d.category === 'certification')
-          const skillDomains = typeDomains.filter(d => d.category === 'domain')
 
           return (
             <div key={t.key} style={{ background: 'white', border: '1px solid var(--gray-200)', borderRadius: 16, padding: 28, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
@@ -130,61 +120,9 @@ export default async function CertificationsPage() {
                 ))}
               </div>
 
-              {/* Certifications / Compétences */}
-              {certDomains.length > 0 && (
-                <div style={{ marginBottom: skillDomains.length > 0 ? 10 : 0 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--gray-400)', letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: 8 }}>
-                    Certifications acceptées
-                  </div>
-                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                    {certDomains.map((d, i) => (
-                      <span key={i} style={{ fontSize: 12, padding: '4px 12px', borderRadius: 20, background: '#F0FDF4', color: '#15803D', border: '1px solid #BBF7D0', fontWeight: 500 }}>
-                        {d.label}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Domaines / compétences */}
-              {skillDomains.length > 0 && (
-                <div>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--gray-400)', letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: 8, marginTop: certDomains.length > 0 ? 12 : 0 }}>
-                    Domaines d'intervention
-                  </div>
-                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                    {skillDomains.map((d, i) => (
-                      <span key={i} style={{ fontSize: 12, padding: '4px 12px', borderRadius: 20, background: '#F3F4F6', color: '#374151', fontWeight: 500 }}>
-                        {d.label}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           )
         })}
-
-        {/* Processus de vérification */}
-        <div style={{ background: 'white', border: '1px solid var(--gray-200)', borderRadius: 16, overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-          <div style={{ padding: '20px 28px', borderBottom: '1px solid var(--gray-100)' }}>
-            <h2 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>Processus de vérification</h2>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)' }}>
-            {[
-              { n: '01', title: 'Inscription', desc: 'Dépôt du SIRET, des documents et des certifications. Délai : 7 jours.' },
-              { n: '02', title: 'Validation', desc: 'Une association indépendante vérifie vos certifications. Frais de dossier : 80 €.' },
-              { n: '03', title: 'Activation', desc: 'Profil en ligne, abonnement mensuel sans engagement, premiers leads sous 48h.' },
-              { n: '04', title: 'Suivi', desc: 'Dashboard, alertes temps réel, score de réactivité pour optimiser votre classement.' },
-            ].map((step, i, arr) => (
-              <div key={step.n} style={{ padding: '20px 20px', borderRight: i < arr.length - 1 ? '1px solid var(--gray-100)' : 'none' }}>
-                <div style={{ fontSize: 32, fontWeight: 700, color: 'var(--gray-200)', lineHeight: 1, marginBottom: 8, letterSpacing: '-1px' }}>{step.n}</div>
-                <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 5 }}>{step.title}</div>
-                <div style={{ fontSize: 12, color: 'var(--gray-600)', lineHeight: 1.6 }}>{step.desc}</div>
-              </div>
-            ))}
-          </div>
-        </div>
 
         {/* CTA */}
         <div style={{ background: 'white', border: '1px solid var(--gray-200)', borderRadius: 16, padding: '28px 32px', textAlign: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>

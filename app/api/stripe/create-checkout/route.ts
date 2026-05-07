@@ -14,7 +14,10 @@ export async function POST(req: Request) {
 
   if (!user) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
 
-  const { partnerId, plan } = await req.json()
+  const { partnerId, plan, source } = await req.json()
+  const cancelUrl = source === 'dashboard'
+    ? `${origin}/espace-partenaire`
+    : `${origin}/inscription?tab=partenaire&cancelled=1`
 
   const { data: partnerCheck } = await supabase
     .from('partners')
@@ -47,7 +50,7 @@ export async function POST(req: Request) {
         metadata: { partner_id: partnerId, plan },
       },
       success_url:  `${origin}/inscription/succes?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url:   `${origin}/inscription?tab=partenaire&cancelled=1`,
+      cancel_url:   cancelUrl,
       client_reference_id: user.id,
       metadata: { user_id: user.id, partner_id: partnerId, plan },
       locale: 'fr',
@@ -63,7 +66,7 @@ export async function POST(req: Request) {
       line_items: [{ price: process.env.STRIPE_PRICE_ASSO!, quantity: 1 }],
       ...(promoId ? { discounts: [{ promotion_code: promoId }] } : { allow_promotion_codes: true }),
       success_url:  `${origin}/inscription/succes?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url:   `${origin}/inscription?tab=partenaire&cancelled=1`,
+      cancel_url:   cancelUrl,
       client_reference_id: user.id,
       metadata: { user_id: user.id, partner_id: partnerId },
       locale: 'fr',
