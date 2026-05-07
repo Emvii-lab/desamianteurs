@@ -7,15 +7,13 @@ interface TocItem { label: string; id: string }
 
 interface LegalPageProps {
   tag: string
-  tagColor?: string
-  tagBg?: string
   title: string
   meta: string
   toc: TocItem[]
   children: ReactNode
 }
 
-export default function LegalPage({ tag, tagColor = 'var(--red)', tagBg = 'rgba(192,57,43,0.1)', title, meta, toc, children }: LegalPageProps) {
+export default function LegalPage({ tag, title, meta, toc, children }: LegalPageProps) {
   return (
     <div style={{ background: '#F3F4F6', minHeight: '100vh' }}>
       <Navbar />
@@ -23,10 +21,10 @@ export default function LegalPage({ tag, tagColor = 'var(--red)', tagBg = 'rgba(
       {/* Hero */}
       <div style={{ background: 'var(--black)', padding: '56px 32px 40px' }}>
         <div style={{ maxWidth: 800, margin: '0 auto' }}>
-          <span style={{ display: 'inline-block', marginBottom: 14, fontSize: 11, fontWeight: 700, padding: '4px 12px', borderRadius: 20, background: tagBg, color: tagColor, letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 14, fontSize: 11, fontWeight: 700, padding: '5px 14px', borderRadius: 20, background: 'rgba(192,57,43,0.18)', color: 'var(--red)', letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
             {tag}
           </span>
-          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(24px, 3vw, 36px)', color: 'white', marginBottom: 10, fontWeight: 400 }}>
+          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(24px, 3vw, 36px)', color: 'white', marginBottom: 10, fontWeight: 700 }}>
             {title}
           </h1>
           <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, margin: 0 }}>{meta}</p>

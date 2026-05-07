@@ -1,11 +1,13 @@
 'use client'
 
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { fadeUp, staggerContainer } from '@/lib/animations'
 import Link from 'next/link'
 import { StatGrid } from '@/components/ui/StatGrid'
 import { DashboardCard } from '@/components/ui/DashboardCard'
 import { DataTable } from '@/components/ui/DataTable'
+import { Loader, AlertTriangle, Gift } from 'lucide-react'
 // import { AlgoMatchingSection } from './components/AlgoMatchingSection'
 
 type Stat = {
@@ -50,21 +52,74 @@ type Diagnostic = {
 
 type PartnerDashboardProps = {
   isValid: boolean
+  feePaid: boolean
+  partnerId: string
   demandes: Demande[]
   avis: Avis[]
   stats: Stat
   diagnostic?: Diagnostic
 }
 
+export default function PartnerDashboard({ isValid, feePaid, partnerId, demandes, avis, stats, diagnostic }: PartnerDashboardProps) {
+  const [paying, setPaying] = useState(false)
 
-export default function PartnerDashboard({ isValid, demandes, avis, stats, diagnostic }: PartnerDashboardProps) {
+  async function handleFinalize() {
+    setPaying(true)
+    try {
+      const res = await fetch('/api/stripe/create-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ partnerId }),
+      })
+      const { url, error } = await res.json()
+      if (url) window.location.href = url
+      else console.error('[finalize]', error)
+    } finally {
+      setPaying(false)
+    }
+  }
 
   return (
-    <motion.div 
+    <motion.div
       initial="hidden"
       animate="visible"
       variants={staggerContainer}
     >
+      {/* Bannière inscription incomplète */}
+      {!feePaid && (
+        <motion.div variants={fadeUp} style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap',
+          background: '#FFFBEB', border: '1.5px solid #FDE68A', borderRadius: 12,
+          padding: '16px 20px', marginBottom: 24,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <AlertTriangle size={20} color="#D97706" style={{ flexShrink: 0 }} />
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                <span style={{ fontSize: 14, fontWeight: 700, color: '#92400E' }}>Inscription incomplète</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'rgba(192,57,43,0.1)', color: 'var(--red)', fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 20, border: '1px solid rgba(192,57,43,0.2)' }}>
+                  <Gift size={11} /> Offre lancement
+                </span>
+              </div>
+              <div style={{ fontSize: 13, color: '#B45309' }}>
+                Finalisez votre dossier pour activer votre compte.{' '}
+                <span style={{ textDecoration: 'line-through', opacity: 0.6 }}>80 €</span>{' '}
+                <strong style={{ color: '#92400E' }}>offerts</strong> en ce moment — code promo appliqué automatiquement.
+              </div>
+            </div>
+          </div>
+          <button
+            className="btn btn-red btn-sm"
+            onClick={handleFinalize}
+            disabled={paying}
+            style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6 }}
+          >
+            {paying ? <Loader size={14} className="animate-spin" /> : null}
+            Finaliser mon inscription
+          </button>
+        </motion.div>
+      )}
+
       <motion.div variants={fadeUp} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 32 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>Espace Partenaire</h1>

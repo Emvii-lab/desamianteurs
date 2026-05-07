@@ -18,7 +18,7 @@ export default async function EspacePartenairePage() {
 
   const { data: partner } = await supabase
     .from('partners')
-    .select('id, is_verified, missions_completed, average_rating, review_count')
+    .select('id, is_verified, validation_fee_paid, missions_completed, average_rating, review_count')
     .eq('user_id', user.id).maybeSingle()
 
   if (!partner) {
@@ -92,8 +92,10 @@ export default async function EspacePartenairePage() {
   }
 
   return (
-    <PartnerDashboard 
+    <PartnerDashboard
       isValid={partner.is_verified ?? false}
+      feePaid={partner.validation_fee_paid ?? false}
+      partnerId={partner.id}
       demandes={demandes}
       avis={avis}
       stats={stats}

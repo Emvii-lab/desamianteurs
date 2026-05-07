@@ -34,9 +34,9 @@ export default function TarifsClient() {
         />
 
         <motion.div {...fadeUp(0)}>
-          <div className="badge badge-red-outline" style={{ marginBottom: 32, border: '1px solid rgba(192,57,43,0.4)' }}>
-            OFFRES PRO
-          </div>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 32, fontSize: 11, fontWeight: 700, padding: '5px 14px', borderRadius: 20, background: 'rgba(192,57,43,0.18)', color: 'var(--red)', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
+            Offres Pro
+          </span>
           <h1 style={{ fontFamily: 'var(--font-serif, "DM Serif Display", Georgia, serif)', color: 'white', fontSize: 'clamp(32px, 6vw, 64px)', fontWeight: 700, marginBottom: 24 }}>
             Des tarifs <span style={{ color: 'var(--red)' }}>simples</span> et <span style={{ color: 'var(--red)' }}>transparents</span>
           </h1>
@@ -119,7 +119,11 @@ export default function TarifsClient() {
                   </div>
                 ))}
               </div>
-              <Link href={plan.id === 'platinum' ? '/contact' : '/inscription'} className={`btn ${plan.ctaStyle}`} style={{ width: '100%', textTransform: 'none', marginTop: 20 }}>
+              <Link
+                href={`/inscription?tab=partenaire&plan=${plan.id}`}
+                className={`btn ${plan.ctaStyle}`}
+                style={{ width: '100%', textTransform: 'none', marginTop: 20 }}
+              >
                 {plan.cta}
               </Link>
             </motion.div>
@@ -127,9 +131,11 @@ export default function TarifsClient() {
         </div>
 
         {/* Comparison table */}
-        <section style={{ marginBottom: 120, overflowX: 'auto' }}>
-          <motion.h2 {...fadeUp()} style={{ fontSize: 24, textAlign: 'center', marginBottom: 48 }}>Comparatif rapide</motion.h2>
-          <motion.div {...fadeUp(0.1)} style={{ minWidth: 800, background: 'white', border: '1px solid var(--gray-100)', borderRadius: 12, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+        <section style={{ marginBottom: 120 }}>
+          <motion.h2 {...fadeUp()} style={{ fontFamily: 'var(--font-serif)', fontSize: 32, fontWeight: 700, textAlign: 'center', marginBottom: 48, color: 'var(--black)' }}>Comparatif rapide</motion.h2>
+          <motion.div {...fadeUp(0.1)}>
+          <div style={{ overflowX: 'auto' }}>
+          <div style={{ minWidth: 800, background: 'white', border: '1px solid var(--gray-100)', borderRadius: 12, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ background: 'var(--black)', color: 'white' }}>
@@ -163,41 +169,43 @@ export default function TarifsClient() {
             <div style={{ padding: '16px 32px', fontSize: 12, color: 'var(--gray-400)', fontStyle: 'italic', textAlign: 'center' }}>
               Maximum 3 professionnels contactés par demande · Rotation automatique si non-réponse sous 48 h
             </div>
+          </div>
+          </div>
           </motion.div>
         </section>
 
         {/* Steps */}
         <section style={{ marginBottom: 120 }}>
           <motion.div {...fadeUp()}>
-            <h2 style={{ fontSize: 28, marginBottom: 12 }}>Comment ça se passe ?</h2>
-            <p style={{ color: 'var(--gray-400)', marginBottom: 48 }}>De l'inscription à l'activation de votre compte.</p>
+            <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 32, fontWeight: 700, marginBottom: 8, color: 'var(--black)' }}>Comment ça se passe ?</h2>
+            <p style={{ color: 'var(--gray-400)', fontSize: 14, marginBottom: 40 }}>De l'inscription à l'activation de votre compte.</p>
           </motion.div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14 }}>
             {STEPS_PRICE.map((step, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] as any, delay: i * 0.1 }}
-                className="step-price-card"
+                transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] as any, delay: i * 0.08 }}
+                whileHover={{ y: -4, boxShadow: '0 12px 32px rgba(0,0,0,0.09)', transition: { duration: 0.2 } }}
                 style={{
                   background: 'white',
-                  padding: '28px 22px',
-                  borderLeft: '1px solid var(--gray-200)',
-                  borderRight: '1px solid var(--gray-200)',
-                  borderBottom: '1px solid var(--gray-200)',
+                  border: '1px solid var(--gray-200)',
                   borderRadius: 12,
-                  boxShadow: '0 2px 12px rgba(0,0,0,0.05)',
-                  position: 'relative',
+                  padding: '24px 20px',
+                  cursor: 'default',
                 }}
               >
-                <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: '50%', background: 'var(--gray-100)', fontSize: 13, fontWeight: 800, color: 'var(--gray-500)', marginBottom: 16 }}>
+                <div style={{ fontSize: 36, fontWeight: 700, color: 'var(--gray-200)', lineHeight: 1, marginBottom: 12, letterSpacing: '-1px', fontFamily: 'var(--font-sans)' }}>
                   {step.n}
                 </div>
-                <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 10, color: 'var(--black)' }}>{step.title}</h3>
-                <p style={{ fontSize: 13, color: 'var(--gray-500)', lineHeight: 1.65, margin: 0 }}>{step.desc}</p>
+                <div style={{ width: 28, height: 28, borderRadius: 6, background: 'rgba(192,57,43,0.07)', color: 'var(--red)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <h3 style={{ fontSize: 13, fontWeight: 700, marginBottom: 6, fontFamily: 'var(--font-sans)', color: 'var(--black)' }}>{step.title}</h3>
+                <p style={{ fontSize: 11.5, color: '#6B7280', lineHeight: 1.55, margin: 0 }}>{step.desc}</p>
               </motion.div>
             ))}
           </div>

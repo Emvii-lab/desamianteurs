@@ -34,22 +34,30 @@ export async function POST(req: Request) {
   switch (event.type) {
     case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session
-      const userId = session.client_reference_id
+      const userId     = session.client_reference_id
       const customerId = session.customer as string
+      const plan       = session.metadata?.plan as string | undefined
 
       if (!userId) break
 
+      const update: Record<string, unknown> = {
+        validation_fee_paid:    true,
+        validation_fee_paid_at: new Date().toISOString(),
+        stripe_customer_id:     customerId,
+      }
+
+      // Pour les plans payants, on note l'abonnement choisi
+      if (plan && ['essentiel', 'performance', 'premium'].includes(plan)) {
+        update.subscription = plan
+      }
+
       const { error } = await admin
         .from('partners')
-        .update({
-          validation_fee_paid: true,
-          validation_fee_paid_at: new Date().toISOString(),
-          stripe_customer_id: customerId,
-        })
+        .update(update)
         .eq('user_id', userId)
 
       if (error) console.error('[Stripe webhook] Erreur update partner:', error.message)
-      else console.log('[Stripe webhook] Partner validé:', userId)
+      else console.log(`[Stripe webhook] Partner validé (plan: ${plan ?? 'freemium'}):`, userId)
       break
     }
 

@@ -81,10 +81,10 @@ export default async function CertificationsPage() {
       {/* Hero */}
       <div style={{ background: 'var(--black)', padding: '56px 32px 40px' }}>
         <div style={{ maxWidth: 900, margin: '0 auto' }}>
-          <span style={{ display: 'inline-block', marginBottom: 16, fontSize: 11, fontWeight: 700, padding: '4px 12px', borderRadius: 20, background: 'rgba(192,57,43,0.2)', color: 'var(--red)', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 16, fontSize: 11, fontWeight: 700, padding: '5px 14px', borderRadius: 20, background: 'rgba(192,57,43,0.18)', color: 'var(--red)', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
             Transparence
           </span>
-          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(26px, 3.5vw, 40px)', color: 'white', marginBottom: 12, fontWeight: 400 }}>
+          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(26px, 3.5vw, 40px)', color: 'white', marginBottom: 12, fontWeight: 700 }}>
             Certifications &amp; documents requis
           </h1>
           <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 15, maxWidth: 620, lineHeight: 1.7, margin: 0 }}>

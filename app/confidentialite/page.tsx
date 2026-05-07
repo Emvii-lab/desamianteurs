@@ -21,8 +21,6 @@ export default function ConfidentialitePage() {
   return (
     <LegalPage
       tag="RGPD"
-      tagColor="#1D4ED8"
-      tagBg="#EFF6FF"
       title="Politique de Confidentialité"
       meta="Conforme au Règlement UE 2016/679 (RGPD) · Version 1.0 — Mars 2026"
       toc={TOC}

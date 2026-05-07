@@ -27,6 +27,7 @@ export function InscriptionContent({
   const router = useRouter()
   const searchParams = useSearchParams()
   const [userType, setUserType] = useState<'client' | 'partenaire'>('client')
+  const selectedPlan = searchParams.get('plan') ?? ''
 
   useEffect(() => {
     setUserType(searchParams.get('tab') === 'partenaire' ? 'partenaire' : 'client')
@@ -155,12 +156,13 @@ export function InscriptionContent({
               ))}
             </div>
 
-            <InscriptionForm 
-              type={userType} 
-              initialRegions={initialRegions} 
-              initialDepartments={initialDepartments} 
+            <InscriptionForm
+              type={userType}
+              initialRegions={initialRegions}
+              initialDepartments={initialDepartments}
               initialDocTypes={initialDocTypes}
               initialDomains={initialDomains}
+              selectedPlan={selectedPlan}
             />
 
             <div style={{ margin: '32px 0', display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -280,16 +282,18 @@ function GeoMarketSection({
 
 function InscriptionForm({
   type,
-  initialRegions, 
-  initialDepartments, 
+  initialRegions,
+  initialDepartments,
   initialDocTypes,
-  initialDomains
-}: { 
+  initialDomains,
+  selectedPlan = '',
+}: {
   type: 'client' | 'partenaire',
   initialRegions: any[],
   initialDepartments: any[],
   initialDocTypes: any[],
-  initialDomains: any[]
+  initialDomains: any[],
+  selectedPlan?: string,
 }) {
   const router = useRouter()
   const [regions] = useState(initialRegions)
@@ -552,9 +556,9 @@ function InscriptionForm({
         const initialCity = siretData?.ville || ''
         const initialCp   = siretData?.cp    || ''
         const initialAddr = siretData?.adresse || ''
-        
-        const { city, zip } = parseLocation(initialCity, initialAddr, initialCp)
-        
+
+        parseLocation(initialCity, initialAddr, initialCp)
+
         const lat  = siretData?.lat   || null
         const lng  = siretData?.lng   || null
 
@@ -641,9 +645,17 @@ function InscriptionForm({
           const res = await fetch('/api/stripe/create-checkout', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ partnerId: newPartner.id }),
+            body: JSON.stringify({ partnerId: newPartner.id, plan: selectedPlan || undefined }),
           })
-          const { url, error: checkoutError } = await res.json()
+          let url: string | undefined
+          let checkoutError: string | undefined
+          try {
+            const json = await res.json()
+            url = json.url
+            checkoutError = json.error
+          } catch {
+            checkoutError = `Erreur serveur (${res.status})`
+          }
           if (url) {
             window.location.href = url
             return
@@ -762,11 +774,32 @@ function InscriptionForm({
       <div>
         <label style={lbl}>Confirmer le mot de passe</label>
         <div style={{ position: 'relative' }}>
-          <input type={showConfirm ? 'text' : 'password'} className="input" placeholder="Confirmez votre mot de passe" value={pwdConfirm} onChange={e => setPwdConfirm(e.target.value)} required style={{ paddingRight: 44 }} />
+          <input
+            type={showConfirm ? 'text' : 'password'}
+            className="input"
+            placeholder="Confirmez votre mot de passe"
+            value={pwdConfirm}
+            onChange={e => setPwdConfirm(e.target.value)}
+            required
+            style={{
+              paddingRight: 44,
+              borderColor: pwdConfirm
+                ? pwd === pwdConfirm ? '#16A34A' : '#DC2626'
+                : undefined,
+            }}
+          />
           <button type="button" onClick={() => setShowConfirm(v => !v)} style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF' }}>
             {showConfirm ? <Eye size={16} /> : <EyeOff size={16} />}
           </button>
         </div>
+        {pwdConfirm && (
+          <p style={{ fontSize: 12, marginTop: 5, display: 'flex', alignItems: 'center', gap: 5, color: pwd === pwdConfirm ? '#16A34A' : '#DC2626' }}>
+            {pwd === pwdConfirm
+              ? <><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg> Les mots de passe correspondent</>
+              : <><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Les mots de passe ne correspondent pas</>
+            }
+          </p>
+        )}
       </div>
 
       {/* Type de client — enum Supabase */}

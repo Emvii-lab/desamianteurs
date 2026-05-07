@@ -114,7 +114,7 @@ export default async function ProfilProPage({ params }: Props) {
 
             <div style={{ flex: 1, minWidth: 200 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 10 }}>
-                <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 28, color: 'white', margin: 0, fontWeight: 400 }}>
+                <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 28, color: 'white', margin: 0, fontWeight: 700 }}>
                   {p.company_name}
                 </h1>
                 {planBadge && (

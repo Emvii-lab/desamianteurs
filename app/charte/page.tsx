@@ -21,8 +21,6 @@ export default function ChartePage() {
   return (
     <LegalPage
       tag="Professionnels"
-      tagColor="#6C3483"
-      tagBg="#F4ECF7"
       title="Charte de Bonne Conduite"
       meta="Applicable à tous les professionnels référencés sur Désamianteurs.fr · Version 1.0 — Mars 2026"
       toc={TOC}
