@@ -179,7 +179,7 @@ export default function PartnerDashboard({ isValid, feePaid, partnerId, absenceS
             style={{ padding: 20, textAlign: 'center', borderBottom: '4px solid var(--red)' }}
           >
             <div style={{ fontSize: 12, color: '#6B7280', fontWeight: 700, textTransform: 'uppercase', marginBottom: 8 }}>Score Réactivité</div>
-            <div style={{ fontSize: 32, fontWeight: 800, color: '#111827' }}>{diagnostic.reactivity_score.toFixed(1)} / 36</div>
+            <div style={{ fontSize: 32, fontWeight: 800, color: '#111827' }}>{diagnostic.reactivity_score.toFixed(1)} / 24</div>
             <div style={{ fontSize: 12, color: '#9CA3AF', marginTop: 4 }}>Sur les 20 derniers dossiers</div>
           </motion.div>
           
