@@ -65,29 +65,48 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const res = await fetch(`${edgeUrl}/verify-siret`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-      },
-      body: JSON.stringify({ siret: clean }),
-      signal: AbortSignal.timeout(10_000),
-    })
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 10_000)
+
+    let res: Response
+    try {
+      res = await fetch(`${edgeUrl}/verify-siret`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({ siret: clean }),
+        signal: controller.signal,
+      })
+    } finally {
+      clearTimeout(timeout)
+    }
 
     if (!res.ok) {
+      const text = await res.text().catch(() => '')
+      console.error('[verify-siret] Edge function error:', res.status, text)
       return NextResponse.json({ error: 'SIRET introuvable ou service indisponible' }, { status: res.status })
     }
 
-    const data = await res.json()
+    let data: any
+    try {
+      data = await res.json()
+    } catch (parseErr) {
+      const raw = await res.text().catch(() => '(unreadable)')
+      console.error('[verify-siret] JSON parse error. Raw response:', raw)
+      return NextResponse.json({ error: 'Réponse invalide du service SIRET' }, { status: 502 })
+    }
 
     if (data?.activite && NAF[data.activite]) {
-      data.activite = NAF[data.activite]
+      data = { ...data, activite: NAF[data.activite] }
     }
 
     return NextResponse.json(data)
   } catch (e: any) {
-    if (e?.name === 'TimeoutError') {
+    const isAbort = e?.name === 'AbortError' || e?.name === 'TimeoutError'
+    console.error('[verify-siret] Erreur:', e?.name, e?.message)
+    if (isAbort) {
       return NextResponse.json({ error: 'Délai dépassé — réessayez' }, { status: 504 })
     }
     return NextResponse.json({ error: 'Erreur interne' }, { status: 500 })
