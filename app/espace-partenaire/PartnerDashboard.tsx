@@ -54,13 +54,19 @@ type PartnerDashboardProps = {
   isValid: boolean
   feePaid: boolean
   partnerId: string
+  absenceStart: string | null
+  absenceEnd: string | null
   demandes: Demande[]
   avis: Avis[]
   stats: Stat
   diagnostic?: Diagnostic
 }
 
-export default function PartnerDashboard({ isValid, feePaid, partnerId, demandes, avis, stats, diagnostic }: PartnerDashboardProps) {
+export default function PartnerDashboard({ isValid, feePaid, partnerId, absenceStart, absenceEnd, demandes, avis, stats, diagnostic }: PartnerDashboardProps) {
+  const isAbsent = !!(absenceStart && absenceEnd &&
+    new Date() >= new Date(absenceStart) &&
+    new Date() <= new Date(absenceEnd)
+  )
   const [paying, setPaying] = useState(false)
 
   async function handleFinalize() {
@@ -85,6 +91,25 @@ export default function PartnerDashboard({ isValid, feePaid, partnerId, demandes
       animate="visible"
       variants={staggerContainer}
     >
+      {/* Bannière mode absence actif */}
+      {isAbsent && (
+        <motion.div variants={fadeUp} style={{
+          display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap',
+          background: '#EFF6FF', border: '1.5px solid #BFDBFE', borderRadius: 12,
+          padding: '14px 20px', marginBottom: 16,
+        }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1D4ED8" strokeWidth="2" style={{ flexShrink: 0 }}><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <div style={{ flex: 1 }}>
+            <span style={{ fontSize: 14, fontWeight: 700, color: '#1E40AF' }}>Mode absence activé — </span>
+            <span style={{ fontSize: 13, color: '#1D4ED8' }}>
+              Aucune demande ne vous sera envoyée jusqu'au{' '}
+              <strong>{new Date(absenceEnd!).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}</strong>.
+              Votre score de réactivité est conservé.
+            </span>
+          </div>
+        </motion.div>
+      )}
+
       {/* Bannière inscription incomplète */}
       {!feePaid && (
         <motion.div variants={fadeUp} style={{
