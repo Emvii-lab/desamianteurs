@@ -1,9 +1,9 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { DemandeFormData } from '@/lib/types'
 
-const demandeSchema = z.object({
+/** Exporté pour les tests unitaires du flux de validation. */
+export const demandeSchema = z.object({
   serviceTypes: z.array(z.string()).min(1, "Veuillez choisir au moins une prestation"),
   userType: z.string().min(1, "Veuillez préciser votre profil"),
   propertyType: z.string().min(1, "Veuillez choisir un type de bien"),

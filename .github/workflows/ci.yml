@@ -1,0 +1,26 @@
+# Lance les tests sur chaque push / PR GitHub.
+# (Le lint est volontairement exclu tant que le projet a des centaines de violations ESLint historiques.)
+# Les déploiements Vercel restent inchangés.
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Unit tests
+        run: npm run test

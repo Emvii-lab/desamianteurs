@@ -87,6 +87,10 @@ export default function HomeClient({ kpis, pros }: { kpis: KpiData; pros: ProCar
   const [searchType, setSearchType] = useState('')
   const [searchLocation, setSearchLocation] = useState('')
 
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
   function handleSearch() {
     const params = new URLSearchParams()
     if (searchType) params.set('type', searchType)
@@ -97,8 +101,8 @@ export default function HomeClient({ kpis, pros }: { kpis: KpiData; pros: ProCar
 
   return (
     <div style={{ fontFamily: 'var(--font-sans), DM Sans, sans-serif', color: '#111' }}>
-      {/* Header sticky — PromoBar + Navbar collent ensemble en haut au scroll */}
-      <div style={{ position: 'sticky', top: 0, zIndex: 1100 }}>
+      {/* Header fixed — hors du flux, ne décale pas le contenu */}
+      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1100 }}>
         <PromoBar />
         <Navbar />
       </div>
@@ -107,11 +111,11 @@ export default function HomeClient({ kpis, pros }: { kpis: KpiData; pros: ProCar
         <section style={{
           background: '#111111',
           color: 'white',
-          minHeight: 'calc(100vh - 120px)', // Compense la navbar + promobar
+          minHeight: '100vh',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
-          padding: '40px 40px 160px', // Augmente le padding bas pour remonter le titre (centrage visuel avec barre recherche)
+          padding: '140px 40px 160px',
           position: 'relative',
           overflow: 'hidden',
           textAlign: 'center'
