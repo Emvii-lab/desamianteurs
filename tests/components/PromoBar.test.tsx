@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import PromoBar from '@/components/PromoBar'
 
 afterEach(() => {
@@ -50,7 +50,9 @@ describe('PromoBar', () => {
     fireEvent.click(screen.getByRole('button', { name: /Fermer le bandeau/i }))
     expect(localStorage.getItem(STORAGE_KEY)).toBeNull()
 
-    await vi.advanceTimersByTimeAsync(350)
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(350)
+    })
 
     expect(localStorage.getItem(STORAGE_KEY)).toBe('1')
     expect(screen.queryByText(/Offre lancement/i)).not.toBeInTheDocument()
