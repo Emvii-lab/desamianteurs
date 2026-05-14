@@ -57,6 +57,49 @@ a {
   transition: var(--transition);
 }
 
+/* ── Responsive Navbar ──────────────────────────────────────────────────── */
+.nav-desktop-links { display: flex !important; align-items: center; gap: 32px; }
+.nav-mobile-toggle { display: none !important; align-items: center; gap: 10px; }
+
+@media (max-width: 768px) {
+  .nav-inner         { padding: 0 16px !important; }
+  .nav-desktop-links { display: none !important; }
+  .nav-mobile-toggle { display: flex !important; }
+}
+
+/* ── Responsive Footer ──────────────────────────────────────────────────── */
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+@media (max-width: 768px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+}
+
+/* ── Bouton DÉCOUVRIR hero ──────────────────────────────────────────────── */
+/* En dessous de ~1000px la search bar (maxWidth 900 + padding 40) prend
+   toute la largeur et chevauche le bouton positionné à right:50        */
+.decouvrir-hero { bottom: 54px; }
+
+@media (max-width: 1000px) {
+  .decouvrir-hero { bottom: 130px; }
+}
+
+/* ── Search bar responsive ──────────────────────────────────────────────── */
+.hero-search-floating { display: block; }
+.hero-search-section  { display: none; }
+
+@media (max-width: 768px) {
+  .hero-search-floating { display: none !important; }
+  .hero-search-section  { display: block !important; }
+}
+
 /* Layout Utilities */
 .container {
   max-width: 1200px;

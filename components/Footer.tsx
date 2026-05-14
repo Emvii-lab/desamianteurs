@@ -71,12 +71,8 @@ function FooterLink({ href, label }: { href: string; label: string }) {
 
 export default function Footer() {
   return (
-    <footer style={{ background: '#0A0A0A', padding: '48px 40px 24px' }}>
-      <div style={{
-        maxWidth: 1200, margin: '0 auto',
-        display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr',
-        gap: 40, marginBottom: 40,
-      }}>
+    <footer style={{ background: '#0A0A0A', padding: '48px 24px 24px' }}>
+      <div className="footer-grid" style={{ maxWidth: 1200, margin: '0 auto' }}>
         {/* Brand */}
         <div>
           <div style={{ marginBottom: 12 }}>
