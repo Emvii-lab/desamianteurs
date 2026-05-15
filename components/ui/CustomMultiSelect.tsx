@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { ChevronDown, ChevronUp, X, Check } from 'lucide-react'
+import { useClickOutside } from '@/lib/hooks/useClickOutside'
 
 type Option = { id: string; label: string }
 
@@ -17,13 +18,8 @@ export default function CustomMultiSelect({ options, value = [], onChange, place
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
-    }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [])
+  const close = useCallback(() => setOpen(false), [])
+  useClickOutside(ref, close)
 
   const toggleOption = (id: string) => {
     const newValue = value.includes(id)

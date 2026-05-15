@@ -383,7 +383,7 @@ export default function CompleterClient({
               >
                 Continuer →
               </button>
-              {error && <p style={{ color: '#C0392B', fontSize: 13, marginTop: 12, fontFamily: SANS }}>{error}</p>}
+              {error && <p className="form-error">{error}</p>}
             </div>
           )}
 
@@ -424,7 +424,7 @@ export default function CompleterClient({
                     </div>
                   </div>
                   {siretStatus === 'error' && (
-                    <p style={{ fontSize: 12, color: '#C0392B', marginTop: 4, fontFamily: SANS }}>SIRET introuvable ou invalide.</p>
+                    <p className="error-text">SIRET introuvable ou invalide.</p>
                   )}
                   {siretStatus === 'ok' && siretData && (
                     <div style={{ marginTop: 12, background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 8, padding: '12px 16px' }}>
@@ -541,7 +541,7 @@ export default function CompleterClient({
               >
                 Continuer →
               </button>
-              {error && <p style={{ color: '#C0392B', fontSize: 13, marginTop: 12, fontFamily: SANS }}>{error}</p>}
+              {error && <p className="form-error">{error}</p>}
             </div>
           )}
 
@@ -626,7 +626,7 @@ export default function CompleterClient({
               >
                 Continuer →
               </button>
-              {error && <p style={{ color: '#C0392B', fontSize: 13, marginTop: 12, fontFamily: SANS }}>{error}</p>}
+              {error && <p className="form-error">{error}</p>}
             </div>
           )}
 
@@ -656,7 +656,7 @@ export default function CompleterClient({
                   </div>
                 </div>
                 {siretStatus === 'error' && (
-                  <p style={{ fontSize: 12, color: '#C0392B', marginTop: 4, fontFamily: SANS }}>SIRET introuvable ou invalide.</p>
+                  <p className="error-text">SIRET introuvable ou invalide.</p>
                 )}
                 {siretStatus === 'ok' && siretData && (
                   <div style={{ marginTop: 12, background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 8, padding: '12px 16px' }}>
@@ -715,7 +715,7 @@ export default function CompleterClient({
               >
                 Continuer →
               </button>
-              {error && <p style={{ color: '#C0392B', fontSize: 13, marginTop: 12, fontFamily: SANS }}>{error}</p>}
+              {error && <p className="form-error">{error}</p>}
             </div>
           )}
 
@@ -783,11 +783,7 @@ export default function CompleterClient({
                 <span>J'accepte les <Link href="/cgu" style={{ color: '#C0392B' }}>Conditions Générales d'Utilisation</Link> et la <Link href="/confidentialite" style={{ color: '#C0392B' }}>Politique de confidentialité</Link></span>
               </label>
 
-              {error && (
-                <div style={{ background: 'rgba(192,57,43,0.06)', border: '1px solid rgba(192,57,43,0.2)', borderRadius: 8, padding: '10px 14px', marginBottom: 16, fontSize: 13, color: '#C0392B', fontFamily: SANS }}>
-                  {error}
-                </div>
-              )}
+              {error && <div className="form-error" style={{ marginBottom: 16 }}>{error}</div>}
 
               <button
                 className="btn btn-red"

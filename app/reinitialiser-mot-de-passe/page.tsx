@@ -102,11 +102,7 @@ export default function ReinitialiserMotDePassePage() {
                     </div>
                   </div>
 
-                  {error && (
-                    <div style={{ background: 'rgba(192,57,43,0.06)', border: '1px solid rgba(192,57,43,0.2)', borderRadius: 8, padding: '10px 14px', fontSize: 13, color: '#C0392B', fontFamily: SANS }}>
-                      {error}
-                    </div>
-                  )}
+                  {error && <div className="form-error">{error}</div>}
 
                   <button type="submit" className="btn btn-red" style={{ width: '100%', padding: 16, textTransform: 'none', letterSpacing: 0, fontWeight: 600 }} disabled={loading}>
                     {loading ? 'Mise à jour...' : 'Mettre à jour le mot de passe'}

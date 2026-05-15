@@ -141,6 +141,7 @@ export default function GoogleAddressMap({ onSelect, searchValue, onSearchChange
   return (
     <>
       <Script
+        id="google-maps-api"
         src={`https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&language=fr`}
         onLoad={initMaps}
         strategy="lazyOnload"

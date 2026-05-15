@@ -120,11 +120,7 @@ export function Step3Coordonnees({
         </>
       )}
 
-      {error && (
-        <div style={{ background: 'rgba(192,57,43,0.06)', border: '1px solid rgba(192,57,43,0.2)', borderRadius: 8, padding: '10px 14px', marginTop: 16, fontSize: 13, color: '#C0392B' }}>
-          {error}
-        </div>
-      )}
+      {error && <div className="form-error" style={{ marginTop: 16 }}>{error}</div>}
 
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 24 }}>
         <button type="button" className="btn btn-outline" onClick={onBack} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '14px 28px' }}>

@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
+import { useClickOutside } from '@/lib/hooks/useClickOutside'
 
 type Option = { id: string; label: string }
 
@@ -19,14 +20,8 @@ export default function CustomSelect({ options, value, onChange, placeholder = '
   const triggerRef = useRef<HTMLButtonElement>(null)
 
   const selected = options.find(o => o.id === value)
-
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
-    }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [])
+  const close = useCallback(() => setOpen(false), [])
+  useClickOutside(ref, close)
 
   return (
     <div ref={ref} style={{ position: 'relative' }}>

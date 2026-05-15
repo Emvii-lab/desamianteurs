@@ -174,6 +174,10 @@ describe('Sécurité — Mass assignment', () => {
     const updateArg = mock._update.mock.calls[0][0]
     const WHITELIST = ['first_name','last_name','phone','description','company_address','city','zip_code','certified_workers_count','accept_individuals','avatar_url','logo_url','updated_at']
     const receivedKeys = Object.keys(updateArg)
+    // L'update doit contenir au moins un champ autorisé (phone, description) + updated_at
+    expect(receivedKeys).toContain('phone')
+    expect(receivedKeys).toContain('updated_at')
+    // Tous les champs reçus doivent être dans la whitelist
     for (const key of receivedKeys) {
       expect(WHITELIST).toContain(key)
     }

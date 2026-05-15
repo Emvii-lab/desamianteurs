@@ -557,6 +557,49 @@ label:has(input:checked) {
 /* Stars */
 .stars { color: #F59E0B; letter-spacing: 1px; }
 
+/* ── Erreurs formulaires ────────────────────────────────────────────────── */
+
+/* Erreur au niveau d'un champ (sous l'input) */
+.error-text {
+  color: #DC2626;
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.error-text::before {
+  content: '✕';
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* Erreur au niveau du formulaire (bloc alerte) */
+.form-error {
+  background: rgba(220, 38, 38, 0.05);
+  border: 1px solid rgba(220, 38, 38, 0.25);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #DC2626;
+  margin-bottom: 4px;
+}
+
+/* Bordure rouge sur l'input quand son frère suivant est une erreur */
+.input:has(+ .error-text),
+.input:has(~ .error-text) {
+  border-color: #DC2626 !important;
+}
+
+/* Cas où .error-text est dans le même conteneur que l'input */
+div:has(> .error-text) > .input {
+  border-color: #DC2626 !important;
+}
+
 /* Animations */
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 .fade-in { animation: fadeIn 0.3s ease; }

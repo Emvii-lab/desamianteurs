@@ -16,9 +16,9 @@ export default async function UtilisateursPage() {
 
   // 2. Récupération des données multi-tables
   const [clientsRes, partnersRes, adminsRes] = await Promise.all([
-    supabase.from('clients').select('id, first_name, last_name, email, phone, created_at, company_name'),
-    supabase.from('partners').select('id, first_name, last_name, email, phone, created_at, company_name, partner_type'),
-    supabase.from('admins').select('id, first_name, last_name, email, created_at')
+    supabase.from('clients').select('id, user_id, first_name, last_name, email, phone, created_at, company_name'),
+    supabase.from('partners').select('id, user_id, first_name, last_name, email, phone, created_at, company_name, partner_type'),
+    supabase.from('admins').select('id, user_id, first_name, last_name, email, created_at')
   ])
 
   // 3. Agrégation

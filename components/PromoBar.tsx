@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { X, ArrowRight, Gift } from 'lucide-react'
 import { useIsMobile } from '@/lib/hooks/useIsMobile'
 
-const STORAGE_KEY = 'promobar_dismissed_v5'
+const STORAGE_KEY = 'promobar_dismissed_v6'
 
 export default function PromoBar() {
   const [visible, setVisible] = useState(false)

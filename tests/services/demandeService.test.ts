@@ -127,8 +127,13 @@ describe('demandeService.submitDemande', () => {
     const mock = buildClient({ existingClient: null })
     vi.mocked(createClient).mockReturnValue(mock as any)
     await demandeService.submitDemande(baseData(), [], true, 'create')
-    const clientFrom = mock._from.mock.calls.filter(([t]: string[]) => t === 'clients')
-    expect(clientFrom.length).toBeGreaterThan(0)
+    // from('clients') est appelé deux fois : SELECT (vérif) + INSERT (création)
+    // On vérifie qu'au moins l'un des appels clients a déclenché insert()
+    const insertWasCalled = mock._from.mock.calls.some((args: string[], idx: number) => {
+      if (args[0] !== 'clients') return false
+      return mock._from.mock.results[idx]?.value?.insert?.mock?.calls?.length > 0
+    })
+    expect(insertWasCalled).toBe(true)
   })
 
   it('réutilise le profil client existant sans en créer un nouveau', async () => {
@@ -136,6 +141,10 @@ describe('demandeService.submitDemande', () => {
     vi.mocked(createClient).mockReturnValue(mock as any)
     const result = await demandeService.submitDemande(baseData(), [], true, 'create')
     expect(result.success).toBe(true)
+    // Vérifie qu'aucun insert n'a été appelé sur clients (réutilisation du profil existant)
+    const clientIdx = mock._from.mock.calls.findIndex(([t]: string[]) => t === 'clients')
+    const clientResult = mock._from.mock.results[clientIdx]
+    expect(clientResult?.value?.insert).not.toHaveBeenCalled()
   })
 
   it('lève une erreur si la création du devis échoue', async () => {

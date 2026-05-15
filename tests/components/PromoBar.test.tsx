@@ -15,7 +15,7 @@ vi.mock('next/link', () => ({
   ),
 }))
 
-const STORAGE_KEY = 'promobar_dismissed_v5'
+const STORAGE_KEY = 'promobar_dismissed_v6'
 
 describe('PromoBar', () => {
   beforeEach(() => {

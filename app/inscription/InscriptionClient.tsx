@@ -1,15 +1,16 @@
 'use client'
 
-import { useState, useEffect, useLayoutEffect, useRef } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { ArrowLeft, User, Building2, ShieldCheck, FileCheck, Info, Eye, EyeOff, CheckCircle, Loader, Gift, Search, Star, Camera } from 'lucide-react'
 import CustomSelect from '@/components/ui/CustomSelect'
-import CustomMultiSelect from '@/components/ui/CustomMultiSelect'
 import { INSCRIPTION_CLIENT_TYPES, INSCRIPTION_PARTNER_TYPES, NEEDS_SIRET } from '@/lib/constants'
-import { parseLocation } from '@/lib/utils'
+import { useSiretValidation } from '@/lib/hooks/useSiretValidation'
+import { usePromoCode } from '@/lib/hooks/usePromoCode'
+import GeoMarketSection from './components/GeoMarketSection'
 
 
 
@@ -198,88 +199,6 @@ export function InscriptionContent({
   )
 }
 
-function GeoMarketSection({
-  geoScope, setGeoScope, selectedGeo, setSelectedGeo,
-  regions, departments, selectedMarkets, setSelectedMarkets, toggle,
-}: {
-  geoScope: string
-  setGeoScope: (v: 'international' | 'national' | 'region' | 'department' | '') => void
-  selectedGeo: string[]
-  setSelectedGeo: (v: string[]) => void
-  regions: any[]
-  departments: any[]
-  selectedMarkets: string[]
-  setSelectedMarkets: (v: string[]) => void
-  toggle: (list: string[], set: (v: string[]) => void, item: string) => void
-}) {
-  const SANS = 'var(--font-sans, DM Sans, sans-serif)'
-  const lbl: React.CSSProperties = { display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 7, fontFamily: SANS }
-  return (
-    <>
-      <div style={{ borderTop: '1px solid var(--gray-100)', paddingTop: 20 }}>
-        <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--gray-400)', letterSpacing: '0.8px', fontFamily: SANS, marginBottom: 20, textTransform: 'uppercase' }}>
-          ZONE GÉOGRAPHIQUE D'INTERVENTION
-        </p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <div>
-            <label style={{ ...lbl, fontSize: 14, marginBottom: 8 }}>Couverture géographique</label>
-            <CustomSelect
-              options={[
-                { id: 'international', label: 'International' },
-                { id: 'national',   label: 'France entière (National)' },
-                { id: 'region',     label: 'Par Région' },
-                { id: 'department', label: 'Par Département' },
-              ]}
-              value={geoScope}
-              onChange={v => { setGeoScope(v as any); setSelectedGeo([]) }}
-              placeholder="Choisir l'échelle d'intervention..."
-            />
-          </div>
-          {geoScope === 'region' && (
-            <div className="fade-in">
-              <label style={{ ...lbl, fontSize: 14, marginBottom: 8 }}>Sélectionner la région</label>
-              <CustomMultiSelect
-                options={regions.map(r => ({ id: r.code, label: r.label }))}
-                value={selectedGeo}
-                onChange={setSelectedGeo}
-                placeholder="Choisir une ou plusieurs régions..."
-              />
-            </div>
-          )}
-          {geoScope === 'department' && (
-            <div className="fade-in">
-              <label style={{ ...lbl, fontSize: 14, marginBottom: 8 }}>Sélectionner le département</label>
-              <CustomMultiSelect
-                options={departments.map(d => ({ id: d.code, label: `${d.code} - ${d.label}` }))}
-                value={selectedGeo}
-                onChange={setSelectedGeo}
-                placeholder="Choisir un ou plusieurs départements..."
-              />
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div>
-        <label style={lbl}>Marchés couverts</label>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {['Marché public', 'Marché privé', 'Particulier'].map(m => (
-            <label key={m} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, cursor: 'pointer' }}>
-              <input
-                type="checkbox"
-                style={{ accentColor: 'var(--red)' }}
-                checked={selectedMarkets.includes(m)}
-                onChange={() => toggle(selectedMarkets, setSelectedMarkets, m)}
-              />
-              {m}
-            </label>
-          ))}
-        </div>
-      </div>
-    </>
-  )
-}
-
 function InscriptionForm({
   type,
   initialRegions,
@@ -313,156 +232,34 @@ function InscriptionForm({
   const [showPwd, setShowPwd]         = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [clientType, setClientType]   = useState('')
-  const [siret, setSiret]             = useState('')
-  const [siretStatus, setSiretStatus] = useState<'idle' | 'loading' | 'ok' | 'error'>('idle')
-  const [siretData, setSiretData]     = useState<{raison_sociale:string;activite:string;adresse:string;ville:string;cp:string;est_actif:boolean;lat?:number;lng?:number} | null>(null)
-  const [geoScope, setGeoScope]         = useState<'international' | 'national' | 'region' | 'department' | ''>('')
-  const [selectedGeo, setSelectedGeo]   = useState<string[]>([])
-  const [siretConfirmed, setSiretConfirmed] = useState(false)
-  
-  // Champs adresse éditables (pré-remplis par SIRET)
-  const [manualAddress, setManualAddress] = useState('')
-  const [manualCity, setManualCity]       = useState('')
-  const [manualZip, setManualZip]         = useState('')
-  const [promoCode, setPromoCode]         = useState('')
-  const [promoValid, setPromoValid]       = useState(false) // true = 100% off confirmé via Stripe
-  const [promoChecking, setPromoChecking] = useState(false)
-  const [promoMsg, setPromoMsg]           = useState<{ type: 'success' | 'error' | null; text: string }>({ type: null, text: '' })
+  const [geoScope, setGeoScope]       = useState<'international' | 'national' | 'region' | 'department' | ''>('')
+  const [selectedGeo, setSelectedGeo] = useState<string[]>([])
   const [cgu, setCgu]                 = useState(false)
   const [loading, setLoading]         = useState(false)
   const [error, setError]             = useState('')
   const [companyDescription, setCompanyDescription] = useState('')
-  const siretTimer                    = useRef<ReturnType<typeof setTimeout> | null>(null)
   const savedScrollY                  = useRef<number | null>(null)
   const fileInputRef                  = useRef<HTMLInputElement>(null)
   const [mediaFile, setMediaFile]     = useState<File | null>(null)
   const [mediaPreview, setMediaPreview] = useState('')
   const [mediaType, setMediaType]     = useState<'photo' | 'logo'>('photo')
-
-  // États pour les sélections spécifiques
-  const [selectedCerts, setSelectedCerts] = useState<string[]>([])
-  const [selectedComp, setSelectedComp]   = useState<string[]>([])
+  const [selectedCerts, setSelectedCerts]     = useState<string[]>([])
+  const [selectedComp, setSelectedComp]       = useState<string[]>([])
   const [selectedMarkets, setSelectedMarkets] = useState<string[]>([])
-  const [nbCertified, setNbCertified]     = useState<number>(0)
+  const [nbCertified, setNbCertified]         = useState<number>(0)
+
+  const onActivite = useCallback((activite: string) => setCompanyDescription(activite), [])
+  const siretHook  = useSiretValidation(onActivite)
+  const promoHook  = usePromoCode()
+
+  const { siret, setSiret, siretStatus, siretData, siretConfirmed, setSiretConfirmed,
+          manualAddress, setManualAddress, manualCity, setManualCity, manualZip, setManualZip } = siretHook
+  const { promoCode, setPromoCode, promoValid, promoChecking, promoMsg } = promoHook
 
   const toggle = (list: string[], set: (v: string[]) => void, item: string) => {
     if (list.includes(item)) set(list.filter(i => i !== item))
     else set([...list, item])
   }
-
-  // parseLocation importé depuis @/lib/utils
-
-  useEffect(() => {
-    const digits = siret.replace(/\D/g, '')
-    if (digits.length !== 14) { setSiretStatus('idle');  return }
-
-    setSiretStatus('loading')
-    if (siretTimer.current) clearTimeout(siretTimer.current)
-    siretTimer.current = setTimeout(async () => {
-      try {
-        const res = await fetch('/api/verify-siret', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ siret: digits }),
-        })
-        const data = await res.json()
-        if (res.ok && data?.raison_sociale) {
-          let finalAdresse = data.adresse ?? ''
-          let finalVille   = data.ville   ?? ''
-          let finalCp      = data.code_postal ?? data.cp ?? ''
-          let finalLat     = undefined
-          let finalLng     = undefined
-
-          console.log("[SIRET] Raw data received:", { adresse: finalAdresse, ville: finalVille, cp: finalCp })
-
-          const { city, zip } = parseLocation(finalVille, finalAdresse, finalCp)
-          finalVille = city
-          finalCp    = zip
-
-          // 2. Géocodage pour validation et coordonnées
-          try {
-            const query = [finalAdresse, finalCp, finalVille].filter(Boolean).join(' ')
-            console.log("[SIRET] Geocoding query:", query)
-            
-            const geoRes = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(query)}&limit=1`)
-            const geoData = await geoRes.json()
-            
-            if (geoData.features?.[0]) {
-              const props = geoData.features[0].properties
-              const coords = geoData.features[0].geometry.coordinates
-              
-              console.log("[SIRET] Geocoding result:", props)
-
-              if (coords && coords.length === 2) {
-                finalLng = coords[0]
-                finalLat = coords[1]
-              }
-              
-              // On privilégie les données BAN (propres) mais on garde l'adresse complète si demandée
-              if (props.name)     finalAdresse = props.name
-              if (props.city)     finalVille   = props.city.toUpperCase()
-              if (props.postcode) finalCp      = props.postcode
-            }
-          } catch (e) {
-            console.error("[SIRET] Geocoding failed:", e)
-          }
-
-          console.log("[SIRET] Final processed data:", { adresse: finalAdresse, ville: finalVille, cp: finalCp, lat: finalLat, lng: finalLng })
-
-          setSiretData({
-            raison_sociale: data.raison_sociale,
-            activite:       data.activite ?? '',
-            adresse:        finalAdresse,
-            ville:          finalVille,
-            cp:             finalCp,
-            est_actif:      data.est_actif ?? true,
-            lat:            finalLat,
-            lng:            finalLng
-          })
-          setManualAddress(finalAdresse)
-          setManualCity(finalVille)
-          setManualZip(finalCp)
-          if (data.activite) setCompanyDescription(data.activite)
-          setSiretStatus('ok')
-        } else {
-          setSiretStatus('error')
-          setSiretData(null)
-        }
-      } catch {
-        setSiretStatus('error')
-      }
-    }, 600)
-    return () => { if (siretTimer.current) clearTimeout(siretTimer.current) }
-  }, [siret])
-
-  // Validation du code promo via Stripe (debounced 600ms)
-  useEffect(() => {
-    if (!promoCode || promoCode.length < 4) {
-      setPromoValid(false)
-      setPromoMsg({ type: null, text: '' })
-      return
-    }
-    setPromoChecking(true)
-    const t = setTimeout(async () => {
-      try {
-        const res = await fetch(`/api/stripe/validate-promo?code=${encodeURIComponent(promoCode)}`)
-        const data = await res.json()
-        if (data.valid) {
-          setPromoValid(data.isFull)
-          setPromoMsg({ type: 'success', text: data.label })
-        } else {
-          setPromoValid(false)
-          setPromoMsg({ type: 'error', text: data.error || 'Code invalide ou expiré' })
-        }
-      } catch {
-        setPromoValid(false)
-        setPromoMsg({ type: 'error', text: 'Impossible de vérifier le code' })
-      } finally {
-        setPromoChecking(false)
-      }
-    }, 600)
-    return () => clearTimeout(t)
-  }, [promoCode])
 
   // Restaure la position de scroll après que React insère le bloc conditionnel
   useLayoutEffect(() => {
@@ -551,14 +348,6 @@ function InscriptionForm({
         })
         if (insErr) throw insErr
       } else {
-        // On utilise les données déjà nettoyées et géocodées dans siretData
-        // On effectue une dernière passe de scission par sécurité juste avant l'insertion
-        const initialCity = siretData?.ville || ''
-        const initialCp   = siretData?.cp    || ''
-        const initialAddr = siretData?.adresse || ''
-
-        parseLocation(initialCity, initialAddr, initialCp)
-
         const lat  = siretData?.lat   || null
         const lng  = siretData?.lng   || null
 
@@ -814,10 +603,7 @@ function InscriptionForm({
           onChange={v => {
             savedScrollY.current = window.scrollY
             setClientType(v)
-            setSiret('')
-            setSiretStatus('idle')
-            setSiretData(null)
-            setSiretConfirmed(false)
+            siretHook.reset()
           }}
           placeholder="Choisir votre activité principale..."
         />
@@ -1213,7 +999,7 @@ function InscriptionForm({
         </label>
       </div>
 
-      {error && <p style={{ color: 'var(--red)', fontSize: 13, textAlign: 'center' }}>{error}</p>}
+      {error && <p className="form-error">{error}</p>}
 
       {/* Documents à fournir - Recap at the end for Partners */}
       {type === 'partenaire' && (clientType === 'diagnostician' || clientType === 'project_manager' || clientType === 'asbestos_remover' || clientType === 'sampler_lab') && (() => {

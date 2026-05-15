@@ -251,9 +251,7 @@ export default function DocumentsClient({
                     {doc.displayStatus === 'rejected' && (doc.rejectionReason ?? 'Document refusé — veuillez renvoyer un nouveau fichier')}
                     {doc.displayStatus === 'expired' && `Expiré${doc.expiresAt ? ` le ${new Date(doc.expiresAt).toLocaleDateString('fr-FR')}` : ''} — renouvellement requis`}
                   </div>
-                  {errors[doc.id] && (
-                    <div style={{ fontSize: 11, color: 'var(--red)', marginTop: 4 }}>{errors[doc.id]}</div>
-                  )}
+                  {errors[doc.id] && <p className="error-text">{errors[doc.id]}</p>}
                 </div>
 
                 <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 12, background: cfg.labelBg, color: cfg.labelColor, flexShrink: 0 }}>
