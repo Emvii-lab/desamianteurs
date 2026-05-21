@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { DM_Sans, DM_Serif_Display } from 'next/font/google'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import './globals.css'
 
 const dmSans = DM_Sans({
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body style={{ fontFamily: 'var(--font-sans), DM Sans, sans-serif', margin: 0 }}>
         {children}
+        <SpeedInsights />
       </body>
     </html>
   )
