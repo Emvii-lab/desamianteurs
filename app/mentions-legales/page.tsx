@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import LegalPage, { LegalSection, LegalTable, InfoBox } from '@/components/ui/LegalPage'
 
 export const metadata: Metadata = {
-  title: 'Mentions légales | Désamianteurs.fr',
-  description: 'Mentions légales de Désamianteurs.fr, conformes à la LCEN et à la loi SREN du 21 mai 2024.',
+  title: 'Mentions légales | Désamianteurs.com',
+  description: 'Mentions légales de Désamianteurs.com, conformes à la LCEN et à la loi SREN du 21 mai 2024.',
 }
 
 const TOC = [
@@ -31,7 +31,7 @@ export default function MentionsLegalesPage() {
             ['Forme juridique',         '[Auto-entrepreneur / SASU / EURL]'],
             ['SIRET',                   '[À compléter après immatriculation]'],
             ['Adresse du siège',        '[À compléter]'],
-            ['Email de contact',        'contact@desamianteurs.fr'],
+            ['Email de contact',        'contact@desamianteurs.com'],
             ['Directeur de publication','Mélanie VOYMANT'],
           ]}
         />
@@ -62,11 +62,11 @@ export default function MentionsLegalesPage() {
       </LegalSection>
 
       <LegalSection id="pi" title="4. Propriété intellectuelle">
-        <p>L'ensemble des contenus du site Désamianteurs.fr (textes, graphismes, logos, icônes, images, architecture) est la propriété exclusive de l'éditeur ou de ses partenaires, protégé par le droit de la propriété intellectuelle. Toute reproduction sans accord préalable écrit est interdite.</p>
+        <p>L'ensemble des contenus du site Désamianteurs.com (textes, graphismes, logos, icônes, images, architecture) est la propriété exclusive de l'éditeur ou de ses partenaires, protégé par le droit de la propriété intellectuelle. Toute reproduction sans accord préalable écrit est interdite.</p>
       </LegalSection>
 
       <LegalSection id="responsabilite" title="5. Responsabilité">
-        <p>Désamianteurs.fr est une plateforme de mise en relation. L'éditeur ne peut être tenu responsable de la qualité des prestations réalisées par les professionnels référencés, ni des relations contractuelles nouées entre les utilisateurs.</p>
+        <p>Désamianteurs.com est une plateforme de mise en relation. L'éditeur ne peut être tenu responsable de la qualité des prestations réalisées par les professionnels référencés, ni des relations contractuelles nouées entre les utilisateurs.</p>
       </LegalSection>
 
       <LegalSection id="mediation" title="6. Médiation des litiges">

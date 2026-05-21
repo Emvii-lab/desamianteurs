@@ -127,7 +127,7 @@ export function InscriptionContent({
 
           <div style={{ maxWidth: 500, width: '100%', margin: '0 auto' }}>
             <div className="inscription-logo" style={{ fontFamily: 'var(--font-serif)', fontSize: 22, fontWeight: 400, marginBottom: 40 }}>
-              Désamianteurs<span style={{ color: 'var(--red)' }}>.fr</span>
+              Désamianteurs<span style={{ color: 'var(--red)' }}>.com</span>
             </div>
 
             <h2 style={{ fontSize: 24, marginBottom: 8, fontFamily: 'var(--font-body)', fontWeight: 700 }}>Créer un compte</h2>

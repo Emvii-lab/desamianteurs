@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import LegalPage, { LegalSection, InfoBox, LegalList, LegalTable } from '@/components/ui/LegalPage'
 
 export const metadata: Metadata = {
-  title: 'Charte de bonne conduite | Désamianteurs.fr',
-  description: 'Charte de bonne conduite applicable à tous les professionnels référencés sur Désamianteurs.fr.',
+  title: 'Charte de bonne conduite | Désamianteurs.com',
+  description: 'Charte de bonne conduite applicable à tous les professionnels référencés sur Désamianteurs.com.',
 }
 
 const TOC = [
@@ -22,12 +22,12 @@ export default function ChartePage() {
     <LegalPage
       tag="Professionnels"
       title="Charte de Bonne Conduite"
-      meta="Applicable à tous les professionnels référencés sur Désamianteurs.fr · Version 1.0 — Mars 2026"
+      meta="Applicable à tous les professionnels référencés sur Désamianteurs.com · Version 1.0 — Mars 2026"
       toc={TOC}
     >
       {/* Préambule */}
       <div style={{ background: '#F4ECF7', borderLeft: '3px solid #6C3483', borderRadius: '0 8px 8px 0', padding: '14px 18px', marginBottom: 20, fontSize: 13, color: '#111', lineHeight: 1.7 }}>
-        La présente Charte définit les engagements que tout Professionnel s'engage à respecter en s'inscrivant sur Désamianteurs.fr. Elle constitue une annexe aux CGU et fait partie intégrante du contrat. Elle est acceptée par le Professionnel lors de la création de son compte.
+        La présente Charte définit les engagements que tout Professionnel s'engage à respecter en s'inscrivant sur Désamianteurs.com. Elle constitue une annexe aux CGU et fait partie intégrante du contrat. Elle est acceptée par le Professionnel lors de la création de son compte.
       </div>
 
       <LegalSection id="art1" title="Article 1 — Exactitude des informations">

@@ -37,11 +37,11 @@ export default function QuoteDetailClient({ quote }: Props) {
   const dateStr = quote.created_at ? format(new Date(quote.created_at), 'dd MMMM yyyy', { locale: fr }) : '—'
 
   return (
-    <motion.div 
+    <motion.div
       initial="hidden"
       animate="visible"
       variants={staggerContainer}
-      style={{ padding: '32px' }}
+      className="admin-page-content"
     >
       {/* Fil d'Ariane & Retour */}
       <motion.div variants={fadeUp} style={{ marginBottom: '24px' }}>
@@ -51,9 +51,9 @@ export default function QuoteDetailClient({ quote }: Props) {
       </motion.div>
 
       {/* Header */}
-      <motion.div variants={fadeUp} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px' }}>
+      <motion.div variants={fadeUp} className="quote-header">
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+          <div className="quote-title-row">
             <h1 style={{ fontSize: '28px', fontWeight: 700, color: '#0A0A0A' }}>Demande #{quote.id.slice(0, 8)}</h1>
             <div style={{ 
               display: 'inline-flex', alignItems: 'center', gap: '6px', 
@@ -71,11 +71,11 @@ export default function QuoteDetailClient({ quote }: Props) {
         </div>
       </motion.div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '32px' }}>
+      <div className="quote-detail-grid" style={{ display: 'grid', gap: '24px' }}>
         {/* Colonne Gauche: Détails */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           <Section title="Détails du projet">
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+            <div className="quote-info-grid" style={{ display: 'grid', gap: '24px' }}>
               <InfoItem icon={Building2} label="Type de bien" value={quote.ref_property_types?.label || 'Propriété'} />
               <InfoItem icon={FileText} label="Surface" value={quote.surface_m2 ? `${quote.surface_m2} m²` : '—'} />
               <InfoItem icon={Clock} label="Délai souhaité" value={TIMELINE_LABELS[quote.timeline] || quote.timeline} />
@@ -173,7 +173,7 @@ export default function QuoteDetailClient({ quote }: Props) {
 
 function Section({ title, children, noPadding = false }: { title: string; children: React.ReactNode; noPadding?: boolean }) {
   return (
-    <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #E5E7EB', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+    <div style={{ background: 'white', borderRadius: 'var(--radius)', border: '1px solid var(--gray-200)', boxShadow: 'var(--shadow-sm)', overflow: 'hidden' }}>
       <div style={{ padding: '16px 24px', borderBottom: '1px solid #F3F4F6', background: '#F9FAFB' }}>
         <h3 style={{ fontSize: '14px', fontWeight: 700, color: '#4B5563', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{title}</h3>
       </div>

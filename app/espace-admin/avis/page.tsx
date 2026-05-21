@@ -2,7 +2,7 @@ import { createServerSupabase } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
 import AvisClient from './AvisClient'
 
-export const metadata = { title: 'Modération des avis | Désamianteurs.fr' }
+export const metadata = { title: 'Modération des avis | Désamianteurs.com' }
 
 export default async function AvisPage() {
   const supabase = await createServerSupabase()

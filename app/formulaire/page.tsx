@@ -2,7 +2,7 @@ import { createServerSupabase } from '@/lib/supabase-server'
 import FormulaireClient from './FormulaireClient'
 
 export const metadata = {
-  title: 'Déposer une demande de devis | Désamianteurs.fr',
+  title: 'Déposer une demande de devis | Désamianteurs.com',
   description: 'Décrivez votre besoin et recevez des devis de professionnels certifiés sous 48h.',
 }
 

@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { createServerSupabase } from '@/lib/supabase-server'
 import DemandesPartenaireClient from './DemandesPartenaireClient'
 
-export const metadata = { title: 'Nouvelles demandes | Désamianteurs.fr' }
+export const metadata = { title: 'Nouvelles demandes | Désamianteurs.com' }
 
 export default async function DemandesPartenairePage() {
   const supabase = await createServerSupabase()

@@ -56,7 +56,7 @@ export default function ReinitialiserMotDePassePage() {
         <div style={{ background: 'white', padding: '80px', display: 'flex', flexDirection: 'column', justifyContent: 'center', position: 'relative' }}>
           <div style={{ maxWidth: 400, width: '100%', margin: '0 auto' }}>
             <div style={{ fontFamily: SERIF, fontSize: 20, fontWeight: 400, marginBottom: 40 }}>
-              Désamianteurs<span style={{ color: '#C0392B' }}>.fr</span>
+              Désamianteurs<span style={{ color: '#C0392B' }}>.com</span>
             </div>
 
             {done ? (

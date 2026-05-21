@@ -288,7 +288,7 @@ export default function CompleterClient({
       {/* Header */}
       <div style={{ background: 'white', borderBottom: '1px solid #E5E7EB', padding: '20px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ fontFamily: 'var(--font-serif, DM Serif Display)', fontSize: 18, fontWeight: 400 }}>
-          Désamianteurs<span style={{ color: '#C0392B' }}>.fr</span>
+          Désamianteurs<span style={{ color: '#C0392B' }}>.com</span>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           {steps.map((s, i) => (
@@ -302,7 +302,7 @@ export default function CompleterClient({
       </div>
 
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '48px 24px' }}>
-        <div style={{ background: 'white', borderRadius: 16, border: '1px solid #E5E7EB', maxWidth: 560, width: '100%', padding: '48px' }}>
+        <div style={{ background: 'white', borderRadius: 'var(--radius)', border: '1px solid var(--gray-200)', maxWidth: 560, width: '100%', padding: '48px' }}>
 
           {/* Bannière compte Google */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 8, padding: '10px 16px', marginBottom: 32 }}>

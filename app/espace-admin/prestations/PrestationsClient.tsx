@@ -142,8 +142,8 @@ function groupBy(arr: any[], key: string) {
 const cardStyle: React.CSSProperties = {
   background: 'white',
   padding: '24px',
-  borderRadius: '16px',
-  border: '1px solid #E5E7EB',
-  boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+  borderRadius: 'var(--radius)',
+  border: '1px solid var(--gray-200)',
+  boxShadow: 'var(--shadow-sm)',
   transition: 'transform 0.2s, box-shadow 0.2s',
 }

@@ -489,7 +489,7 @@ function StatCard({ label, value }: { label: string; value: number }) {
     <motion.div
       variants={fadeUp}
       whileHover={{ boxShadow: '0 4px 12px rgba(0,0,0,0.05)', borderColor: '#D1D5DB' }}
-      style={{ background: 'white', padding: '12px 20px', borderRadius: '12px', border: '1px solid #E5E7EB', textAlign: 'center', transition: 'all 0.2s ease' }}
+      style={{ background: 'white', padding: '12px 20px', borderRadius: 'var(--radius)', border: '1px solid var(--gray-200)', textAlign: 'center', transition: 'all 0.2s ease' }}
     >
       <div style={{ fontSize: '11px', fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', marginBottom: '2px' }}>{label}</div>
       <div style={{ fontSize: '18px', fontWeight: 700, color: '#111827' }}>{value}</div>

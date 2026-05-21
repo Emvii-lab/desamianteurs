@@ -4,7 +4,7 @@ import AdminDashboard from './AdminDashboard'
 import { AVATAR_COLORS, TYPE_LABEL } from '@/lib/constants'
 
 export const metadata = {
-  title: 'Administration | Désamianteurs.fr',
+  title: 'Administration | Désamianteurs.com',
 }
 
 export default async function EspaceAdminPage() {

@@ -5,7 +5,7 @@ import Footer from '@/components/Footer'
 import Navbar from '@/components/Navbar'
 
 export const metadata = {
-  title: 'Inscription | Désamianteurs.fr',
+  title: 'Inscription | Désamianteurs.com',
 }
 
 export default async function InscriptionPage() {

@@ -4,7 +4,7 @@ import ClientDashboard from './ClientDashboard'
 import { STATUS_STYLE, STATUS_LABEL, AVATAR_COLORS } from '@/lib/constants'
 
 export const metadata = {
-  title: 'Mon Espace Client | Désamianteurs.fr',
+  title: 'Mon Espace Client | Désamianteurs.com',
 }
 
 export default async function EspaceClientPage() {

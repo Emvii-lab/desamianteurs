@@ -77,7 +77,7 @@ export default function AvisClient({ initialReviews }: Props) {
       </motion.div>
 
       {filteredReviews.length === 0 && (
-        <motion.div variants={fadeUp} style={{ padding: '64px', textAlign: 'center', background: 'white', borderRadius: '16px', border: '1px dashed #E5E7EB' }}>
+        <motion.div variants={fadeUp} style={{ padding: '64px', textAlign: 'center', background: 'white', borderRadius: 'var(--radius)', border: '1px dashed var(--gray-200)' }}>
           <MessageSquare size={48} style={{ margin: '0 auto 16px', color: '#E5E7EB' }} />
           <p style={{ color: '#6B7280' }}>Aucun avis à afficher pour ce filtre.</p>
         </motion.div>
@@ -90,10 +90,10 @@ function ReviewCard({ review, onAction }: { review: any; onAction: any }) {
   const date = format(new Date(review.created_at), 'dd MMMM yyyy', { locale: fr })
   
   return (
-    <div style={{ 
-      background: 'white', borderRadius: '16px', border: '1px solid #E5E7EB', 
+    <div style={{
+      background: 'white', borderRadius: 'var(--radius)', border: '1px solid var(--gray-200)',
       padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px',
-      boxShadow: '0 1px 2px rgba(0,0,0,0.05)', position: 'relative', height: '100%'
+      boxShadow: 'var(--shadow-sm)', position: 'relative', height: '100%'
     }}>
       {/* Header: Rating & Date */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

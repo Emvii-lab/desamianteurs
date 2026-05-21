@@ -3,7 +3,7 @@ import { createServerSupabase } from '@/lib/supabase-server'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 
-export const metadata = { title: 'Mes avis | Désamianteurs.fr' }
+export const metadata = { title: 'Mes avis | Désamianteurs.com' }
 
 function Stars({ n, max = 5 }: { n: number; max?: number }) {
   return (

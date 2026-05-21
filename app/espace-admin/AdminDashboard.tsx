@@ -75,7 +75,7 @@ export default function AdminDashboard({ stats, pendingPartners, pendingReviews,
     >
       <motion.div variants={fadeUp} style={{ marginBottom: 32 }}>
         <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>Tableau de bord Admin</h1>
-        <p style={{ fontSize: 14, color: 'var(--gray-600)' }}>Supervision de la plateforme Désamianteurs.fr</p>
+        <p style={{ fontSize: 14, color: 'var(--gray-600)' }}>Supervision de la plateforme Désamianteurs.com</p>
       </motion.div>
 
       <StatGrid
@@ -294,7 +294,7 @@ export default function AdminDashboard({ stats, pendingPartners, pendingReviews,
           <motion.div 
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            style={{ background: 'white', padding: 32, borderRadius: 16, width: '100%', maxWidth: 500 }}
+            style={{ background: 'white', padding: 28, borderRadius: 'var(--radius)', width: '100%', maxWidth: 500 }}
           >
             <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>
               {rejectionModal.type === 'partner' ? 'Refuser le partenaire' : 'Rejeter l\'avis'}

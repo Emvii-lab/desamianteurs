@@ -1,7 +1,7 @@
 import TarifsClient from './TarifsClient'
 
 export const metadata = {
-  title: 'Tarifs et Formules | Désamianteurs.fr',
+  title: 'Tarifs et Formules | Désamianteurs.com',
   description: 'Découvrez nos formules adaptées à chaque besoin : Standard, Premium, Élite et Platinium.',
 }
 

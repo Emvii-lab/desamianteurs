@@ -178,7 +178,7 @@ export default function DashboardSidebar({ role, userId, userName = 'Utilisateur
     {/* Barre mobile sticky (visible uniquement sur mobile) */}
     <div className="admin-mobile-bar">
       <Link href="/" className="brand" style={{ margin: 0, fontSize: 18 }}>
-        Désamianteurs<span>.fr</span>
+        Désamianteurs<span>.com</span>
       </Link>
       <button
         onClick={() => setMobileOpen(true)}
@@ -202,7 +202,7 @@ export default function DashboardSidebar({ role, userId, userName = 'Utilisateur
     >
       <div style={{ padding: '32px 24px' }}>
         <Link href="/" className="brand" style={{ fontSize: '18px' }}>
-          Désamianteurs<span>.fr</span>
+          Désamianteurs<span>.com</span>
         </Link>
       </div>
 

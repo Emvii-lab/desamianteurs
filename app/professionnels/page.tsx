@@ -3,7 +3,7 @@ import ProfessionalsClient from './ProfessionalsClient'
 import { AVATAR_COLORS, TYPE_LABEL } from '@/lib/constants'
 
 export const metadata = {
-  title: 'Trouvez un professionnel certifié | Désamianteurs.fr',
+  title: 'Trouvez un professionnel certifié | Désamianteurs.com',
   description: 'Annuaire des professionnels certifiés du désamiantage et du diagnostic.',
 }
 

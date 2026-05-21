@@ -79,7 +79,7 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/" style={{ display: 'flex', alignItems: 'baseline', textDecoration: 'none', flexShrink: 0 }}>
           <span style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 22, color: '#0A0A0A', letterSpacing: '-0.5px' }}>Désamianteurs</span>
-          <span style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 22, color: 'var(--red)' }}>.fr</span>
+          <span style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 22, color: 'var(--red)' }}>.com</span>
         </Link>
 
         {/* Desktop : liens + auth — masqué sur mobile via CSS */}

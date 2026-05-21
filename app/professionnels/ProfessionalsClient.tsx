@@ -89,7 +89,7 @@ export default function ProfessionalsClient({ initialPros, initialType, initialL
 
         {/* Sidebar Filters */}
         <aside className={`pros-sidebar${showFilters ? ' open' : ''}`}>
-          <div style={{ background: 'white', border: '1px solid var(--gray-200)', borderRadius: 8, padding: 24 }}>
+          <div style={{ background: 'white', border: '1px solid var(--gray-200)', borderRadius: 'var(--radius)', padding: 24 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
               <span style={{ fontWeight: 700, fontSize: 14 }}>Filtres</span>
               <button 
@@ -98,7 +98,7 @@ export default function ProfessionalsClient({ initialPros, initialType, initialL
                   setMinRating('all')
                   setSearch('')
                 }}
-                style={{ color: 'var(--gray-400)', fontSize: 11, fontWeight: 700, background: 'none', border: '1px solid var(--gray-200)', padding: '4px 12px', borderRadius: 4, cursor: 'pointer' }}
+                style={{ color: 'var(--gray-400)', fontSize: 11, fontWeight: 700, background: 'none', border: '1px solid var(--gray-200)', padding: '4px 12px', borderRadius: 6, cursor: 'pointer' }}
               >
                 Réinitialiser
               </button>

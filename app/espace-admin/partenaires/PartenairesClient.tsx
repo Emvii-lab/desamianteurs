@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { 
-  Search, CheckCircle2, AlertCircle, 
+import Link from 'next/link'
+import {
+  Search, CheckCircle2, AlertCircle,
   MoreVertical, Mail, Phone, MapPin, Building2,
   Briefcase, Calendar, ChevronRight
 } from 'lucide-react'
@@ -164,12 +165,13 @@ export default function PartenairesClient({ initialPartners, partnerTypes }: Pro
                     </div>
                   </td>
                   <td style={{ ...tdStyle, textAlign: 'right' }}>
-                    <button 
+                    <Link
+                      href={`/espace-admin/partenaires/${p.id}`}
                       className="btn btn-outline btn-sm"
-                      style={{ padding: '6px 12px' }}
+                      style={{ padding: '6px 12px', textDecoration: 'none' }}
                     >
                       Détails <ChevronRight size={14} />
-                    </button>
+                    </Link>
                   </td>
                 </motion.tr>
               )
@@ -193,7 +195,7 @@ function StatCard({ label, value, color = '#111827' }: { label: string; value: n
     <motion.div 
       variants={fadeUp}
       whileHover={{ y: -4, boxShadow: '0 12px 24px -10px rgba(0,0,0,0.1)', borderColor: 'var(--red)' }}
-      style={{ background: 'white', padding: '12px 20px', borderRadius: '12px', border: '1px solid #E5E7EB', textAlign: 'center' }}
+      style={{ background: 'white', padding: '12px 20px', borderRadius: 'var(--radius)', border: '1px solid var(--gray-200)', textAlign: 'center' }}
     >
       <div style={{ fontSize: '11px', fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', marginBottom: '2px' }}>{label}</div>
       <div style={{ fontSize: '18px', fontWeight: 700, color }}>{value}</div>

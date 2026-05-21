@@ -4,6 +4,8 @@
   --red: #C0392B;
   --red-hover: #922B21;
   --red-light: rgba(192, 57, 43, 0.08);
+  --red-error: #DC2626;
+  --red-error-bg: rgba(220, 38, 38, 0.05);
   --black: #0A0A0A;
   --white: #FFFFFF;
   --gray-50: #F9FAFB;
@@ -48,7 +50,7 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-body);
-  font-weight: 700;
+  font-weight: 600;
   color: var(--black);
 }
 
@@ -462,7 +464,7 @@ button {
   text-align: left;
   background: white;
   border: 1px solid var(--gray-100);
-  border-radius: 8px;
+  border-radius: var(--radius);
   padding: 40px;
 }
 
@@ -535,7 +537,6 @@ button {
 
 /* Dashboard layouts */
 .dashboard-layout { display: flex; min-height: 100vh; background: var(--gray-100); }
-.sidebar { width: 240px; background: white; border-right: 1px solid var(--gray-200); display: flex; flex-direction: column; flex-shrink: 0; min-height: 100vh; }
 .dashboard-main { flex: 1; padding: 32px 40px; overflow-y: auto; }
 .dashboard-content { display: flex; flex-direction: column; gap: 0; }
 
@@ -631,7 +632,7 @@ label:has(input:checked) {
 
 /* Erreur au niveau d'un champ (sous l'input) */
 .error-text {
-  color: #DC2626;
+  color: var(--red-error);
   font-size: 13px;
   font-weight: 500;
   margin-top: 5px;
@@ -649,30 +650,59 @@ label:has(input:checked) {
 
 /* Erreur au niveau du formulaire (bloc alerte) */
 .form-error {
-  background: rgba(220, 38, 38, 0.05);
+  background: var(--red-error-bg);
   border: 1px solid rgba(220, 38, 38, 0.25);
   border-radius: 8px;
   padding: 10px 14px;
   font-size: 13px;
   font-weight: 500;
-  color: #DC2626;
+  color: var(--red-error);
   margin-bottom: 4px;
 }
 
 /* Bordure rouge sur l'input quand son frère suivant est une erreur */
 .input:has(+ .error-text),
 .input:has(~ .error-text) {
-  border-color: #DC2626 !important;
+  border-color: var(--red-error) !important;
 }
 
 /* Cas où .error-text est dans le même conteneur que l'input */
 div:has(> .error-text) > .input {
-  border-color: #DC2626 !important;
+  border-color: var(--red-error) !important;
 }
 
 /* Animations */
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 .fade-in { animation: fadeIn 0.3s ease; }
+
+/* ── Témoignages — carrousel infini ────────────────────────────────────────── */
+@keyframes scrollTestimonials {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.testimonials-track {
+  animation: scrollTestimonials 48s linear infinite;
+  display: flex;
+  width: max-content;
+}
+.testimonials-wrap:hover .testimonials-track {
+  animation-play-state: paused;
+}
+
+/* ── Bouton ghost sur fond sombre ─────────────────────────────────────────── */
+.btn-ghost-dark {
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.85) !important;
+  border: 1.5px solid rgba(255,255,255,0.2) !important;
+  backdrop-filter: blur(4px);
+  transition: all 0.2s ease;
+}
+.btn-ghost-dark:hover {
+  background: rgba(255,255,255,0.12) !important;
+  color: white !important;
+  border-color: rgba(255,255,255,0.4) !important;
+  transform: translateY(-2px) !important;
+}
 
 /* Skeleton Loading */
 .skeleton {
@@ -714,7 +744,7 @@ div:has(> .error-text) > .input {
   flex-shrink: 0;
 }
 
-@media(max-width: 700px) {
+@media(max-width: 768px) {
   .msg-layout           { grid-template-columns: 1fr; height: calc(100vh - 52px); }
   /* Afficher uniquement le panneau actif */
   .msg-show-list .chat-area  { display: none; }
@@ -876,9 +906,12 @@ div:has(> .error-text) > .input {
   background: white;
   border-right: 1px solid var(--gray-100);
   width: 280px;
-  height: 100vh;
+  min-height: 100vh;
   position: sticky;
   top: 0;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
 }
 
 .sidebar-section-title {
@@ -1038,8 +1071,17 @@ div:has(> .error-text) > .input {
 /* ── Espace client ──────────────────────────────────────────────────────── */
 .client-dash-grid { grid-template-columns: 1.6fr 1fr; }
 
+/* ── Page détail demande ────────────────────────────────────────────────── */
+.quote-detail-grid { grid-template-columns: 2fr 1fr; }
+.quote-info-grid   { grid-template-columns: 1fr 1fr; }
+.quote-header      { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; }
+.quote-title-row   { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+
 @media (max-width: 768px) {
-  .client-dash-grid { grid-template-columns: 1fr; }
+  .client-dash-grid  { grid-template-columns: 1fr; }
+  .quote-detail-grid { grid-template-columns: 1fr; }
+  .quote-info-grid   { grid-template-columns: 1fr; }
+  .quote-header      { flex-direction: column; gap: 12px; margin-bottom: 24px; }
 }
 
 /* ── Espace partenaire ──────────────────────────────────────────────────── */

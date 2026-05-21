@@ -2,7 +2,7 @@ import { createServerSupabase } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
 import UtilisateursClient from './UtilisateursClient'
 
-export const metadata = { title: 'Tous les utilisateurs | Désamianteurs.fr' }
+export const metadata = { title: 'Tous les utilisateurs | Désamianteurs.com' }
 
 export default async function UtilisateursPage() {
   const supabase = await createServerSupabase()

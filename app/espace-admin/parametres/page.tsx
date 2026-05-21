@@ -2,7 +2,7 @@ import { createServerSupabase } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
 import ParametresClient from './ParametresClient'
 
-export const metadata = { title: 'Paramètres | Désamianteurs.fr' }
+export const metadata = { title: 'Paramètres | Désamianteurs.com' }
 
 export default async function ParametresPage() {
   const supabase = await createServerSupabase()

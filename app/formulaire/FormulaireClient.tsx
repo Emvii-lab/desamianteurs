@@ -334,7 +334,7 @@ export default function FormulaireClient({ initialServices, initialPropertyTypes
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-                style={{ background: '#111', borderRadius: 10, padding: '24px 20px', textAlign: 'center' }}
+                style={{ background: '#111', borderRadius: 'var(--radius)', padding: '24px 20px', textAlign: 'center' }}
               >
                 <div style={{ fontSize: 52, fontWeight: 800, color: 'var(--red)', lineHeight: 1 }}>{prosInZone ?? '—'}</div>
                 <div style={{ fontSize: 14, fontWeight: 700, color: 'white', marginTop: 8 }}>professionnels certifiés</div>
@@ -349,10 +349,10 @@ export default function FormulaireClient({ initialServices, initialPropertyTypes
                 transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1], delay: 0.05 }}
                 style={{
                 background: 'white',
-                borderRadius: 14,
-                border: '1px solid #E5E7EB',
+                borderRadius: 'var(--radius)',
+                border: '1px solid var(--gray-200)',
                 padding: '20px 22px',
-                boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+                boxShadow: 'var(--shadow-sm)',
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 18, paddingBottom: 14, borderBottom: '1px solid #F3F4F6' }}>
                   <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--red)', flexShrink: 0 }} />
@@ -385,10 +385,10 @@ export default function FormulaireClient({ initialServices, initialPropertyTypes
               transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1], delay: 0.1 }}
               style={{
                 background: 'white',
-                borderRadius: 14,
-                border: '1px solid #E5E7EB',
+                borderRadius: 'var(--radius)',
+                border: '1px solid var(--gray-200)',
                 padding: '18px 22px',
-                boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+                boxShadow: 'var(--shadow-sm)',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, paddingBottom: 14, borderBottom: '1px solid #F3F4F6' }}>

@@ -77,7 +77,7 @@ export default function Footer() {
         <div>
           <div style={{ marginBottom: 12 }}>
             <span style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 700, fontSize: 16, color: 'white' }}>Désamianteurs</span>
-            <span style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 700, fontSize: 16, color: 'var(--red)' }}>.fr</span>
+            <span style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 700, fontSize: 16, color: 'var(--red)' }}>.com</span>
           </div>
           <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', lineHeight: 1.7, maxWidth: 220, fontFamily: 'DM Sans, sans-serif' }}>
             La plateforme de référence pour tous vos besoins liés à l'amiante.
@@ -98,7 +98,7 @@ export default function Footer() {
 
       <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: 20, textAlign: 'center' }}>
         <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)', fontFamily: 'DM Sans, sans-serif' }}>
-          © 2026 Désamianteurs.fr — Tous droits réservés
+          © 2026 Désamianteurs.com — Tous droits réservés
         </p>
       </div>
     </footer>

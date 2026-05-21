@@ -5,8 +5,8 @@ import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 
 export const metadata: Metadata = {
-  title: 'Certifications & documents requis | Désamianteurs.fr',
-  description: 'Consultez les certifications obligatoires exigées pour chaque type de professionnel référencé sur Désamianteurs.fr.',
+  title: 'Certifications & documents requis | Désamianteurs.com',
+  description: 'Consultez les certifications obligatoires exigées pour chaque type de professionnel référencé sur Désamianteurs.com.',
 }
 
 const TYPES = [
@@ -81,7 +81,7 @@ export default async function CertificationsPage() {
             Certifications &amp; documents requis
           </h1>
           <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 15, maxWidth: 620, lineHeight: 1.7, margin: 0 }}>
-            Chaque professionnel référencé sur Désamianteurs.fr doit fournir et maintenir à jour les documents suivants, vérifiés par notre équipe avant toute activation du profil.
+            Chaque professionnel référencé sur Désamianteurs.com doit fournir et maintenir à jour les documents suivants, vérifiés par notre équipe avant toute activation du profil.
           </p>
         </div>
       </div>

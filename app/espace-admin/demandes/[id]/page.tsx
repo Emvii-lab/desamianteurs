@@ -2,7 +2,7 @@ import { createServerSupabase } from '@/lib/supabase-server'
 import { notFound, redirect } from 'next/navigation'
 import QuoteDetailClient from './QuoteDetailClient'
 
-export const metadata = { title: 'Détails de la demande | Désamianteurs.fr' }
+export const metadata = { title: 'Détails de la demande | Désamianteurs.com' }
 
 interface PageProps {
   params: Promise<{ id: string }>

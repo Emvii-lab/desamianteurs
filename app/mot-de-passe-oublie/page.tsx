@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { ArrowLeft, Mail } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 import Footer from '@/components/Footer'
+import Navbar from '@/components/Navbar'
 
 const SERIF = 'var(--font-serif, "DM Serif Display", Georgia, serif)'
 const SANS  = 'var(--font-sans, DM Sans, sans-serif)'
@@ -30,10 +31,15 @@ export default function MotDePasseOubliePage() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+      {/* Navbar — visible sur mobile uniquement */}
+      <div className="mobile-only" style={{ position: 'sticky', top: 0, zIndex: 1000 }}>
+        <Navbar />
+      </div>
+
+      <div className="connexion-split" style={{ flex: 1, display: 'grid' }}>
 
         {/* Côté gauche — noir */}
-        <div style={{ background: '#111111', color: 'white', padding: '80px', display: 'flex', flexDirection: 'column', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+        <div className="connexion-left" style={{ background: '#111111', color: 'white', padding: '80px', flexDirection: 'column', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', bottom: -200, right: -100, width: 600, height: 600, borderRadius: '50%', background: 'rgba(192,57,43,0.08)', pointerEvents: 'none' }} />
           <div style={{ position: 'relative', zIndex: 10 }}>
             <h1 style={{ fontFamily: SERIF, fontSize: 44, fontWeight: 400, marginBottom: 20, color: 'white', lineHeight: 1.2 }}>
@@ -47,19 +53,17 @@ export default function MotDePasseOubliePage() {
         </div>
 
         {/* Côté droit — blanc */}
-        <div style={{ background: 'white', padding: '80px', display: 'flex', flexDirection: 'column', justifyContent: 'center', position: 'relative' }}>
-          <Link href="/connexion" style={{ position: 'absolute', top: 32, right: 48, display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, color: '#C0392B', textDecoration: 'none', fontFamily: SANS }}>
+        <div className="connexion-right" style={{ background: 'white', padding: '80px', display: 'flex', flexDirection: 'column', justifyContent: 'center', position: 'relative' }}>
+          <Link href="/connexion" className="connexion-back" style={{ position: 'absolute', top: 32, right: 48, display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, color: '#C0392B', textDecoration: 'none', fontFamily: SANS }}>
             <ArrowLeft size={15} /> Retour à la connexion
           </Link>
 
           <div style={{ maxWidth: 400, width: '100%', margin: '0 auto' }}>
-            {/* Logo */}
-            <div style={{ fontFamily: SERIF, fontSize: 20, fontWeight: 400, marginBottom: 40 }}>
-              Désamianteurs<span style={{ color: '#C0392B' }}>.fr</span>
+            <div className="connexion-logo" style={{ fontFamily: SERIF, fontSize: 20, fontWeight: 400, marginBottom: 40 }}>
+              Désamianteurs<span style={{ color: '#C0392B' }}>.com</span>
             </div>
 
             {sent ? (
-              /* État succès */
               <div style={{ textAlign: 'center' }}>
                 <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'rgba(192,57,43,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
                   <Mail size={32} color="#C0392B" strokeWidth={1.5} />
@@ -68,7 +72,7 @@ export default function MotDePasseOubliePage() {
                   E-mail envoyé !
                 </h2>
                 <p style={{ fontFamily: SANS, fontSize: 14, color: '#6B7280', lineHeight: 1.7, marginBottom: 32 }}>
-                  Si un compte existe avec l'adresse <strong style={{ color: '#111' }}>{email}</strong>,
+                  Si un compte existe avec l&apos;adresse <strong style={{ color: '#111' }}>{email}</strong>,
                   vous recevrez un lien de réinitialisation dans quelques minutes.
                   Pensez à vérifier vos spams.
                 </p>
@@ -77,7 +81,6 @@ export default function MotDePasseOubliePage() {
                 </Link>
               </div>
             ) : (
-              /* Formulaire */
               <>
                 <h2 style={{ fontFamily: SANS, fontSize: 24, fontWeight: 700, marginBottom: 6, color: '#111' }}>
                   Réinitialiser le mot de passe

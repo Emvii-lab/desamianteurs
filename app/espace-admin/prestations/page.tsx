@@ -2,7 +2,7 @@ import { createServerSupabase } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
 import PrestationsClient from './PrestationsClient'
 
-export const metadata = { title: 'Types de prestation | Désamianteurs.fr' }
+export const metadata = { title: 'Types de prestation | Désamianteurs.com' }
 
 export default async function PrestationsPage() {
   const supabase = await createServerSupabase()

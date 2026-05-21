@@ -5,7 +5,7 @@ import { ArrowLeft, MapPin, Clock, CheckCircle2, AlertCircle, FileText, Send, Us
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 
-export const metadata = { title: 'Détail demande | Désamianteurs.fr' }
+export const metadata = { title: 'Détail demande | Désamianteurs.com' }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
   draft:       { label: 'Brouillon',  color: '#6B7280', bg: '#F3F4F6' },

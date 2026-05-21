@@ -2,7 +2,7 @@ import { createServerSupabase } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
 import PartenairesClient from './PartenairesClient'
 
-export const metadata = { title: 'Comptes partenaires | Désamianteurs.fr' }
+export const metadata = { title: 'Comptes partenaires | Désamianteurs.com' }
 
 export default async function PartenairesPage() {
   const supabase = await createServerSupabase()

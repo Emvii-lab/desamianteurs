@@ -28,7 +28,7 @@ export default function ClientDashboard({ prenom, demandes, devis, stats }: Clie
     >
       <motion.div variants={fadeUp} style={{ marginBottom: 40 }}>
         <h1 style={{ fontSize: 32, fontWeight: 800, color: '#0A0A0A', marginBottom: 4 }}>Bonjour, {prenom}</h1>
-        <p style={{ fontSize: 15, color: '#6B7280' }}>Voici un résumé de votre activité sur Désamianteurs.fr</p>
+        <p style={{ fontSize: 15, color: '#6B7280' }}>Voici un résumé de votre activité sur Désamianteurs.com</p>
       </motion.div>
 
       <StatGrid 
@@ -43,7 +43,7 @@ export default function ClientDashboard({ prenom, demandes, devis, stats }: Clie
       <motion.div variants={fadeUp} style={{ marginBottom: 40 }}>
         <Link href="/formulaire" className="btn btn-red" style={{ 
           display: 'inline-flex', alignItems: 'center', gap: 10, padding: '14px 28px', 
-          background: 'var(--red)', color: 'white', borderRadius: '12px', fontWeight: 700,
+          background: 'var(--red)', color: 'white', borderRadius: 'var(--radius)', fontWeight: 700,
           textDecoration: 'none', transition: 'all 0.2s'
         }}>
           <Plus size={18} strokeWidth={3} /> Nouvelle demande de devis

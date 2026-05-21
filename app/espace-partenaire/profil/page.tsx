@@ -4,7 +4,7 @@ import { TYPE_LABEL, AVATAR_COLORS } from '@/lib/constants'
 import { colorFor, getInitials } from '@/lib/utils'
 import ProfilPartenaireClient from './ProfilPartenaireClient'
 
-export const metadata = { title: 'Mon profil partenaire | Désamianteurs.fr' }
+export const metadata = { title: 'Mon profil partenaire | Désamianteurs.com' }
 
 const PLAN_LABEL: Record<string, { label: string; color: string; bg: string }> = {
   freemium:    { label: 'Freemium',    color: '#6B7280', bg: '#F3F4F6' },

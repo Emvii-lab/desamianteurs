@@ -113,7 +113,7 @@ export default function ParametresClient({ initialAdmin }: { initialAdmin: Admin
             <motion.div 
               whileHover={{ y: -2, boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
               style={{ 
-                flex: 1, padding: '16px', borderRadius: '12px', border: '1px solid #E5E7EB',
+                flex: 1, padding: '16px', borderRadius: 'var(--radius)', border: '1px solid var(--gray-200)',
                 display: 'flex', alignItems: 'center', gap: '12px'
               }}
             >
@@ -157,9 +157,9 @@ export default function ParametresClient({ initialAdmin }: { initialAdmin: Admin
 const sectionStyle: React.CSSProperties = {
   background: 'white',
   padding: '24px',
-  borderRadius: '16px',
-  border: '1px solid #E5E7EB',
-  boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+  borderRadius: 'var(--radius)',
+  border: '1px solid var(--gray-200)',
+  boxShadow: 'var(--shadow-sm)',
 }
 
 const sectionHeaderStyle: React.CSSProperties = {
@@ -184,9 +184,9 @@ const labelStyle: React.CSSProperties = {
 }
 
 const inputStyle: React.CSSProperties = {
-  padding: '10px 12px',
-  borderRadius: '8px',
-  border: '1px solid #E5E7EB',
+  padding: '11px 14px',
+  borderRadius: '6px',
+  border: '1px solid var(--gray-200)',
   fontSize: '14px',
   outline: 'none',
   transition: 'border-color 0.2s',

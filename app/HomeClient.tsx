@@ -19,6 +19,17 @@ const STEPS = [
   { n: '04', Icon: Star, title: 'Évaluez la prestation', desc: 'Après les travaux, laissez un avis pour aider la communauté et valoriser les bons professionnels.' },
 ]
 
+const TESTIMONIALS = [
+  { name: 'Marie D.', city: 'Lyon (69)', rating: 5, service: 'Diagnostic amiante', text: 'Devis reçu en moins de 24h. Le professionnel était ponctuel et très rigoureux. Je recommande sans hésiter.' },
+  { name: 'Thomas R.', city: 'Paris (75)', rating: 5, service: 'Désamiantage SS4', text: 'Rapide, efficace et transparent sur les tarifs. Mon appartement est maintenant aux normes. Merci !' },
+  { name: 'Sophie M.', city: 'Bordeaux (33)', rating: 5, service: 'MOE Amiante', text: "J'ai pu comparer 3 devis et choisir sereinement. Une expérience vraiment simple et rassurante." },
+  { name: 'Jean-Pierre L.', city: 'Marseille (13)', rating: 4, service: 'Prélèvement matériaux', text: "Bon professionnel, délais tenus. La plateforme m'a beaucoup simplifié la recherche dans ma région." },
+  { name: 'Claire B.', city: 'Nantes (44)', rating: 5, service: 'Diagnostic plomb', text: "Je cherchais depuis des semaines. En 2 jours j'avais rendez-vous avec un diagnostiqueur disponible. Incroyable !" },
+  { name: 'Marc F.', city: 'Toulouse (31)', rating: 5, service: 'Désamiantage SS4', text: "Professionnel sérieux, travail soigné. Les avis clients m'ont aidé à faire le bon choix en toute confiance." },
+  { name: 'Isabelle V.', city: 'Strasbourg (67)', rating: 5, service: 'Expert juridique', text: "Besoin urgent après un litige. J'ai trouvé un expert en 1h chrono. Service vraiment remarquable !" },
+  { name: 'Luc P.', city: 'Lille (59)', rating: 4, service: 'MOE Amiante', text: 'Très satisfait de la mise en relation. Le pro a parfaitement géré mon chantier de rénovation.' },
+]
+
 const fadeUp = {
   hidden: { opacity: 0, y: 22 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: 'easeOut' as const } },
@@ -32,6 +43,7 @@ function StatCounter({ raw, suffix, decimal }: { raw: number; suffix: string; de
   const [count, setCount] = useState(0)
   const ref = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, { once: true, margin: '-50px' })
+  const isMobile = useIsMobile()
 
   useEffect(() => {
     if (!inView) return
@@ -51,7 +63,7 @@ function StatCounter({ raw, suffix, decimal }: { raw: number; suffix: string; de
     : Math.floor(count).toLocaleString('fr-FR').replace(/,/g, ' ')
 
   return (
-    <div ref={ref} style={{ fontSize: 42, fontWeight: 800, color: '#111', lineHeight: 1, marginBottom: 10, letterSpacing: '-1px' }}>
+    <div ref={ref} style={{ fontSize: isMobile ? 32 : 42, fontWeight: 800, color: '#111', lineHeight: 1, marginBottom: 10, letterSpacing: '-1px' }}>
       {formatted}<span style={{ color: 'var(--red)' }}>{suffix}</span>
     </div>
   )
@@ -213,10 +225,13 @@ export default function HomeClient({ kpis, pros }: { kpis: KpiData; pros: ProCar
                 certifiés du secteur de l'amiante. Devis gratuits, pros vérifiés.
               </motion.p>
 
-              <motion.div variants={fadeUp} style={{ marginBottom: 40 }}>
-                <BtnRed href="/formulaire" size="lg" style={{ letterSpacing: '0.6px', padding: isMobile ? '14px 28px' : '16px 40px' }}>
+              <motion.div variants={fadeUp} style={{ marginBottom: 40, display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: 'center', justifyContent: 'center', gap: 12, width: isMobile ? '100%' : 'auto', maxWidth: isMobile ? 340 : 'none' }}>
+                <BtnRed href="/formulaire" size="lg" style={{ letterSpacing: '0.6px', padding: isMobile ? '14px 28px' : '16px 40px', width: isMobile ? '100%' : 'auto', justifyContent: 'center' }}>
                   DÉPOSER UNE DEMANDE
                 </BtnRed>
+                <Link href="/professionnels" className="btn btn-ghost-dark btn-lg" style={{ padding: isMobile ? '14px 28px' : '16px 36px', width: isMobile ? '100%' : 'auto', justifyContent: 'center' }}>
+                  Explorer les professionnels →
+                </Link>
               </motion.div>
             </motion.div>
           </div>
@@ -348,18 +363,52 @@ export default function HomeClient({ kpis, pros }: { kpis: KpiData; pros: ProCar
           </div>
         </div>
 
-        {/* Flèche vers écran 3 — masquée sur mobile */}
-        {!isMobile && (
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1, y: [0, 8, 0] }}
-            transition={{ delay: 0.5, duration: 2, repeat: Infinity }}
-            style={{ position: 'absolute', bottom: 40, right: 50, color: '#111', opacity: 0.35, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, zIndex: 30 }}
-            onClick={() => document.getElementById('comment-ca-fonctionne')?.scrollIntoView({ behavior: 'smooth' })}
-          >
-            <span style={{ fontSize: 10, fontWeight: 900, letterSpacing: '1.5px' }}>DÉCOUVRIR</span>
-            <ChevronDown size={28} strokeWidth={2.5} />
-          </motion.div>
-        )}
+      </section>
+
+      {/* ── Témoignages ── */}
+      <section style={{ background: '#FAFAFA', padding: isMobile ? '56px 0' : '88px 0', overflow: 'hidden', borderTop: '1px solid var(--gray-100)', borderBottom: '1px solid var(--gray-100)' }}>
+        <motion.div
+          initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }} transition={{ duration: 0.5 }}
+          style={{ textAlign: 'center', marginBottom: isMobile ? 32 : 48, padding: `0 ${px}` }}
+        >
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(192,57,43,0.07)', color: 'var(--red)', padding: '5px 14px', borderRadius: 20, fontSize: 11, fontWeight: 700, letterSpacing: '0.8px', marginBottom: 16 }}>
+            <Star size={13} strokeWidth={2.5} />
+            CE QUE DISENT NOS CLIENTS
+          </div>
+          <h2 style={{ fontFamily: 'var(--font-serif, "DM Serif Display", Georgia, serif)', fontSize: isMobile ? 26 : 40, fontWeight: 700, color: '#111', lineHeight: 1.15, letterSpacing: '-0.5px' }}>
+            Ils ont fait confiance<br />
+            <span style={{ color: 'var(--red)' }}>à notre plateforme</span>
+          </h2>
+        </motion.div>
+
+        <div className="testimonials-wrap" style={{ position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: isMobile ? 40 : 100, background: 'linear-gradient(to right, #FAFAFA, transparent)', zIndex: 10, pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: isMobile ? 40 : 100, background: 'linear-gradient(to left, #FAFAFA, transparent)', zIndex: 10, pointerEvents: 'none' }} />
+          <div className="testimonials-track" style={{ gap: isMobile ? 12 : 20, paddingLeft: isMobile ? 16 : 32, paddingBottom: 8 }}>
+            {[...TESTIMONIALS, ...TESTIMONIALS].map((t, i) => (
+              <div key={i} style={{ background: 'white', borderRadius: 'var(--radius)', border: '1px solid var(--gray-200)', padding: isMobile ? '20px' : '28px', width: isMobile ? 260 : 320, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 14, boxShadow: 'var(--shadow-sm)' }}>
+                <div style={{ display: 'flex', gap: 3 }}>
+                  {Array.from({ length: 5 }).map((_, j) => (
+                    <svg key={j} width="13" height="13" viewBox="0 0 24 24" fill={j < t.rating ? '#F59E0B' : '#E5E7EB'} xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                    </svg>
+                  ))}
+                </div>
+                <p style={{ fontSize: 13, color: '#374151', lineHeight: 1.65, flex: 1, margin: 0, fontStyle: 'italic' }}>"{t.text}"</p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, paddingTop: 12, borderTop: '1px solid var(--gray-100)' }}>
+                  <div style={{ width: 34, height: 34, borderRadius: '50%', background: 'var(--red)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>
+                    {t.name.split(' ').map((w: string) => w[0]).join('')}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: '#111' }}>{t.name}</div>
+                    <div style={{ fontSize: 11, color: '#9CA3AF' }}>{t.city} · {t.service}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* ── ÉCRAN 3 : Fonctionnement & Professionnels ── */}
@@ -372,22 +421,22 @@ export default function HomeClient({ kpis, pros }: { kpis: KpiData; pros: ProCar
         scrollMarginTop: 100,
       }}>
         {/* Étapes */}
-        <div style={{ width: '100%', padding: isMobile ? `32px ${px} 24px` : `0 ${px} 48px` }}>
+        <div style={{ width: '100%', padding: isMobile ? `40px ${px} 24px` : `72px ${px} 40px` }}>
           <div style={{ maxWidth: 1200, margin: '0 auto' }}>
             <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-60px' }} transition={{ duration: 0.5 }}>
               <h2 style={{ fontFamily: 'var(--font-serif, "DM Serif Display", Georgia, serif)', fontSize: isMobile ? 26 : 32, fontWeight: 700, marginBottom: 8, color: '#111' }}>Comment ça fonctionne ?</h2>
-              <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 24 }}>Simple, rapide et sécurisé en 3 étapes.</p>
+              <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 32 }}>Simple, rapide et sécurisé en 4 étapes.</p>
             </motion.div>
 
-            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-60px' }} style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: isMobile ? 10 : 14 }}>
+            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-60px' }} style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: isMobile ? 12 : 16 }}>
               {STEPS.map(({ n, Icon, title, desc }) => (
-                <motion.div key={n} variants={fadeUp} whileHover={{ y: -4, boxShadow: '0 12px 32px rgba(0,0,0,0.10)', transition: { duration: 0.2 } }} style={{ background: 'white', borderRadius: 8, border: '1px solid #E5E7EB', padding: isMobile ? '14px 12px' : '18px 16px', cursor: 'default' }}>
-                  <div style={{ fontFamily: 'var(--font-sans), DM Sans, sans-serif', fontSize: 32, fontWeight: 700, color: '#E5E7EB', lineHeight: 1, marginBottom: 8 }}>{n}</div>
-                  <div style={{ width: 26, height: 26, borderRadius: 6, background: 'rgba(192,57,43,0.07)', color: 'var(--red)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
-                    <Icon size={13} strokeWidth={1.8} />
+                <motion.div key={n} variants={fadeUp} whileHover={{ y: -4, boxShadow: '0 12px 32px rgba(0,0,0,0.08)', transition: { duration: 0.2 } }} style={{ background: 'white', borderRadius: 'var(--radius)', border: '1px solid var(--gray-200)', padding: isMobile ? '20px 16px' : '28px 24px', cursor: 'default' }}>
+                  <div style={{ fontSize: isMobile ? 36 : 48, fontWeight: 800, color: '#F3F4F6', lineHeight: 1, marginBottom: isMobile ? 12 : 20, letterSpacing: '-1px' }}>{n}</div>
+                  <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(192,57,43,0.07)', color: 'var(--red)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: isMobile ? 12 : 16 }}>
+                    <Icon size={18} strokeWidth={1.5} />
                   </div>
-                  <h3 style={{ fontSize: 12, fontWeight: 700, fontFamily: 'var(--font-sans), DM Sans, sans-serif', marginBottom: 5 }}>{title}</h3>
-                  <p style={{ fontSize: 11, color: '#6B7280', lineHeight: 1.55, margin: 0 }}>{desc}</p>
+                  <h3 style={{ fontSize: isMobile ? 13 : 15, fontWeight: 700, marginBottom: isMobile ? 6 : 8, color: '#111' }}>{title}</h3>
+                  <p style={{ fontSize: isMobile ? 12 : 13, color: '#6B7280', lineHeight: 1.65, margin: 0 }}>{desc}</p>
                 </motion.div>
               ))}
             </motion.div>
@@ -395,17 +444,17 @@ export default function HomeClient({ kpis, pros }: { kpis: KpiData; pros: ProCar
         </div>
 
         {/* Professionnels à la une */}
-        <div style={{ width: '100%', padding: isMobile ? `24px ${px} 40px` : `0 ${px} 48px` }}>
+        <div style={{ width: '100%', padding: isMobile ? `24px ${px} 56px` : `40px ${px} 72px` }}>
           <div style={{ maxWidth: 1200, margin: '0 auto' }}>
             <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-60px' }} transition={{ duration: 0.5 }}>
               <h2 style={{ fontFamily: 'var(--font-serif, "DM Serif Display", Georgia, serif)', fontSize: isMobile ? 26 : 32, fontWeight: 700, marginBottom: 8, color: '#111' }}>Professionnels à la une</h2>
               <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 24 }}>Découvrez des pros vérifiés près de chez vous.</p>
             </motion.div>
 
-            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-60px' }} style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isMobile ? 10 : 16, marginBottom: 32 }}>
+            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-60px' }} style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isMobile ? 10 : 16, marginBottom: 40 }}>
               {pros.map((pro: ProCard) => (
                 <Link key={pro.id} href={`/professionnels/${pro.id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
-                  <motion.div variants={fadeUp} whileHover={{ y: -4, boxShadow: '0 12px 32px rgba(0,0,0,0.09)', transition: { duration: 0.2 } }} style={{ background: 'white', borderRadius: 8, border: '1px solid #E5E7EB', padding: '16px 20px', cursor: 'pointer' }}>
+                  <motion.div variants={fadeUp} whileHover={{ y: -4, boxShadow: '0 12px 32px rgba(0,0,0,0.09)', transition: { duration: 0.2 } }} style={{ background: 'white', borderRadius: 'var(--radius)', border: '1px solid var(--gray-200)', padding: '16px 20px', cursor: 'pointer' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
                       <div style={{ width: 34, height: 34, borderRadius: 8, background: pro.color, color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{pro.initials}</div>
                       <div>
@@ -429,6 +478,33 @@ export default function HomeClient({ kpis, pros }: { kpis: KpiData; pros: ProCar
             </motion.div>
           </div>
         </div>
+      </section>
+
+      {/* ── Section CTA finale ── */}
+      <section style={{ background: '#111', color: 'white', padding: isMobile ? '64px 20px' : '100px 40px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', bottom: -120, right: -120, width: 360, height: 360, borderRadius: '50%', background: 'rgba(192,57,43,0.15)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', top: -80, left: -80, width: 240, height: 240, borderRadius: '50%', background: 'rgba(192,57,43,0.10)', pointerEvents: 'none' }} />
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} style={{ position: 'relative', maxWidth: 600, margin: '0 auto' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(192,57,43,0.18)', color: 'var(--red)', padding: '5px 14px', borderRadius: 20, fontSize: 11, fontWeight: 700, letterSpacing: '0.8px', marginBottom: 24 }}>
+            <ShieldCheck size={13} strokeWidth={2.5} />
+            GRATUIT & SANS ENGAGEMENT
+          </div>
+          <h2 style={{ fontFamily: 'var(--font-serif, "DM Serif Display", Georgia, serif)', fontSize: isMobile ? 28 : 48, fontWeight: 700, color: 'white', lineHeight: 1.15, marginBottom: 24, letterSpacing: '-0.5px' }}>
+            Prêt à trouver votre<br />
+            <span style={{ color: 'var(--red)' }}>professionnel certifié ?</span>
+          </h2>
+          <p style={{ fontSize: isMobile ? 14 : 16, color: 'rgba(255,255,255,0.55)', lineHeight: 1.7, marginBottom: 36 }}>
+            Déposez votre demande en 3 minutes.<br />Recevez jusqu'à 5 devis gratuits.
+          </p>
+          <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: 'center', justifyContent: 'center', gap: 12, width: isMobile ? '100%' : 'auto', maxWidth: isMobile ? 340 : 'none', margin: '0 auto' }}>
+            <BtnRed href="/formulaire" size="lg" style={{ padding: isMobile ? '14px 28px' : '16px 40px', letterSpacing: '0.6px', width: isMobile ? '100%' : 'auto', justifyContent: 'center' }}>
+              DÉPOSER UNE DEMANDE
+            </BtnRed>
+            <Link href="/professionnels" className="btn btn-ghost-dark btn-lg" style={{ padding: isMobile ? '14px 28px' : '16px 36px', width: isMobile ? '100%' : 'auto', justifyContent: 'center' }}>
+              Explorer les professionnels →
+            </Link>
+          </div>
+        </motion.div>
       </section>
 
       <Footer />

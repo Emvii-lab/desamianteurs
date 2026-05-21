@@ -148,7 +148,7 @@ export default function PartnerDashboard({ isValid, feePaid, partnerId, absenceS
       <motion.div variants={fadeUp} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 32 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>Espace Partenaire</h1>
-          <p style={{ fontSize: 14, color: '#6B7280' }}>Gérez vos demandes et votre activité sur Désamianteurs.fr</p>
+          <p style={{ fontSize: 14, color: '#6B7280' }}>Gérez vos demandes et votre activité sur Désamianteurs.com</p>
         </div>
         {isValid && (
           <motion.span 

@@ -5,7 +5,7 @@ import { AVATAR_COLORS } from '@/lib/constants'
 import { timeAgo } from '@/lib/utils'
 
 export const metadata = {
-  title: 'Espace Partenaire | Désamianteurs.fr',
+  title: 'Espace Partenaire | Désamianteurs.com',
 }
 
 export default async function EspacePartenairePage() {

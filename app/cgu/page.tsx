@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import LegalPage, { LegalSection, InfoBox, LegalList } from '@/components/ui/LegalPage'
 
 export const metadata: Metadata = {
-  title: "Conditions Générales d'Utilisation | Désamianteurs.fr",
-  description: "CGU de Désamianteurs.fr — marketplace de mise en relation amiante. Version 1.0 — Mars 2026.",
+  title: "Conditions Générales d'Utilisation | Désamianteurs.com",
+  description: "CGU de Désamianteurs.com — marketplace de mise en relation amiante. Version 1.0 — Mars 2026.",
 }
 
 const TOC = [
@@ -30,7 +30,7 @@ export default function CguPage() {
       toc={TOC}
     >
       <LegalSection id="art1" title="Article 1 — Objet et champ d'application">
-        <p>Les présentes CGU régissent l'accès et l'utilisation de la plateforme Désamianteurs.fr, place de marché numérique de mise en relation entre des clients ayant des besoins liés à l'amiante ou au plomb, et des professionnels certifiés du secteur.</p>
+        <p>Les présentes CGU régissent l'accès et l'utilisation de la plateforme Désamianteurs.com, place de marché numérique de mise en relation entre des clients ayant des besoins liés à l'amiante ou au plomb, et des professionnels certifiés du secteur.</p>
         <InfoBox><strong>Important :</strong> Tout accès implique l'acceptation sans réserve des présentes CGU.</InfoBox>
       </LegalSection>
 
@@ -42,7 +42,7 @@ export default function CguPage() {
       </LegalSection>
 
       <LegalSection id="art3" title="Article 3 — Description du service">
-        <p>Désamianteurs.fr agit en qualité d'intermédiaire de mise en relation. L'éditeur n'est pas partie aux contrats conclus entre Clients et Professionnels. Les Professionnels restent seuls responsables de la qualité, conformité réglementaire et exécution de leurs prestations.</p>
+        <p>Désamianteurs.com agit en qualité d'intermédiaire de mise en relation. L'éditeur n'est pas partie aux contrats conclus entre Clients et Professionnels. Les Professionnels restent seuls responsables de la qualité, conformité réglementaire et exécution de leurs prestations.</p>
       </LegalSection>
 
       <LegalSection id="art4" title="Article 4 — Tarification et abonnements">
@@ -84,7 +84,7 @@ export default function CguPage() {
       </LegalSection>
 
       <LegalSection id="art10" title="Article 10 — Responsabilité et garanties">
-        <p>Désamianteurs.fr est une plateforme de mise en relation et n'est pas responsable de la qualité des prestations réalisées, des relations contractuelles entre utilisateurs, ni des dommages résultant de l'utilisation de la plateforme. La plateforme ne garantit pas un volume minimum de demandes.</p>
+        <p>Désamianteurs.com est une plateforme de mise en relation et n'est pas responsable de la qualité des prestations réalisées, des relations contractuelles entre utilisateurs, ni des dommages résultant de l'utilisation de la plateforme. La plateforme ne garantit pas un volume minimum de demandes.</p>
       </LegalSection>
 
       <LegalSection id="art11" title="Article 11 — Droit applicable et litiges">
@@ -93,7 +93,7 @@ export default function CguPage() {
 
       <LegalSection id="art12" title="Article 12 — Modification des CGU">
         <p>L'éditeur se réserve le droit de modifier les présentes CGU à tout moment. Toute modification sera notifiée par email avec un préavis de <strong>30 jours</strong>. La poursuite de l'utilisation vaut acceptation des nouvelles dispositions.</p>
-        <p style={{ marginTop: 10, fontStyle: 'italic', color: 'var(--gray-400)', fontSize: 13 }}>Pour toute question : <strong>contact@desamianteurs.fr</strong></p>
+        <p style={{ marginTop: 10, fontStyle: 'italic', color: 'var(--gray-400)', fontSize: 13 }}>Pour toute question : <strong>contact@desamianteurs.com</strong></p>
       </LegalSection>
     </LegalPage>
   )

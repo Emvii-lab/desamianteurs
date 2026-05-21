@@ -3,7 +3,7 @@ import { createServerSupabase } from '@/lib/supabase-server'
 import { TYPE_LABEL } from '@/lib/constants'
 import DocumentsClient from './DocumentsClient'
 
-export const metadata = { title: 'Documents obligatoires | Désamianteurs.fr' }
+export const metadata = { title: 'Documents obligatoires | Désamianteurs.com' }
 
 export default async function DocumentsPage() {
   const supabase = await createServerSupabase()

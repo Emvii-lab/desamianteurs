@@ -49,7 +49,7 @@ export default function TarifsClient() {
       <div className="tarifs-content" style={{ maxWidth: 1200, margin: '-60px auto 100px', position: 'relative', zIndex: 10 }}>
 
         {/* Freemium */}
-        <motion.div {...fadeUp(0.1)} className="tarifs-freemium" style={{ background: 'white', border: '1px solid var(--gray-100)', borderRadius: 10, marginBottom: 48, boxShadow: '0 10px 40px rgba(0,0,0,0.05)' }}>
+        <motion.div {...fadeUp(0.1)} className="tarifs-freemium" style={{ background: 'white', border: '1px solid var(--gray-100)', borderRadius: 'var(--radius)', marginBottom: 48, boxShadow: '0 10px 40px rgba(0,0,0,0.05)' }}>
           <div>
             <h3 style={{ fontSize: 18, marginBottom: 4, fontWeight: 700 }}>Freemium – Gratuit</h3>
             <p style={{ fontSize: 14, color: 'var(--gray-400)', margin: 0 }}>1 affaire offerte pour tester la plateforme · Sans engagement · Profil visible</p>
@@ -186,26 +186,26 @@ export default function TarifsClient() {
                 style={{
                   background: 'white',
                   border: '1px solid var(--gray-200)',
-                  borderRadius: 12,
+                  borderRadius: 'var(--radius)',
                   padding: '24px 20px',
                   cursor: 'default',
                 }}
               >
-                <div style={{ fontSize: 36, fontWeight: 700, color: 'var(--gray-200)', lineHeight: 1, marginBottom: 12, letterSpacing: '-1px', fontFamily: 'var(--font-sans)' }}>
+                <div style={{ fontSize: 36, fontWeight: 800, color: 'var(--gray-100)', lineHeight: 1, marginBottom: 14, letterSpacing: '-1px', fontFamily: 'var(--font-sans)' }}>
                   {step.n}
                 </div>
-                <div style={{ width: 28, height: 28, borderRadius: 6, background: 'rgba(192,57,43,0.07)', color: 'var(--red)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>
+                <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(192,57,43,0.07)', color: 'var(--red)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>
                 </div>
                 <h3 style={{ fontSize: 13, fontWeight: 700, marginBottom: 6, fontFamily: 'var(--font-sans)', color: 'var(--black)' }}>{step.title}</h3>
-                <p style={{ fontSize: 11.5, color: '#6B7280', lineHeight: 1.55, margin: 0 }}>{step.desc}</p>
+                <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, margin: 0 }}>{step.desc}</p>
               </motion.div>
             ))}
           </div>
         </section>
 
         {/* CTA footer */}
-        <motion.div {...fadeUp(0.1)} className="tarifs-cta-footer" style={{ background: 'var(--gray-50)', border: '1px solid var(--gray-100)', borderRadius: 8, padding: '24px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+        <motion.div {...fadeUp(0.1)} className="tarifs-cta-footer" style={{ background: 'var(--gray-50)', border: '1px solid var(--gray-100)', borderRadius: 'var(--radius)', padding: '24px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
           <Check size={18} color="var(--red)" />
           <span style={{ fontSize: 14, fontWeight: 600 }}>L'inscription et les demandes de devis sont 100 % gratuits pour les clients particuliers et maîtres d'ouvrage.</span>
         </motion.div>

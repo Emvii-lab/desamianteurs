@@ -23,8 +23,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const supabase = await createServerSupabase()
   const { data } = await supabase.from('partners').select('company_name, description').eq('id', id).maybeSingle()
   return {
-    title: data ? `${data.company_name} | Désamianteurs.fr` : 'Profil professionnel | Désamianteurs.fr',
-    description: data?.description?.slice(0, 155) ?? 'Professionnel certifié sur Désamianteurs.fr',
+    title: data ? `${data.company_name} | Désamianteurs.com` : 'Profil professionnel | Désamianteurs.com',
+    description: data?.description?.slice(0, 155) ?? 'Professionnel certifié sur Désamianteurs.com',
   }
 }
 
@@ -300,7 +300,7 @@ export default async function ProfilProPage({ params }: Props) {
                 Notre équipe vérifie toutes les certifications. Contactez-nous pour toute question.
               </div>
               <a
-                href={`mailto:contact@desamianteurs.fr?subject=Signalement%20profil%20${encodeURIComponent(p.company_name ?? '')}`}
+                href={`mailto:contact@desamianteurs.com?subject=Signalement%20profil%20${encodeURIComponent(p.company_name ?? '')}`}
                 className="btn btn-outline btn-sm"
                 style={{ width: '100%', justifyContent: 'center', display: 'flex', fontSize: 12 }}
               >

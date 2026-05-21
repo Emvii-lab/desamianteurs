@@ -2,7 +2,7 @@ import { createServerSupabase } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
 import CompleterClient from './CompleterClient'
 
-export const metadata = { title: 'Compléter votre profil | Désamianteurs.fr' }
+export const metadata = { title: 'Compléter votre profil | Désamianteurs.com' }
 
 export default async function CompleterPage({
   searchParams,

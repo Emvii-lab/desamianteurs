@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import { TYPE_LABEL } from '@/lib/constants'
 
-export const metadata = { title: 'Mes certifications | Désamianteurs.fr' }
+export const metadata = { title: 'Mes certifications | Désamianteurs.com' }
 
 export default async function CertificationsPartenairePage() {
   const supabase = await createServerSupabase()
@@ -51,7 +51,7 @@ export default async function CertificationsPartenairePage() {
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1D4ED8" strokeWidth="2" style={{ flexShrink: 0, marginTop: 2 }}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         <p style={{ fontSize: 13, color: '#1E40AF', margin: 0, lineHeight: 1.6 }}>
           Ces certifications ont été déclarées lors de votre inscription et vérifiées par notre équipe.
-          Pour modifier vos certifications, <a href="mailto:contact@desamianteurs.fr?subject=Modification certifications" style={{ color: 'var(--red)', fontWeight: 600 }}>contactez le support</a>.
+          Pour modifier vos certifications, <a href="mailto:contact@desamianteurs.com?subject=Modification certifications" style={{ color: 'var(--red)', fontWeight: 600 }}>contactez le support</a>.
         </p>
       </div>
 

@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+
+  <!-- Fond noir arrondi -->
+  <rect width="512" height="512" fill="#0A0A0A" rx="80"/>
+
+  <!-- Bouclier rouge -->
+  <path id="shield-path"
+    d="M80 58 L432 58 L432 292 C432 388 348 447 256 470 C164 447 80 388 80 292 Z"
+    fill="#C0392B"/>
+
+  <!-- ClipPath = rien ne peut dépasser du bouclier -->
+  <defs>
+    <clipPath id="shield-clip">
+      <path d="M80 58 L432 58 L432 292 C432 388 348 447 256 470 C164 447 80 388 80 292 Z"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#shield-clip)">
+
+    <!-- ═══ Lettre D ═══ -->
+    <!-- Tige gauche -->
+    <rect x="100" y="130" width="44" height="252" fill="white"/>
+    <!-- Ventre du D -->
+    <path d="M122 130 L206 130 Q308 130 308 256 Q308 382 206 382 L122 382 Z" fill="white"/>
+    <!-- Creux intérieur du D -->
+    <path d="M144 170 L202 170 Q268 170 268 256 Q268 342 202 342 L144 342 Z" fill="#C0392B"/>
+
+    <!-- ═══ Lettre A ═══ -->
+    <!-- Jambe gauche (diagonale gauche, épaisseur 38) -->
+    <polygon points="308,382 346,382 400,130 362,130" fill="white"/>
+    <!-- Jambe droite (diagonale droite, épaisseur 38) -->
+    <polygon points="362,130 400,130 454,382 416,382" fill="white"/>
+    <!-- Traverse -->
+    <rect x="318" y="272" width="126" height="30" fill="white"/>
+    <!-- Creux intérieur du A (triangle rouge au-dessus de la traverse) -->
+    <polygon points="381,152 410,272 352,272" fill="#C0392B"/>
+
+  </g>
+
+</svg>

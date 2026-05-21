@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import LegalPage, { LegalSection, InfoBox, LegalList, LegalTable } from '@/components/ui/LegalPage'
 
 export const metadata: Metadata = {
-  title: 'Politique de confidentialité | Désamianteurs.fr',
-  description: 'Politique de confidentialité et traitement des données personnelles conforme au RGPD — Désamianteurs.fr.',
+  title: 'Politique de confidentialité | Désamianteurs.com',
+  description: 'Politique de confidentialité et traitement des données personnelles conforme au RGPD — Désamianteurs.com.',
 }
 
 const TOC = [
@@ -26,8 +26,8 @@ export default function ConfidentialitePage() {
       toc={TOC}
     >
       <LegalSection id="qui" title="1. Qui sommes-nous ?">
-        <p>Désamianteurs.fr est une plateforme de mise en relation spécialisée dans le secteur de l'amiante et du plomb. Responsable de traitement : <em>[raison sociale à compléter après immatriculation]</em>.</p>
-        <p style={{ marginTop: 8 }}>Email RGPD : <strong>rgpd@desamianteurs.fr</strong></p>
+        <p>Désamianteurs.com est une plateforme de mise en relation spécialisée dans le secteur de l'amiante et du plomb. Responsable de traitement : <em>[raison sociale à compléter après immatriculation]</em>.</p>
+        <p style={{ marginTop: 8 }}>Email RGPD : <strong>rgpd@desamianteurs.com</strong></p>
       </LegalSection>
 
       <LegalSection id="donnees" title="2. Données collectées et finalités">
@@ -46,7 +46,7 @@ export default function ConfidentialitePage() {
 
       <LegalSection id="destinataires" title="3. Destinataires des données">
         <LegalList items={[
-          "L'équipe interne Désamianteurs.fr (accès limité selon le rôle)",
+          "L'équipe interne Désamianteurs.com (accès limité selon le rôle)",
           'Supabase Inc. — hébergeur base de données (DPA signé, données en Europe)',
           'Vercel Inc. — hébergeur du site web',
           'n8n (OVH) — automatisation email (données transitoires)',
@@ -71,7 +71,7 @@ export default function ConfidentialitePage() {
             [<strong>Réclamation CNIL</strong>, 'Déposer une plainte sur cnil.fr — 3 Place de Fontenoy, 75007 Paris'],
           ]}
         />
-        <p style={{ marginTop: 12 }}>Pour exercer vos droits : <strong>rgpd@desamianteurs.fr</strong> — Délai de réponse : 30 jours maximum.</p>
+        <p style={{ marginTop: 12 }}>Pour exercer vos droits : <strong>rgpd@desamianteurs.com</strong> — Délai de réponse : 30 jours maximum.</p>
       </LegalSection>
 
       <LegalSection id="cookies" title="6. Cookies">
@@ -101,7 +101,7 @@ export default function ConfidentialitePage() {
 
       <LegalSection id="contact" title="8. Contact et réclamations">
         <LegalList items={[
-          <span>Email RGPD : <strong>rgpd@desamianteurs.fr</strong></span>,
+          <span>Email RGPD : <strong>rgpd@desamianteurs.com</strong></span>,
           'En cas de violation de données : notification CNIL dans les 72h (art. 33 RGPD)',
         ]} />
       </LegalSection>

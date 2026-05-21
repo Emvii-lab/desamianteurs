@@ -4,7 +4,7 @@ import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 
 export const metadata: Metadata = {
-  title: 'Actualités | Désamianteurs.fr',
+  title: 'Actualités | Désamianteurs.com',
   description: 'Suivez les dernières actualités sur la réglementation amiante, les certifications et les bonnes pratiques du secteur.',
 }
 
@@ -185,7 +185,7 @@ export default function ActualitesPage() {
               Recevez une synthèse mensuelle des actualités amiante directement dans votre boîte mail.
             </p>
           </div>
-          <a href="mailto:contact@desamianteurs.fr?subject=Inscription newsletter" className="btn btn-red" style={{ flexShrink: 0, whiteSpace: 'nowrap' }}>
+          <a href="mailto:contact@desamianteurs.com?subject=Inscription newsletter" className="btn btn-red" style={{ flexShrink: 0, whiteSpace: 'nowrap' }}>
             S'inscrire à la newsletter
           </a>
         </div>
