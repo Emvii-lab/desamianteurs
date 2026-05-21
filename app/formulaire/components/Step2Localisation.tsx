@@ -7,7 +7,7 @@ import { ACCESSIBILITY_OPTIONS, FLOOR_OPTIONS, ELEVATOR_OPTIONS } from '@/lib/co
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface Props {
-  form: UseFormReturn<DemandeFormValues, any, any>
+  form: UseFormReturn<DemandeFormValues>
   onNext: () => void
   onBack: () => void
 }
@@ -36,24 +36,24 @@ export function Step2Localisation({ form, onNext, onBack }: Props) {
             setValue('department', r.department)
           }}
         />
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 140px 1fr', gap: 10, marginTop: 10 }}>
+        <div className="step-grid-addr" style={{ display: 'grid', gap: 10, marginTop: 10 }}>
           <input className="input" placeholder="Numéro et nom de rue" {...register('streetAddress')} />
           <input className="input" placeholder="Code postal" {...register('postalCode')} />
           <input className="input" placeholder="Ville" {...register('city')} />
         </div>
         {(errors.streetAddress || errors.city || errors.postalCode) && (
-          <p className="error-text">L'adresse complète est requise</p>
+          <p className="error-text">L&apos;adresse complète est requise</p>
         )}
       </div>
 
       <div style={{ marginBottom: 24 }}>
-        <label className="label">Complément d'adresse <span style={{ color: '#9CA3AF', fontWeight: 400 }}>(facultatif)</span></label>
+        <label className="label">Complément d&apos;adresse <span style={{ color: '#9CA3AF', fontWeight: 400 }}>(facultatif)</span></label>
         <input className="input" placeholder="Bâtiment, appartement, étage, digicode..." {...register('complement')} />
       </div>
 
       <div style={{ marginBottom: 24 }}>
         <label className="label">Accessibilité du chantier <span style={{ color: '#9CA3AF', fontWeight: 400 }}>(facultatif)</span></label>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+        <div className="step-grid-3" style={{ display: 'grid', gap: 10 }}>
           {ACCESSIBILITY_OPTIONS.map(opt => {
             const active = accessibility === opt.id
             return (
@@ -80,7 +80,7 @@ export function Step2Localisation({ form, onNext, onBack }: Props) {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
+      <div className="step-grid-2" style={{ display: 'grid', gap: 16, marginBottom: 24 }}>
         <div>
           <label className="label">Étage <span style={{ color: 'var(--red)' }}>*</span></label>
           <CustomSelect
@@ -114,9 +114,9 @@ export function Step2Localisation({ form, onNext, onBack }: Props) {
           type="button"
           whileHover={{ scale: 1.01, translateY: -1 }}
           whileTap={{ scale: 0.98 }}
-          className="btn btn-outline"
+          className="btn btn-outline step-nav-btn"
           onClick={onBack}
-          style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '14px 28px' }}
+          style={{ display: 'flex', alignItems: 'center', gap: 8 }}
         >
           <ChevronLeft size={18} /> Retour
         </motion.button>
@@ -124,9 +124,9 @@ export function Step2Localisation({ form, onNext, onBack }: Props) {
           type="button"
           whileHover={{ scale: 1.01, translateY: -1 }}
           whileTap={{ scale: 0.98 }}
-          className="btn btn-red"
+          className="btn btn-red step-nav-btn"
           onClick={onNext}
-          style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '14px 28px' }}
+          style={{ display: 'flex', alignItems: 'center', gap: 8 }}
         >
           Étape suivante <ChevronRight size={18} />
         </motion.button>

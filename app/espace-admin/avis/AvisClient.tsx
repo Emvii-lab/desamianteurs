@@ -32,18 +32,18 @@ export default function AvisClient({ initialReviews }: Props) {
   }
 
   return (
-    <motion.div 
+    <motion.div
       initial="hidden"
       animate="visible"
       variants={staggerContainer}
-      style={{ padding: '32px' }}
+      className="admin-page-content"
     >
-      <motion.div variants={fadeUp} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+      <motion.div variants={fadeUp} className="admin-page-header">
         <div>
           <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#0A0A0A', marginBottom: '4px' }}>Modération des avis</h1>
           <p style={{ color: '#6B7280', fontSize: '14px' }}>Approuvez ou rejetez les avis laissés par les clients.</p>
         </div>
-        <div style={{ display: 'flex', gap: '8px', background: '#F3F4F6', padding: '4px', borderRadius: '8px' }}>
+        <div className="admin-pill-tabs" style={{ display: 'flex', gap: '8px', background: '#F3F4F6', padding: '4px', borderRadius: '8px' }}>
           {['all', 'pending', 'published', 'rejected'].map((f) => (
             <button
               key={f}

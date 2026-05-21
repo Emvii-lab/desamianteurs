@@ -172,7 +172,7 @@ export default function PartnerDashboard({ isValid, feePaid, partnerId, absenceS
       />
 
       {diagnostic && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24, marginBottom: 24 }}>
+        <div className="partner-diag-grid" style={{ display: 'grid', gap: 24, marginBottom: 24 }}>
           <motion.div 
             whileHover={{ y: -6, boxShadow: '0 12px 32px rgba(0,0,0,0.08)' }}
             className="card" 

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { User, CheckCircle2, Eye, EyeOff, Send, ChevronLeft } from 'lucide-react'
 
 interface Props {
-  form: UseFormReturn<DemandeFormValues, any, any>
+  form: UseFormReturn<DemandeFormValues>
   onBack: () => void
   onSubmit: () => void
   loading: boolean
@@ -26,7 +26,7 @@ export function Step3Coordonnees({
   return (
     <div className="fade-in-up">
       <h2 style={{ fontSize: 26, fontWeight: 700, marginBottom: 6 }}>Vos coordonnées</h2>
-      <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 28 }}>Étape 3 sur 3 — Dernière étape avant d'envoyer votre demande aux pros.</p>
+      <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 28 }}>Étape 3 sur 3 — Dernière étape avant d&apos;envoyer votre demande aux pros.</p>
 
       {isLoggedIn ? (
         <div style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 10, padding: '16px 20px', marginBottom: 28, display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -39,10 +39,9 @@ export function Step3Coordonnees({
         <>
           <div style={{ display: 'flex', border: '1.5px solid #E5E7EB', borderRadius: 8, overflow: 'hidden', marginBottom: 28 }}>
             {(['create', 'login'] as const).map(mode => (
-              <button key={mode} type="button" onClick={() => setAuthMode(mode)} style={{
+              <button key={mode} type="button" onClick={() => setAuthMode(mode)} className="step-tab-btn" style={{
                 flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                padding: '13px 16px', border: 'none', cursor: 'pointer',
-                fontSize: 14, fontWeight: 600,
+                border: 'none', cursor: 'pointer', fontWeight: 600,
                 background: authMode === mode ? '#C0392B' : 'white',
                 color: authMode === mode ? 'white' : '#374151',
                 transition: 'all 0.15s',
@@ -55,7 +54,7 @@ export function Step3Coordonnees({
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {authMode === 'create' && (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div className="step-grid-2" style={{ display: 'grid', gap: 16 }}>
                 <div>
                   <label className="label">Prénom</label>
                   <input className="input" placeholder="Jean" {...register('prenom')} />
@@ -108,12 +107,12 @@ export function Step3Coordonnees({
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 16 }}>
               <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, fontSize: 13, color: '#4B5563', cursor: 'pointer' }}>
                 <input type="checkbox" {...register('cgu')} style={{ accentColor: '#C0392B', marginTop: 2 }} />
-                <span>J'accepte les <a href="/cgu" style={{ color: '#C0392B' }}>CGU</a> et la <a href="/confidentialite" style={{ color: '#C0392B' }}>Politique de confidentialité</a></span>
+                <span>J&apos;accepte les <a href="/cgu" style={{ color: '#C0392B' }}>CGU</a> et la <a href="/confidentialite" style={{ color: '#C0392B' }}>Politique de confidentialité</a></span>
               </label>
               {errors.cgu && <p className="error-text">{errors.cgu.message}</p>}
               <label style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#4B5563', cursor: 'pointer' }}>
                 <input type="checkbox" {...register('notifs')} style={{ accentColor: '#C0392B' }} />
-                J'accepte de recevoir des notifications par e-mail
+                J&apos;accepte de recevoir des notifications par e-mail
               </label>
             </div>
           )}
@@ -123,11 +122,11 @@ export function Step3Coordonnees({
       {error && <div className="form-error" style={{ marginTop: 16 }}>{error}</div>}
 
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 24 }}>
-        <button type="button" className="btn btn-outline" onClick={onBack} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '14px 28px' }}>
+        <button type="button" className="btn btn-outline step-nav-btn" onClick={onBack} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <ChevronLeft size={18} /> Retour
         </button>
-        <button type="button" className="btn btn-red" onClick={onSubmit} disabled={loading}
-          style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 28px', opacity: loading ? 0.7 : 1 }}>
+        <button type="button" className="btn btn-red step-nav-btn" onClick={onSubmit} disabled={loading}
+          style={{ display: 'flex', alignItems: 'center', gap: 10, opacity: loading ? 0.7 : 1 }}>
           <Send size={16} strokeWidth={2} />
           {loading ? 'Envoi en cours...' : 'Envoyer ma demande'}
         </button>

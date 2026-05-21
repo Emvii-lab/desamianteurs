@@ -327,23 +327,23 @@ export default function UtilisateursClient({ initialUsers }: Props) {
         initial="hidden"
         animate="visible"
         variants={staggerContainer}
-        style={{ padding: '32px' }}
+        className="admin-page-content"
       >
         {/* En-tête */}
-        <motion.div variants={fadeUp} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+        <motion.div variants={fadeUp} className="admin-page-header">
           <div>
             <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#0A0A0A', marginBottom: '4px' }}>Tous les utilisateurs</h1>
             <p style={{ color: '#6B7280', fontSize: '14px' }}>Consultez la liste globale de tous les comptes enregistrés sur la plateforme.</p>
           </div>
-          <div style={{ display: 'flex', gap: '12px' }}>
+          <div className="admin-header-actions">
             <StatCard label="Total"   value={users.length} />
             <StatCard label="Clients" value={users.filter(u => u.role === 'client').length} />
           </div>
         </motion.div>
 
         {/* Tabs + recherche */}
-        <motion.div variants={fadeUp} style={{ display: 'flex', alignItems: 'center', gap: '24px', marginBottom: '24px' }}>
-          <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid #E5E7EB', flex: 1 }}>
+        <motion.div variants={fadeUp} className="admin-tabs-row">
+          <div className="admin-tabs-list">
             {[
               { id: 'all',        label: 'Tous',        count: users.length },
               { id: 'partenaire', label: 'Partenaires', count: users.filter(u => u.role === 'partenaire').length },
@@ -373,7 +373,7 @@ export default function UtilisateursClient({ initialUsers }: Props) {
             })}
           </div>
 
-          <div style={{ position: 'relative', width: '300px' }}>
+          <div className="admin-tabs-search" style={{ position: 'relative' }}>
             <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
             <input
               type="text"
@@ -386,7 +386,7 @@ export default function UtilisateursClient({ initialUsers }: Props) {
         </motion.div>
 
         {/* Table */}
-        <motion.div variants={fadeUp} style={{ background: 'white', borderRadius: '12px', border: '1px solid #E5E7EB', overflow: 'hidden' }}>
+        <motion.div variants={fadeUp} className="admin-table-container">
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
               <tr style={{ background: '#F9FAFB', borderBottom: '1px solid #E5E7EB' }}>

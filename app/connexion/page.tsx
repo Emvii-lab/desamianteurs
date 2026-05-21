@@ -7,11 +7,12 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft, Lock, CheckCircle, MessageSquare } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 import Footer from '@/components/Footer'
+import Navbar from '@/components/Navbar'
 
 const SERIF = 'var(--font-serif, "DM Serif Display", Georgia, serif)'
 const SANS  = 'var(--font-sans, DM Sans, sans-serif)'
 
-async function getRoleRedirect(supabase: any, userId: string): Promise<string> {
+async function getRoleRedirect(supabase: ReturnType<typeof import('@/lib/supabase').createClient>, userId: string): Promise<string> {
   try {
     const [adminRes, partnerRes] = await Promise.all([
       supabase.from('admins').select('id').eq('user_id', userId).maybeSingle(),
@@ -34,17 +35,39 @@ export default function ConnexionPage() {
     e.preventDefault()
     setError('')
     setLoading(true)
+
+    // Filet de sécurité : si Supabase ne répond pas du tout (réseau coupé, service down)
+    const timeout = setTimeout(() => {
+      setLoading(false)
+      setError('Impossible de joindre le serveur. Vérifiez votre connexion et réessayez.')
+    }, 12000)
+
     try {
       const supabase = createClient()
       const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password })
+      clearTimeout(timeout)
+
       if (authError || !data.user) {
-        setError('Email ou mot de passe incorrect.')
+        const code = authError?.code ?? ''
+        const status = authError?.status ?? 0
+
+        if (status === 429 || code.includes('rate') || code.includes('limit')) {
+          setError('Trop de tentatives. Patientez quelques minutes avant de réessayer.')
+        } else if (code === 'invalid_credentials' || code === 'user_not_found' || status === 400) {
+          setError('Email ou mot de passe incorrect.')
+        } else if (code === 'email_not_confirmed') {
+          setError('Veuillez confirmer votre adresse email avant de vous connecter.')
+        } else {
+          setError(authError?.message || 'Email ou mot de passe incorrect.')
+        }
         setLoading(false)
         return
       }
+
       const redirectPath = await getRoleRedirect(supabase, data.user.id)
       router.push(redirectPath)
     } catch (err) {
+      clearTimeout(timeout)
       console.error('Login error:', err)
       setError('Une erreur est survenue. Veuillez réessayer.')
       setLoading(false)
@@ -61,10 +84,15 @@ export default function ConnexionPage() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+      {/* Navbar — visible sur mobile uniquement (desktop a son propre branding) */}
+      <div className="mobile-only" style={{ position: 'sticky', top: 0, zIndex: 1000 }}>
+        <Navbar />
+      </div>
+
+      <div className="connexion-split" style={{ flex: 1, display: 'grid' }}>
 
         {/* Côté gauche — noir */}
-        <div style={{ background: '#111111', color: 'white', padding: '80px', paddingTop: '100px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', position: 'relative', overflow: 'hidden' }}>
+        <div className="connexion-left" style={{ background: '#111111', color: 'white', padding: '80px', paddingTop: '100px', flexDirection: 'column', justifyContent: 'flex-start', position: 'relative', overflow: 'hidden' }}>
           <motion.div
             animate={{ y: [0, -14, 0], scale: [1, 1.02, 1] }}
             transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
@@ -106,14 +134,14 @@ export default function ConnexionPage() {
         </div>
 
         {/* Côté droit — blanc */}
-        <div style={{ background: 'white', padding: '80px', display: 'flex', flexDirection: 'column', justifyContent: 'center', position: 'relative' }}>
-          <Link href="/" style={{ position: 'absolute', top: 32, right: 48, display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, color: '#C0392B', textDecoration: 'none', fontFamily: SANS }}>
-            <ArrowLeft size={15} /> Retour à l'accueil
+        <div className="connexion-right" style={{ background: 'white', padding: '80px', display: 'flex', flexDirection: 'column', justifyContent: 'center', position: 'relative' }}>
+          <Link href="/" className="connexion-back" style={{ position: 'absolute', top: 32, right: 48, display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, color: '#C0392B', textDecoration: 'none', fontFamily: SANS }}>
+            <ArrowLeft size={15} /> Retour à l&apos;accueil
           </Link>
 
           <div style={{ maxWidth: 400, width: '100%', margin: '0 auto' }}>
-            {/* Logo */}
-            <div style={{ fontFamily: SERIF, fontSize: 20, fontWeight: 400, marginBottom: 40 }}>
+            {/* Logo — masqué sur mobile (Navbar l'affiche déjà) */}
+            <div className="connexion-logo" style={{ fontFamily: SERIF, fontSize: 20, fontWeight: 400, marginBottom: 40 }}>
               Désamianteurs<span style={{ color: '#C0392B' }}>.fr</span>
             </div>
 
@@ -153,7 +181,7 @@ export default function ConnexionPage() {
 
             <p style={{ textAlign: 'center', marginTop: 40, fontFamily: SANS, fontSize: 14, color: '#9CA3AF' }}>
               Pas encore de compte ?{' '}
-              <Link href="/inscription" style={{ color: '#C0392B', fontWeight: 700, textDecoration: 'none' }}>S'inscrire gratuitement</Link>
+              <Link href="/inscription" style={{ color: '#C0392B', fontWeight: 700, textDecoration: 'none' }}>S&apos;inscrire gratuitement</Link>
             </p>
           </div>
         </div>

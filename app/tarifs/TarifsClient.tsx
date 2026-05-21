@@ -20,7 +20,7 @@ export default function TarifsClient() {
       <Navbar />
 
       {/* Hero */}
-      <section style={{ background: 'var(--black)', padding: '100px 32px 140px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+      <section className="tarifs-hero" style={{ background: 'var(--black)', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
         {/* Cercles animés */}
         <motion.div
           animate={{ y: [0, -14, 0], scale: [1, 1.02, 1] }}
@@ -46,37 +46,30 @@ export default function TarifsClient() {
         </motion.div>
       </section>
 
-      <div style={{ maxWidth: 1200, margin: '-60px auto 100px', padding: '0 32px', position: 'relative', zIndex: 10 }}>
+      <div className="tarifs-content" style={{ maxWidth: 1200, margin: '-60px auto 100px', position: 'relative', zIndex: 10 }}>
 
         {/* Freemium */}
-        <motion.div {...fadeUp(0.1)} style={{ background: 'white', border: '1px solid var(--gray-100)', borderRadius: 10, padding: '32px 48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 48, boxShadow: '0 10px 40px rgba(0,0,0,0.05)' }}>
+        <motion.div {...fadeUp(0.1)} className="tarifs-freemium" style={{ background: 'white', border: '1px solid var(--gray-100)', borderRadius: 10, marginBottom: 48, boxShadow: '0 10px 40px rgba(0,0,0,0.05)' }}>
           <div>
             <h3 style={{ fontSize: 18, marginBottom: 4, fontWeight: 700 }}>Freemium – Gratuit</h3>
             <p style={{ fontSize: 14, color: 'var(--gray-400)', margin: 0 }}>1 affaire offerte pour tester la plateforme · Sans engagement · Profil visible</p>
           </div>
-          <Link href="/inscription" className="btn btn-outline" style={{ textTransform: 'none', padding: '12px 32px', flexShrink: 0 }}>
+          <Link href="/inscription" className="btn btn-outline tarifs-freemium-btn" style={{ textTransform: 'none', padding: '12px 32px' }}>
             Commencer gratuitement
           </Link>
         </motion.div>
 
         {/* Pricing cards */}
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
-          gap: 24, 
-          marginBottom: 100, 
-          maxWidth: 1000, 
-          margin: '0 auto 100px' 
-        }}>
+        <div className="tarifs-plans" style={{ display: 'grid', gap: 24, maxWidth: 1000, margin: '0 auto', marginBottom: 100 }}>
           {PLANS.map((plan, idx) => (
             <motion.div
               key={plan.id}
               {...fadeUp(idx * 0.12)}
+              className="tarifs-plan-card"
               style={{
                 background: 'white',
                 border: plan.highlight ? '2px solid var(--red)' : '1px solid var(--gray-100)',
                 borderRadius: 12,
-                padding: '40px 24px',
                 textAlign: 'center',
                 position: 'relative',
                 display: 'flex',
@@ -89,10 +82,10 @@ export default function TarifsClient() {
                   {plan.tag}
                 </div>
               )}
-              <div style={{ marginBottom: 32 }}>
+              <div className="tarifs-plan-price" style={{ marginBottom: 32 }}>
                 <div className="badge" style={{ background: 'var(--gray-50)', color: plan.highlight ? 'var(--red)' : 'var(--gray-400)', fontSize: 10, fontWeight: 800, marginBottom: 20 }}>{plan.name}</div>
                 <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 4 }}>
-                  <span style={{ fontSize: plan.price === 'Sur devis' ? 24 : 48, fontWeight: 800 }}>{plan.price === 'Sur devis' ? plan.price : `€${plan.price}`}</span>
+                  <span className="tarifs-plan-price-value" style={{ fontSize: plan.price === 'Sur devis' ? 24 : 48, fontWeight: 800 }}>{plan.price === 'Sur devis' ? plan.price : `€${plan.price}`}</span>
                   <span style={{ fontSize: 14, color: 'var(--gray-400)' }}>{plan.period}</span>
                 </div>
               </div>
@@ -131,7 +124,7 @@ export default function TarifsClient() {
         </div>
 
         {/* Comparison table */}
-        <section style={{ marginBottom: 120 }}>
+        <section className="tarifs-comparatif" style={{ marginBottom: 120 }}>
           <motion.h2 {...fadeUp()} style={{ fontFamily: 'var(--font-serif)', fontSize: 32, fontWeight: 700, textAlign: 'center', marginBottom: 48, color: 'var(--black)' }}>Comparatif rapide</motion.h2>
           <motion.div {...fadeUp(0.1)}>
           <div style={{ overflowX: 'auto' }}>
@@ -175,13 +168,13 @@ export default function TarifsClient() {
         </section>
 
         {/* Steps */}
-        <section style={{ marginBottom: 120 }}>
+        <section className="tarifs-steps-section" style={{ marginBottom: 120 }}>
           <motion.div {...fadeUp()}>
             <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 32, fontWeight: 700, marginBottom: 8, color: 'var(--black)' }}>Comment ça se passe ?</h2>
             <p style={{ color: 'var(--gray-400)', fontSize: 14, marginBottom: 40 }}>De l'inscription à l'activation de votre compte.</p>
           </motion.div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14 }}>
+          <div className="tarifs-steps" style={{ display: 'grid', gap: 14 }}>
             {STEPS_PRICE.map((step, i) => (
               <motion.div
                 key={i}
@@ -212,7 +205,7 @@ export default function TarifsClient() {
         </section>
 
         {/* CTA footer */}
-        <motion.div {...fadeUp(0.1)} style={{ background: 'var(--gray-50)', border: '1px solid var(--gray-100)', borderRadius: 8, padding: '24px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+        <motion.div {...fadeUp(0.1)} className="tarifs-cta-footer" style={{ background: 'var(--gray-50)', border: '1px solid var(--gray-100)', borderRadius: 8, padding: '24px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
           <Check size={18} color="var(--red)" />
           <span style={{ fontSize: 14, fontWeight: 600 }}>L'inscription et les demandes de devis sont 100 % gratuits pour les clients particuliers et maîtres d'ouvrage.</span>
         </motion.div>

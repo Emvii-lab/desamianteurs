@@ -47,28 +47,25 @@ export default function PartenairesClient({ initialPartners, partnerTypes }: Pro
   }, [partners, search, filterType, filterStatus])
 
   return (
-    <motion.div 
+    <motion.div
       initial="hidden"
       animate="visible"
       variants={staggerContainer}
-      style={{ padding: '32px' }}
+      className="admin-page-content"
     >
-      <motion.div variants={fadeUp} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+      <motion.div variants={fadeUp} className="admin-page-header">
         <div>
           <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#0A0A0A', marginBottom: '4px' }}>Comptes partenaires</h1>
           <p style={{ color: '#6B7280', fontSize: '14px' }}>Gérez les professionnels inscrits sur la plateforme.</p>
         </div>
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div className="admin-header-actions">
           <StatCard label="Total" value={partners.length} />
           <StatCard label="En attente" value={partners.filter(p => p.status === 'pending').length} color="#D97706" />
         </div>
       </motion.div>
 
       {/* Barre de recherche et filtres */}
-      <motion.div variants={fadeUp} style={{ 
-        background: 'white', padding: '16px', borderRadius: '12px', border: '1px solid #E5E7EB', 
-        display: 'flex', gap: '16px', marginBottom: '24px', alignItems: 'center'
-      }}>
+      <motion.div variants={fadeUp} className="admin-filter-bar">
         <div style={{ position: 'relative', flex: 1 }}>
           <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
           <input 
@@ -109,7 +106,7 @@ export default function PartenairesClient({ initialPartners, partnerTypes }: Pro
       </motion.div>
 
       {/* Table */}
-      <motion.div variants={fadeUp} style={{ background: 'white', borderRadius: '12px', border: '1px solid #E5E7EB', overflow: 'hidden' }}>
+      <motion.div variants={fadeUp} className="admin-table-container">
         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
           <thead>
             <tr style={{ background: '#F9FAFB', borderBottom: '1px solid #E5E7EB' }}>

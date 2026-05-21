@@ -50,7 +50,7 @@ export default function ClientDashboard({ prenom, demandes, devis, stats }: Clie
         </Link>
       </motion.div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 24 }}>
+      <div className="client-dash-grid" style={{ display: 'grid', gap: 24 }}>
         <DashboardCard 
           title="Mes demandes récentes" 
           noPadding

@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 import { createServerSupabase } from '@/lib/supabase-server'
 import { InscriptionContent } from './InscriptionClient'
 import Footer from '@/components/Footer'
+import Navbar from '@/components/Navbar'
 
 export const metadata = {
   title: 'Inscription | Désamianteurs.fr',
@@ -19,6 +20,9 @@ export default async function InscriptionPage() {
 
   return (
     <div className="fade-in" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <div className="mobile-only" style={{ position: 'sticky', top: 0, zIndex: 1000 }}>
+        <Navbar />
+      </div>
       <Suspense>
         <InscriptionContent 
           initialRegions={reg.data || []} 

@@ -82,6 +82,7 @@ const ROLE_LABELS: Record<string, string> = {
 export default function DashboardSidebar({ role, userId, userName = 'Utilisateur' }: Props) {
   const pathname = usePathname()
   const [unreadTotal, setUnreadTotal] = useState(0)
+  const [mobileOpen, setMobileOpen] = useState(false)
   const [absenceModal, setAbsenceModal] = useState(false)
   const [absenceStart, setAbsenceStart] = useState('')
   const [absenceEnd, setAbsenceEnd]     = useState('')
@@ -174,10 +175,29 @@ export default function DashboardSidebar({ role, userId, userName = 'Utilisateur
 
   return (
     <>
+    {/* Barre mobile sticky (visible uniquement sur mobile) */}
+    <div className="admin-mobile-bar">
+      <Link href="/" className="brand" style={{ margin: 0, fontSize: 18 }}>
+        Désamianteurs<span>.fr</span>
+      </Link>
+      <button
+        onClick={() => setMobileOpen(true)}
+        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 8, color: 'var(--black)', display: 'flex', alignItems: 'center' }}
+        aria-label="Ouvrir le menu"
+      >
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    {/* Overlay (ferme la sidebar en cliquant à côté) */}
+    {mobileOpen && <div className="sidebar-overlay" onClick={() => setMobileOpen(false)} />}
+
     <motion.div
       initial={{ x: -20, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
-      className="sidebar"
+      className={`sidebar${mobileOpen ? ' sidebar-open' : ''}`}
       style={{ display: 'flex', flexDirection: 'column' }}
     >
       <div style={{ padding: '32px 24px' }}>
@@ -209,7 +229,7 @@ export default function DashboardSidebar({ role, userId, userName = 'Utilisateur
       <div style={{ padding: '16px 0', flex: 1, overflowY: 'auto' }}>
         <p style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1.2px', color: 'var(--gray-400)', padding: '16px 24px 8px' }}>PRINCIPAL</p>
         {menu.main.map(item => (
-          <SidebarLink key={item.href} item={item} active={pathname === item.href} unreadTotal={unreadTotal} />
+          <SidebarLink key={item.href} item={item} active={pathname === item.href} unreadTotal={unreadTotal} onClose={() => setMobileOpen(false)} />
         ))}
 
         <p style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1.2px', color: 'var(--gray-400)', padding: '24px 24px 8px' }}>COMPTE</p>
@@ -221,13 +241,14 @@ export default function DashboardSidebar({ role, userId, userName = 'Utilisateur
               item={item}
               active={pathname === item.href}
               unreadTotal={unreadTotal}
+              onClose={() => setMobileOpen(false)}
               onLogout={item.label === 'Déconnexion' ? handleLogout : undefined}
             />
           ))}
 
         {/* Bouton mode absence — partenaire uniquement */}
         {role === 'partenaire' && (
-          <motion.div whileHover={{ x: 4 }} transition={{ duration: 0.2 }}>
+          <motion.div whileHover={{ x: 4 }} transition={{ duration: 0.2 }} onClick={() => setMobileOpen(false)}>
             <div
               onClick={() => setAbsenceModal(true)}
               style={{
@@ -267,6 +288,7 @@ export default function DashboardSidebar({ role, userId, userName = 'Utilisateur
               item={logoutItem}
               active={false}
               unreadTotal={0}
+              onClose={() => setMobileOpen(false)}
               onLogout={handleLogout}
             />
           ) : null
@@ -335,14 +357,14 @@ export default function DashboardSidebar({ role, userId, userName = 'Utilisateur
   )
 }
 
-function SidebarLink({ item, active, unreadTotal, onLogout }: { item: SidebarItem; active: boolean; unreadTotal: number; onLogout?: () => void }) {
+function SidebarLink({ item, active, unreadTotal, onLogout, onClose }: { item: SidebarItem; active: boolean; unreadTotal: number; onLogout?: () => void; onClose?: () => void }) {
   const { Icon } = item
   const isMessagerie = item.label === 'Messagerie'
 
   return (
     <motion.div whileHover={{ x: 4 }} transition={{ duration: 0.2 }}>
       {onLogout ? (
-        <div onClick={onLogout} style={{
+        <div onClick={() => { onClose?.(); onLogout() }} style={{
           display: 'flex', alignItems: 'center', gap: 12,
           padding: '12px 24px', fontSize: 14,
           color: 'var(--gray-600)',
@@ -357,7 +379,7 @@ function SidebarLink({ item, active, unreadTotal, onLogout }: { item: SidebarIte
           <span style={{ flex: 1 }}>{item.label}</span>
         </div>
       ) : (
-        <Link href={item.href} style={{
+        <Link href={item.href} onClick={onClose} style={{
         display: 'flex', alignItems: 'center', gap: 12,
         padding: '12px 24px', fontSize: 14,
         color: active ? 'var(--red)' : 'var(--gray-600)',

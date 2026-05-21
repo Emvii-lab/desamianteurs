@@ -22,18 +22,18 @@ export default function PrestationsClient({ services, domains }: Props) {
   const [activeTab, setActiveTab] = useState<'services' | 'domains'>('services')
 
   return (
-    <motion.div 
+    <motion.div
       initial="hidden"
       animate="visible"
       variants={staggerContainer}
-      style={{ padding: '32px' }}
+      className="admin-page-content"
     >
-      <motion.div variants={fadeUp} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+      <motion.div variants={fadeUp} className="admin-page-header">
         <div>
           <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#0A0A0A', marginBottom: '4px' }}>Types de prestation</h1>
           <p style={{ color: '#6B7280', fontSize: '14px' }}>Gérez les catégories de services et les domaines d'intervention.</p>
         </div>
-        <div style={{ display: 'flex', gap: '8px', background: '#F3F4F6', padding: '4px', borderRadius: '8px' }}>
+        <div className="admin-pill-tabs" style={{ display: 'flex', gap: '8px', background: '#F3F4F6', padding: '4px', borderRadius: '8px' }}>
           <button
             onClick={() => setActiveTab('services')}
             style={{
@@ -68,7 +68,7 @@ export default function PrestationsClient({ services, domains }: Props) {
       </motion.div>
 
       {activeTab === 'services' ? (
-        <motion.div variants={staggerContainer} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '20px' }}>
+        <motion.div variants={staggerContainer} className="prestation-grid" style={{ display: 'grid', gap: '20px' }}>
           {services.map((s) => (
             <motion.div 
               key={s.id} 
@@ -101,7 +101,7 @@ export default function PrestationsClient({ services, domains }: Props) {
           ))}
         </motion.div>
       ) : (
-        <motion.div variants={staggerContainer} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
+        <motion.div variants={staggerContainer} className="prestation-grid" style={{ display: 'grid', gap: '20px' }}>
           {Object.entries(groupBy(domains, 'partner_type')).map(([type, items]: [any, any]) => (
             <motion.div key={type} variants={fadeUp} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <h2 style={{ fontSize: '14px', fontWeight: 700, color: '#4B5563', textTransform: 'uppercase', letterSpacing: '0.05em', paddingLeft: '4px' }}>

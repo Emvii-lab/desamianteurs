@@ -35,6 +35,15 @@ export default function ProfessionalsClient({ initialPros, initialType, initialL
   const [minRating, setMinRating]   = useState('all')
   const [sort, setSort]         = useState('name')
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list')
+  const [showFilters, setShowFilters] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth <= 768)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
   const [selectedPro, setSelectedPro] = useState<Pro | null>(null)
   const [mapCenter, setMapCenter] = useState({ lat: 46.2276, lng: 2.2137 })
   const [mapZoom, setMapZoom] = useState(6)
@@ -71,15 +80,15 @@ export default function ProfessionalsClient({ initialPros, initialType, initialL
       <Navbar />
 
       {/* Hero */}
-      <section style={{ background: 'var(--black)', padding: '80px 32px', textAlign: 'center' }}>
-        <h1 style={{ color: 'white', fontSize: 56, marginBottom: 16, fontFamily: 'var(--font-serif)', fontWeight: 700 }}>Trouvez un professionnel certifié</h1>
+      <section className="pros-hero" style={{ background: 'var(--black)', textAlign: 'center' }}>
+        <h1 className="pros-hero-title" style={{ color: 'white', marginBottom: 16, fontFamily: 'var(--font-serif)', fontWeight: 700 }}>Trouvez un professionnel certifié</h1>
         <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 16 }}>Tous les professionnels vérifiés dans notre base. Certifications contrôlées, avis authentiques.</p>
       </section>
 
-      <div style={{ maxWidth: 1200, margin: '48px auto', padding: '0 32px', display: 'grid', gridTemplateColumns: '280px 1fr', gap: 32 }}>
-        
+      <div className="pros-layout" style={{ maxWidth: 1200, margin: '48px auto', display: 'grid', gap: 32 }}>
+
         {/* Sidebar Filters */}
-        <aside>
+        <aside className={`pros-sidebar${showFilters ? ' open' : ''}`}>
           <div style={{ background: 'white', border: '1px solid var(--gray-200)', borderRadius: 8, padding: 24 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
               <span style={{ fontWeight: 700, fontSize: 14 }}>Filtres</span>
@@ -132,15 +141,26 @@ export default function ProfessionalsClient({ initialPros, initialType, initialL
 
         {/* Main Content */}
         <main>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 10 }}>
             <div style={{ fontSize: 14, fontWeight: 600 }}>{`${filtered.length} professionnel${filtered.length > 1 ? 's' : ''} correspondent à votre recherche`}</div>
-            <button 
-              onClick={() => setViewMode(m => m === 'list' ? 'map' : 'list')} 
-              className={viewMode === 'map' ? 'btn btn-red' : 'btn btn-outline'} 
-              style={{ padding: '10px 20px', fontSize: 13, display: 'flex', alignItems: 'center', gap: 8, textTransform: 'none', transition: 'all 0.2s' }}
-            >
-              <MapIcon size={16} /> {viewMode === 'list' ? 'Vue carte' : 'Vue liste'}
-            </button>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {/* Bouton filtres — visible mobile uniquement */}
+              <button
+                className="pros-filter-toggle btn btn-outline"
+                onClick={() => setShowFilters(v => !v)}
+                style={{ padding: '10px 16px', fontSize: 13, display: 'none', alignItems: 'center', gap: 6 }}
+              >
+                {showFilters ? <X size={15} /> : <Search size={15} />}
+                Filtres
+              </button>
+              <button
+                onClick={() => setViewMode(m => m === 'list' ? 'map' : 'list')}
+                className={viewMode === 'map' ? 'btn btn-red' : 'btn btn-outline'}
+                style={{ padding: '10px 20px', fontSize: 13, display: 'flex', alignItems: 'center', gap: 8, textTransform: 'none', transition: 'all 0.2s' }}
+              >
+                <MapIcon size={16} /> {viewMode === 'list' ? 'Vue carte' : 'Vue liste'}
+              </button>
+            </div>
           </div>
 
           <div style={{ marginBottom: 32, position: 'relative' }}>
@@ -178,7 +198,7 @@ export default function ProfessionalsClient({ initialPros, initialType, initialL
               ))}
             </div>
           ) : (
-            <div style={{ height: 600, width: '100%', borderRadius: 12, overflow: 'hidden', border: '1px solid var(--gray-200)', position: 'relative' }}>
+            <div className="pros-map" style={{ height: 600, width: '100%', borderRadius: 12, overflow: 'hidden', border: '1px solid var(--gray-200)', position: 'relative' }}>
               <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || ''}>
                 <Map
                   style={{ width: '100%', height: '100%' }}
@@ -221,28 +241,15 @@ export default function ProfessionalsClient({ initialPros, initialType, initialL
                         onCloseClick={() => setSelectedPro(null)}
                         headerDisabled={true}
                         pixelOffset={[0, -45]}
+                        maxWidth={isMobile ? 200 : 280}
                       >
-                        <div style={{ minWidth: 240, padding: '16px 8px 8px 8px' }}>
-                          <div style={{ fontSize: 10, fontWeight: 900, color: '#C0392B', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 8 }}>{selectedPro.typeLabel}</div>
-                          <div style={{ fontWeight: 800, fontSize: 17, marginBottom: 6, color: 'var(--black)', fontFamily: 'var(--font-serif)' }}>{selectedPro.name}</div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--gray-500)', marginBottom: 20 }}>
-                            <MapPin size={14} color="var(--gray-400)" /> {selectedPro.city}
+                        <div className="map-info-card" style={{ padding: '12px 8px 8px 8px' }}>
+                          <div className="map-info-type">{selectedPro.typeLabel}</div>
+                          <div className="map-info-name">{selectedPro.name}</div>
+                          <div className="map-info-city">
+                            <MapPin size={13} color="var(--gray-400)" /> {selectedPro.city}
                           </div>
-                          <Link 
-                            href={`/professionnels/${selectedPro.id}`}
-                            style={{ 
-                              display: 'block',
-                              textAlign: 'center',
-                              background: 'var(--black)',
-                              color: 'white',
-                              padding: '12px 16px',
-                              borderRadius: 8,
-                              fontSize: 13, 
-                              fontWeight: 700, 
-                              textDecoration: 'none',
-                              transition: 'opacity 0.2s'
-                            }}
-                          >
+                          <Link href={`/professionnels/${selectedPro.id}`} className="map-info-btn">
                             Consulter le profil
                           </Link>
                         </div>
@@ -262,16 +269,24 @@ export default function ProfessionalsClient({ initialPros, initialType, initialL
 
 function ProCard({ pro }: { pro: Pro }) {
   return (
-    <div key={pro.id} className="card" style={{ padding: 32, display: 'grid', gridTemplateColumns: '64px 1fr', gap: 24, position: 'relative' }}>
-      <div style={{ width: 64, height: 64, borderRadius: 8, background: pro.color, color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800 }}>
-        {pro.initials}
+    <div key={pro.id} className="card pro-card-wrap pro-card-grid" style={{ position: 'relative' }}>
+      {/* Avatar + badge vérifié côte à côte sur mobile */}
+      <div className="pro-card-avatar-row">
+        <div className="pro-card-avatar" style={{ borderRadius: 8, background: pro.color, color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, flexShrink: 0 }}>
+          {pro.initials}
+        </div>
+        {pro.verified && (
+          <div className="pro-card-badge-mobile" style={{ alignItems: 'center', gap: 6, color: '#059669', fontSize: 11, fontWeight: 800 }}>
+            <Check size={14} /> VÉRIFIÉ
+          </div>
+        )}
       </div>
-      
+
       <div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
           <h3 style={{ fontSize: 18, fontFamily: 'var(--font-body)', fontWeight: 700 }}>{pro.name}</h3>
           {pro.verified && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#059669', fontSize: 11, fontWeight: 800 }}>
+            <div className="pro-card-badge-desktop" style={{ alignItems: 'center', gap: 6, color: '#059669', fontSize: 11, fontWeight: 800 }}>
               <Check size={14} /> VÉRIFIÉ
             </div>
           )}
@@ -285,11 +300,11 @@ function ProCard({ pro }: { pro: Pro }) {
           {pro.typeLabel}
         </div>
 
-        <p style={{ fontSize: 14, color: 'var(--gray-500)', lineHeight: 1.6, marginBottom: 24, maxWidth: '80%' }}>
+        <p className="pro-card-desc" style={{ fontSize: 14, color: 'var(--gray-500)', lineHeight: 1.6, marginBottom: 24 }}>
           {pro.desc}
         </p>
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid var(--gray-100)', paddingTop: 20 }}>
+        <div className="pro-card-footer" style={{ borderTop: '1px solid var(--gray-100)', paddingTop: 20 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <div style={{ display: 'flex', gap: 2 }}>
@@ -304,7 +319,7 @@ function ProCard({ pro }: { pro: Pro }) {
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: 12 }}>
+          <div className="pro-card-btns">
             <Link href={`/professionnels/${pro.id}`} className="btn btn-outline btn-sm">Voir le profil</Link>
             <Link href="/formulaire" className="btn btn-red btn-sm">Demander un devis</Link>
           </div>
@@ -328,28 +343,29 @@ function MapMarkers({ pros, onSelect, selectedId, isProgrammatic }: { pros: Pro[
             isProgrammatic.current = true
             onSelect(pro)
             if (map) {
-              const targetZoom = 14
-              const currentZoom = map.getZoom() || 6
-              
-              // Smoothly animate zoom and pan
-              map.panTo({ lat: pro.lat, lng: pro.lng })
-              
-              const animateZoom = (current: number, target: number) => {
-                if (current === target) return
-                const step = target > current ? 1 : -1
-                setTimeout(() => {
-                  map.setZoom(current + step)
-                  animateZoom(current + step, target)
-                }, 120) // Slightly slower for more "organic" feel
+              const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
+
+              if (isMobile) {
+                // Sur mobile : zoom direct (l'animation step-by-step ne fonctionne pas au toucher)
+                map.panTo({ lat: pro.lat, lng: pro.lng })
+                map.setZoom(14)
+              } else {
+                // Desktop : animation progressive
+                const targetZoom = 14
+                const currentZoom = map.getZoom() || 6
+                map.panTo({ lat: pro.lat, lng: pro.lng })
+                const animateZoom = (current: number, target: number) => {
+                  if (current === target) return
+                  const step = target > current ? 1 : -1
+                  setTimeout(() => {
+                    map.setZoom(current + step)
+                    animateZoom(current + step, target)
+                  }, 120)
+                }
+                setTimeout(() => animateZoom(currentZoom, targetZoom), 400)
               }
-              
-              setTimeout(() => {
-                animateZoom(currentZoom, targetZoom)
-              }, 400) // Start zooming after the pan has begun
             }
-            setTimeout(() => {
-              isProgrammatic.current = false
-            }, 1500)
+            setTimeout(() => { isProgrammatic.current = false }, 1500)
           }}
         />
       ))}

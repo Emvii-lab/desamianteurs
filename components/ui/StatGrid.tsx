@@ -17,14 +17,10 @@ interface StatGridProps {
 
 export function StatGrid({ stats, columns = 4 }: StatGridProps) {
   return (
-    <motion.div 
-      variants={staggerContainer} 
-      style={{ 
-        display: 'grid', 
-        gridTemplateColumns: `repeat(${columns}, 1fr)`, 
-        gap: 16, 
-        marginBottom: 32 
-      }}
+    <motion.div
+      variants={staggerContainer}
+      className="stat-grid-wrap"
+      style={{ '--cols': columns, display: 'grid', gap: 16, marginBottom: 32 } as React.CSSProperties}
     >
       {stats.map((s, idx) => (
         <motion.div 

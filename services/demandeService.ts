@@ -175,10 +175,29 @@ export const demandeService = {
     authMode: 'create' | 'login',
   ) {
     const supabase = createClient()
-    const userId   = await resolveUserId(supabase, data, isLoggedIn, authMode)
-    const clientId = await resolveClientId(supabase, userId, data)
-    const quoteId  = await createQuote(supabase, clientId, data)
-    await linkServiceTypes(supabase, quoteId, data.serviceTypes)
+    let userId: string
+    let submissionData = data
+
+    if (isLoggedIn) {
+      // L'utilisateur est déjà connecté : récupérer les vraies infos auth
+      // (email/prenom/nom sont vides dans le formulaire quand connecté)
+      const { data: { user }, error } = await supabase.auth.getUser()
+      if (error || !user) throw new Error('Session expirée. Veuillez vous reconnecter.')
+      userId = user.id
+      submissionData = {
+        ...data,
+        email:     user.email     || '',
+        prenom:    user.user_metadata?.prenom    || '',
+        nom:       user.user_metadata?.nom       || '',
+        telephone: user.user_metadata?.telephone || '',
+      }
+    } else {
+      userId = await resolveUserId(supabase, data, isLoggedIn, authMode)
+    }
+
+    const clientId = await resolveClientId(supabase, userId, submissionData)
+    const quoteId  = await createQuote(supabase, clientId, submissionData)
+    await linkServiceTypes(supabase, quoteId, submissionData.serviceTypes)
     await uploadQuoteFiles(supabase, quoteId, files)
     return { success: true, quoteId }
   },

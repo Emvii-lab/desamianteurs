@@ -23,8 +23,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" className={`${dmSans.variable} ${dmSerifDisplay.variable}`}>
+    <html lang="fr" className={`${dmSans.variable} ${dmSerifDisplay.variable}`} data-scroll-behavior="smooth">
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         {/* Pré-connexions aux services externes pour réduire la latence */}
         <link rel="preconnect" href="https://zpagogunyynnmysaglwr.supabase.co" />
         <link rel="preconnect" href="https://js.stripe.com" />

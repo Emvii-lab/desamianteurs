@@ -27,15 +27,18 @@ interface Conversation {
 
 export default function MessageriePartenaire({
   userId,
+  partnerId,
   initialConversations = []
 }: {
   userId: string,
+  partnerId: string,
   initialConversations?: Conversation[]
 }) {
   const supabase = createClient()
 
   const [conversations, setConversations] = useState<Conversation[]>(initialConversations)
   const [activeConv, setActiveConv] = useState<string | null>(initialConversations[0]?.assignment_id || null)
+  const [mobilePanelView, setMobilePanelView] = useState<'list' | 'chat'>('list')
   const [messagesCache, setMessagesCache] = useState<Record<string, Message[]>>({})
   const [newMessage, setNewMessage] = useState('')
   const [loading, setLoading] = useState(!initialConversations.length)
@@ -105,7 +108,7 @@ export default function MessageriePartenaire({
         quote:quotes!quote_id(id, client_id),
         messages(content, created_at, is_read, sender_id)
       `)
-      .eq('partner_id', userId)
+      .eq('partner_id', partnerId)
 
     if (error) console.error('fetchConversations:', error.message)
 
@@ -204,7 +207,7 @@ export default function MessageriePartenaire({
   const currentConv = conversations.find(c => c.assignment_id === activeConv)
 
   return (
-    <div className="msg-layout">
+    <div className={`msg-layout ${mobilePanelView === 'chat' ? 'msg-show-chat' : 'msg-show-list'}`}>
       <div className="conv-list">
         <div className="conv-head">
           Messages Clients
@@ -217,7 +220,7 @@ export default function MessageriePartenaire({
             <div
               key={conv.assignment_id}
               className={`conv-item ${activeConv === conv.assignment_id ? 'active' : ''}`}
-              onClick={() => setActiveConv(conv.assignment_id)}
+              onClick={() => { setActiveConv(conv.assignment_id); setMobilePanelView('chat') }}
             >
               <div className={`conv-av ${activeConv === conv.assignment_id ? 'red' : ''}`}>CL</div>
               <div className="conv-meta">
@@ -246,6 +249,9 @@ export default function MessageriePartenaire({
         {activeConv ? (
           <>
             <div className="chat-header">
+              <button className="msg-back-btn" onClick={() => setMobilePanelView('list')} aria-label="Retour">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
               <div className="conv-av red">CL</div>
               <div className="info">
                 <h3>{currentConv?.client_name}</h3>

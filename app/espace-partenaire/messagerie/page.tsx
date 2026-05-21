@@ -23,50 +23,33 @@ export default async function MessageriePartenairePage() {
     redirect('/')
   }
 
-  // 2. Récupérer les conversations
-  // On récupère les assignments liés au partenaire
-  const { data: assignments } = await supabase
-    .from('quote_assignments')
-    .select(`
-      id,
-      quote_id,
-      status,
-      quotes (
-        id,
-        address_city,
-        property_type_id,
-        clients (
-          first_name,
-          last_name
-        )
-      )
-    `)
-    .eq('partner_id', partner.id)
-    .in('status', ['accepted', 'quote_sent'])
+  // 2. Récupérer les conversations + messages en une seule requête (évite N+1)
+  const [assignmentsRes, propertyTypesRes] = await Promise.all([
+    supabase
+      .from('quote_assignments')
+      .select(`
+        id, quote_id, status,
+        quotes(id, address_city, property_type_id, clients(first_name, last_name)),
+        messages(content, created_at, is_read, sender_id)
+      `)
+      .eq('partner_id', partner.id)
+      .in('status', ['accepted', 'quote_sent']),
+    supabase.from('ref_property_types').select('id, label'),
+  ])
 
-  // Récupérer les labels des types de biens
-  const { data: propertyTypes } = await supabase.from('ref_property_types').select('id, label')
+  const assignments = assignmentsRes.data || []
+  const propertyTypes = propertyTypesRes.data || []
 
-  // Enrichir avec les derniers messages et les comptes non lus
-  const conversations = await Promise.all((assignments || []).map(async a => {
+  // Agréger en JS (plus de requêtes N+1)
+  const conversations = assignments.map(a => {
     const quote = a.quotes as any
     const client = quote?.clients
-    const propertyType = propertyTypes?.find(pt => pt.id === quote?.property_type_id)
-    
-    const { data: lastMsg } = await supabase
-      .from('messages')
-      .select('content, created_at, is_read, sender_id')
-      .eq('assignment_id', a.id)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle()
-
-    const { count: unreadCount } = await supabase
-      .from('messages')
-      .select('*', { count: 'exact', head: true })
-      .eq('assignment_id', a.id)
-      .eq('is_read', false)
-      .neq('sender_id', user.id)
+    const propertyType = propertyTypes.find((pt: any) => pt.id === quote?.property_type_id)
+    const msgs: any[] = (a.messages || []).sort(
+      (x: any, y: any) => new Date(y.created_at).getTime() - new Date(x.created_at).getTime()
+    )
+    const lastMsg = msgs[0] || null
+    const unreadCount = msgs.filter((m: any) => !m.is_read && m.sender_id !== user.id).length
 
     return {
       assignment_id: a.id,
@@ -76,9 +59,9 @@ export default async function MessageriePartenairePage() {
       city: quote?.address_city || '',
       last_message: lastMsg?.content || null,
       last_message_at: lastMsg?.created_at || null,
-      unread_count: unreadCount || 0
+      unread_count: unreadCount,
     }
-  }))
+  })
 
   // Trier par date du dernier message
   conversations.sort((a, b) => {
@@ -89,7 +72,7 @@ export default async function MessageriePartenairePage() {
 
   return (
     <div className="dashboard-content">
-      <MessageriePartenaire initialConversations={conversations} userId={user.id} />
+      <MessageriePartenaire initialConversations={conversations} userId={user.id} partnerId={partner.id} />
     </div>
   )
 }

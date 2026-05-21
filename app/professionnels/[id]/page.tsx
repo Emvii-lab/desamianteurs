@@ -86,7 +86,7 @@ export default async function ProfilProPage({ params }: Props) {
 
       {/* ── Hero fond noir ── */}
       <div style={{ background: 'var(--black)' }}>
-        <div style={{ maxWidth: 960, margin: '0 auto', padding: '20px 32px 0' }}>
+        <div className="pro-detail-hero" style={{ maxWidth: 960, margin: '0 auto' }}>
           <Link
             href="/professionnels"
             style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'rgba(255,255,255,0.45)', fontSize: 13, fontWeight: 600, textDecoration: 'none', marginBottom: 28 }}
@@ -95,7 +95,7 @@ export default async function ProfilProPage({ params }: Props) {
             Retour aux résultats
           </Link>
 
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 24, paddingBottom: 36, flexWrap: 'wrap' }}>
+          <div className="pro-detail-hero-info" style={{ paddingBottom: 36 }}>
             {/* Avatar / Logo */}
             <div style={{
               width: 80, height: 80, flexShrink: 0,
@@ -158,8 +158,8 @@ export default async function ProfilProPage({ params }: Props) {
       </div>
 
       {/* ── Content ── */}
-      <div style={{ maxWidth: 960, margin: '0 auto', padding: '32px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 24, alignItems: 'start' }}>
+      <div className="pro-detail-content" style={{ maxWidth: 960, margin: '0 auto' }}>
+        <div className="pro-detail-grid" style={{ display: 'grid', gap: 24, alignItems: 'start' }}>
 
           {/* COLONNE PRINCIPALE */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -172,19 +172,6 @@ export default async function ProfilProPage({ params }: Props) {
               </Card>
             )}
 
-            {/* Domaines d'intervention */}
-            {badges.length > 0 && (
-              <Card>
-                <h2 style={h2}>Domaines d'intervention</h2>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  {badges.map((d: any) => (
-                    <span key={d.id} style={{ padding: '7px 16px', background: '#F3F4F6', borderRadius: 20, fontSize: 13, fontWeight: 600, color: '#374151' }}>
-                      {d.label}
-                    </span>
-                  ))}
-                </div>
-              </Card>
-            )}
 
             {/* Certifications & Documents */}
             {hasDocsSection && (

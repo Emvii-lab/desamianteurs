@@ -44,10 +44,10 @@ export function InscriptionContent({
 
   return (
     <div className="fade-in" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
-        
+      <div className="inscription-split" style={{ flex: 1, display: 'grid' }}>
+
         {/* Left Side - Black */}
-        <div style={{ background: 'var(--black)', color: 'white', padding: '80px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', paddingTop: '100px', position: 'relative', overflow: 'hidden' }}>
+        <div className="inscription-left" style={{ background: 'var(--black)', color: 'white', padding: '80px', flexDirection: 'column', justifyContent: 'flex-start', paddingTop: '100px', position: 'relative', overflow: 'hidden' }}>
 
           {/* Cercle 1 — bas droite, flottant lentement */}
           <motion.div
@@ -120,13 +120,13 @@ export function InscriptionContent({
         </div>
 
         {/* Right Side - White */}
-        <div style={{ background: 'white', padding: '60px 80px', position: 'relative' }}>
-          <Link href="/" style={{ position: 'absolute', top: 40, right: 80, display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 600, color: 'var(--red)' }}>
-            <ArrowLeft size={16} /> Retour à l'accueil
+        <div className="inscription-right" style={{ background: 'white', padding: '60px 80px', position: 'relative' }}>
+          <Link href="/" className="inscription-back" style={{ position: 'absolute', top: 40, right: 80, display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 600, color: 'var(--red)' }}>
+            <ArrowLeft size={16} /> Retour à l&apos;accueil
           </Link>
 
           <div style={{ maxWidth: 500, width: '100%', margin: '0 auto' }}>
-            <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 40 }}>
+            <div className="inscription-logo" style={{ fontFamily: 'var(--font-serif)', fontSize: 22, fontWeight: 400, marginBottom: 40 }}>
               Désamianteurs<span style={{ color: 'var(--red)' }}>.fr</span>
             </div>
 

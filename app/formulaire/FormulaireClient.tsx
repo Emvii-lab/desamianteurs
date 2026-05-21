@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import { createClient } from '@/lib/supabase'
-import { CheckCircle2, ShieldCheck } from 'lucide-react'
+import { CheckCircle2, ShieldCheck, Check, Phone, LayoutDashboard, Mail } from 'lucide-react'
 import { TIMINGS, BUDGET_OPTIONS, FLOOR_OPTIONS } from '@/lib/constants'
 import { ServiceType, PropertyType } from '@/lib/types'
 import { useDemandeForm } from '@/hooks/useDemandeForm'
@@ -55,6 +55,7 @@ function StepIndicator({ current }: { current: number }) {
 
               {/* Label animé */}
               <motion.span
+                className="step-label"
                 animate={{
                   color: active ? '#C0392B' : done ? '#9CA3AF' : '#9CA3AF',
                   fontWeight: active ? 700 : 500,
@@ -161,7 +162,21 @@ export default function FormulaireClient({ initialServices, initialPropertyTypes
   const prevStep = () => setStep(prev => prev - 1)
 
   const onSubmit = async () => {
-    const isValid = await trigger()
+    const businessFields = [
+      'serviceTypes', 'userType', 'propertyType', 'timing', 'budget',
+      'streetAddress', 'city', 'postalCode', 'floor', 'elevator',
+    ] as const
+
+    // undefined → trigger() sans argument = valide TOUS les champs (mode création compte)
+    // login     → valide les champs métier + email/password uniquement
+    // connecté  → valide les champs métier uniquement (email/mdp non affichés)
+    const fieldsToValidate = isLoggedIn
+      ? businessFields
+      : authMode === 'login'
+        ? ([...businessFields, 'email', 'password'] as const)
+        : undefined
+
+    const isValid = await trigger(fieldsToValidate as Parameters<typeof trigger>[0])
     if (!isValid) return
 
     setLoading(true)
@@ -169,8 +184,8 @@ export default function FormulaireClient({ initialServices, initialPropertyTypes
     try {
       await demandeService.submitDemande(getValues(), files, isLoggedIn, authMode)
       setSubmitted(true)
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Une erreur est survenue.')
     } finally {
       setLoading(false)
     }
@@ -203,18 +218,59 @@ export default function FormulaireClient({ initialServices, initialPropertyTypes
 
   if (submitted) {
     return (
-      <div className="fade-in">
+      <div className="fade-in" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
         <Navbar />
-        <section style={{ background: '#111', padding: '100px 40px', textAlign: 'center' }}>
-          <CheckCircle2 size={64} color="var(--red)" style={{ marginBottom: 24 }} />
-          <h1 style={{ color: 'white', fontSize: 32, fontWeight: 700, marginBottom: 16 }}>Demande envoyée !</h1>
-          <p style={{ color: '#9CA3AF', maxWidth: 500, margin: '0 auto 40px' }}>
-            Des professionnels certifiés de votre zone vous contacteront sous 48h.
-          </p>
-          <div style={{ display: 'flex', gap: 16, justifyContent: 'center' }}>
-            <Link href="/espace-client" className="btn btn-red">Accéder à mon espace</Link>
-            <Link href="/" className="btn btn-outline">Retour à l'accueil</Link>
+        <section className="formulaire-success" style={{ flex: 1, padding: '72px 24px 80px', textAlign: 'center' }}>
+
+          {/* Icône */}
+          <div className="formulaire-success-icon">
+            <div style={{ width: 96, height: 96, borderRadius: '50%', background: 'rgba(192,57,43,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: 68, height: 68, borderRadius: '50%', background: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Check size={28} color="var(--red)" strokeWidth={3} />
+              </div>
+            </div>
           </div>
+
+          {/* Titre */}
+          <h1 className="formulaire-success-title" style={{ fontSize: 'clamp(26px, 4vw, 40px)', fontWeight: 700, lineHeight: 1.2, maxWidth: 640, margin: '0 auto 20px' }}>
+            {!isLoggedIn && authMode === 'create'
+              ? 'Votre compte a bien été créé et votre demande envoyée !'
+              : 'Votre demande a bien été envoyée !'}
+          </h1>
+
+          {/* Sous-titre */}
+          <p className="formulaire-success-text" style={{ fontSize: 15, maxWidth: 560, margin: '0 auto 4px' }}>
+            Votre demande a été transmise à des professionnels certifiés de votre zone.
+          </p>
+          <p className="formulaire-success-text" style={{ fontSize: 15, maxWidth: 560, margin: '0 auto 48px' }}>
+            Elle sera traitée en moyenne sous <strong>48h</strong>.
+          </p>
+
+          {/* Cartes info */}
+          <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', maxWidth: 580, margin: '0 auto 48px', textAlign: 'left' }}>
+            {([
+              { Icon: Phone,           title: 'Les pros vous contactent sous 48h',              desc: 'Vous recevrez leurs devis directement par e-mail et dans votre espace client.' },
+              { Icon: LayoutDashboard, title: "Suivez votre demande dans l'espace client",       desc: 'Comparez les devis, échangez avec les pros et acceptez la meilleure offre.' },
+              { Icon: Mail,            title: 'Un e-mail de confirmation vous a été envoyé',     desc: 'Vérifiez votre boîte mail (et vos spams) pour retrouver le récapitulatif de votre demande.' },
+            ] as const).map(({ Icon, title, desc }, i) => (
+              <div key={title} style={{ display: 'flex', gap: 16, padding: '18px 24px', borderBottom: i < 2 ? '1px solid #F3F4F6' : 'none', alignItems: 'flex-start' }}>
+                <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(192,57,43,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <Icon size={16} color="var(--red)" />
+                </div>
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: 14, color: '#111', marginBottom: 2 }}>{title}</div>
+                  <div style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.5 }}>{desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Boutons */}
+          <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Link href="/espace-client" className="btn btn-red">Accéder à mon espace client</Link>
+            <Link href="/" className="btn btn-outline">Retour à l&apos;accueil</Link>
+          </div>
+
         </section>
         <Footer />
       </div>
@@ -224,22 +280,22 @@ export default function FormulaireClient({ initialServices, initialPropertyTypes
   return (
     <div className="fade-in">
       <Navbar />
-      <section style={{ background: '#111', padding: '72px 40px 56px', textAlign: 'center' }}>
+      <section className="formulaire-hero" style={{ background: '#111', textAlign: 'center' }}>
         <div className="badge badge-red" style={{ marginBottom: 28 }}>GRATUIT ET SANS ENGAGEMENT</div>
         <h1 style={{ color: 'white', fontSize: 'clamp(32px, 5vw, 52px)', fontWeight: 700, fontFamily: 'var(--font-serif, "DM Serif Display", Georgia, serif)' }}>
           Déposez votre demande<br /><em style={{ color: 'var(--red)', fontStyle: 'normal' }}>en quelques minutes</em>
         </h1>
       </section>
 
-      <section ref={stepperRef} style={{ background: 'white', borderBottom: '1px solid #E5E7EB', padding: '20px 40px' }}>
+      <section ref={stepperRef} className="formulaire-stepper" style={{ background: 'white', borderBottom: '1px solid #E5E7EB' }}>
         <div style={{ maxWidth: 600, margin: '0 auto' }}>
           <StepIndicator current={step} />
         </div>
       </section>
 
-      <div style={{ background: '#F5F5F5', padding: '40px 40px 80px' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 340px', gap: 32, alignItems: 'start' }}>
-          <div className="card" style={{ padding: 48 }}>
+      <div className="formulaire-content" style={{ background: '#F5F5F5' }}>
+        <div className="formulaire-grid" style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gap: 32, alignItems: 'start' }}>
+          <div className="formulaire-card card" style={{ padding: 48 }}>
             {step === 1 && (
               <Step1Besoin 
                 form={form} 
@@ -272,7 +328,7 @@ export default function FormulaireClient({ initialServices, initialPropertyTypes
             )}
           </div>
 
-          <aside style={{ display: 'flex', flexDirection: 'column', gap: 24, position: 'sticky', top: 96, alignSelf: 'start' }}>
+          <aside className="formulaire-aside" style={{ flexDirection: 'column', gap: 24, position: 'sticky', top: 96, alignSelf: 'start' }}>
             {step === 3 && (
               <motion.div
                 initial={{ opacity: 0, y: 14 }}

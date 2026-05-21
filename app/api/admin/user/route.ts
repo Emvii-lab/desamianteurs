@@ -28,7 +28,7 @@ export async function POST(req: Request) {
   const { email } = await req.json()
   if (!email) return NextResponse.json({ error: 'Email requis' }, { status: 400 })
 
-  const origin = req.headers.get('origin') ?? 'http://localhost:3000'
+  const origin = req.headers.get('origin') ?? process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
   const admin  = getAdminClient()
 
   const { data, error } = await admin.auth.admin.generateLink({

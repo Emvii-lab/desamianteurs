@@ -213,12 +213,12 @@ export default function ProfilPartenaireClient({ partner, plan, avatarColor, ini
                 placeholder="Présentez votre activité, vos spécialités et votre zone d'intervention..."
               />
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div className="step-grid-2" style={{ display: 'grid', gap: 16 }}>
               <div>
                 <label style={lbl}>Nb. de techniciens certifiés</label>
                 <input type="number" min={0} style={inputStyle} value={workers} onChange={e => setWorkers(+e.target.value)} />
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, paddingTop: 24 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, paddingTop: 8 }}>
                 <input type="checkbox" id="accept_ind" checked={acceptInd} onChange={e => setAcceptInd(e.target.checked)} style={{ accentColor: 'var(--red)', width: 16, height: 16 }} />
                 <label htmlFor="accept_ind" style={{ fontSize: 13, cursor: 'pointer' }}>
                   <span style={{ fontWeight: 600 }}>Accepter les dossiers particuliers</span>

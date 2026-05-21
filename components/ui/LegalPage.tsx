@@ -19,7 +19,7 @@ export default function LegalPage({ tag, title, meta, toc, children }: LegalPage
       <Navbar />
 
       {/* Hero */}
-      <div style={{ background: 'var(--black)', padding: '56px 32px 40px' }}>
+      <div className="legal-hero" style={{ background: 'var(--black)' }}>
         <div style={{ maxWidth: 800, margin: '0 auto' }}>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 14, fontSize: 11, fontWeight: 700, padding: '5px 14px', borderRadius: 20, background: 'rgba(192,57,43,0.18)', color: 'var(--red)', letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
             {tag}
@@ -31,7 +31,7 @@ export default function LegalPage({ tag, title, meta, toc, children }: LegalPage
         </div>
       </div>
 
-      <div style={{ maxWidth: 800, margin: '0 auto', padding: '40px 32px 80px', display: 'flex', flexDirection: 'column', gap: 0 }}>
+      <div className="legal-content" style={{ maxWidth: 800, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 0 }}>
 
         {/* Sommaire */}
         {toc.length > 0 && (
@@ -61,7 +61,7 @@ export default function LegalPage({ tag, title, meta, toc, children }: LegalPage
 
 export function LegalSection({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return (
-    <div id={id} style={{ background: 'white', border: '1px solid var(--gray-200)', borderRadius: 12, padding: '24px 28px', marginBottom: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+    <div id={id} className="legal-section" style={{ background: 'white', border: '1px solid var(--gray-200)', borderRadius: 12, marginBottom: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
       <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 14, color: 'var(--black)', scrollMarginTop: 80 }}>{title}</h2>
       <div style={{ fontSize: 14, color: 'var(--gray-600)', lineHeight: 1.8 }}>
         {children}

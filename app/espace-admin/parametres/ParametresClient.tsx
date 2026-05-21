@@ -8,6 +8,7 @@ import {
 import { motion } from 'framer-motion'
 import { fadeUp, staggerContainer } from '@/lib/animations'
 import { createClient } from '@/lib/supabase'
+import { FormMessage } from '@/components/ui/FormMessage'
 
 type Admin = {
   id: string
@@ -44,11 +45,12 @@ export default function ParametresClient({ initialAdmin }: { initialAdmin: Admin
   }
 
   return (
-    <motion.div 
+    <motion.div
       initial="hidden"
       animate="visible"
       variants={staggerContainer}
-      style={{ padding: '32px', maxWidth: '800px' }}
+      className="admin-page-content"
+      style={{ maxWidth: '800px' }}
     >
       <motion.div variants={fadeUp} style={{ marginBottom: '32px' }}>
         <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#0A0A0A', marginBottom: '4px' }}>Paramètres du compte</h1>
@@ -66,7 +68,7 @@ export default function ParametresClient({ initialAdmin }: { initialAdmin: Admin
             <User size={18} style={{ color: '#4B5563' }} />
             <h2 style={{ fontSize: '16px', fontWeight: 600 }}>Profil Personnel</h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <div className="step-grid-2" style={{ display: 'grid', gap: '16px' }}>
             <div style={inputGroupStyle}>
               <label style={labelStyle}>Prénom</label>
               <input 
@@ -107,7 +109,7 @@ export default function ParametresClient({ initialAdmin }: { initialAdmin: Admin
           <p style={{ fontSize: '13px', color: '#6B7280', marginBottom: '16px' }}>
             Votre compte est protégé par l'authentification sécurisée de la plateforme.
           </p>
-          <div style={{ display: 'flex', gap: '12px' }}>
+          <div className="admin-params-security" style={{ display: 'flex', gap: '12px' }}>
             <motion.div 
               whileHover={{ y: -2, boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
               style={{ 
@@ -139,38 +141,13 @@ export default function ParametresClient({ initialAdmin }: { initialAdmin: Admin
           </div>
         </motion.section>
 
-        {/* Feedback Message */}
-        {message && (
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            style={{ 
-              padding: '12px 16px', borderRadius: '8px', fontSize: '14px', fontWeight: 500,
-              background: message.type === 'success' ? '#D1FAE5' : '#FEE2E2',
-              color: message.type === 'success' ? '#065F46' : '#991B1B',
-              border: `1px solid ${message.type === 'success' ? '#A7F3D0' : '#FECACA'}`
-            }}
-          >
-            {message.text}
-          </motion.div>
-        )}
+        {message && <FormMessage type={message.type} text={message.text} />}
 
         {/* Save Button */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
-          <motion.button 
-            type="submit" 
-            disabled={loading}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            style={{ 
-              display: 'flex', alignItems: 'center', gap: '8px',
-              padding: '12px 32px', borderRadius: '12px', background: '#0A0A0A', color: 'white',
-              border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '15px',
-              transition: 'opacity 0.2s'
-            }}
-          >
-            {loading ? 'Enregistrement...' : <><Save size={18} /> Enregistrer les modifications</>}
-          </motion.button>
+        <div className="admin-params-save" style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
+          <button type="submit" disabled={loading} className="btn btn-red" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Save size={16} /> {loading ? 'Sauvegarde...' : 'Sauvegarder'}
+          </button>
         </div>
       </motion.form>
     </motion.div>

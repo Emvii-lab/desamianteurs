@@ -8,7 +8,7 @@ import { DemandeFormValues } from '@/hooks/useDemandeForm'
 import { formatSize } from '@/lib/utils'
 
 interface Props {
-  form: UseFormReturn<DemandeFormValues, any, any>
+  form: UseFormReturn<DemandeFormValues>
   services: ServiceType[]
   propertyTypes: PropertyType[]
   onNext: () => void
@@ -56,7 +56,7 @@ export function Step1Besoin({ form, services, propertyTypes, onNext, files, onFi
       {/* Prestation Type */}
       <div style={{ marginBottom: 40 }}>
         <label className="label" style={{ marginBottom: 16 }}>Type de prestation <span style={{ color: 'var(--red)' }}>*</span></label>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <div className="step-grid-2" style={{ display: 'grid', gap: 12 }}>
           {services.map(st => {
             const selected = selectedServices?.includes(st.id)
             const Icon = ICON_MAP[st.code] ?? AlertCircle
@@ -96,7 +96,7 @@ export function Step1Besoin({ form, services, propertyTypes, onNext, files, onFi
       {/* User Type */}
       <div style={{ marginBottom: 40 }}>
         <label className="label" style={{ marginBottom: 16 }}>Vous êtes <span style={{ color: 'var(--red)' }}>*</span></label>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+        <div className="step-grid-3" style={{ display: 'grid', gap: 10 }}>
           {USER_TYPES.map(t => (
             <motion.button key={t} type="button" 
               whileHover={{ scale: 1.02 }}
@@ -114,7 +114,7 @@ export function Step1Besoin({ form, services, propertyTypes, onNext, files, onFi
       </div>
 
       {/* Property & Surface */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 40 }}>
+      <div className="step-grid-2" style={{ display: 'grid', gap: 24, marginBottom: 40 }}>
         <div>
           <label className="label">Type de bien <span style={{ color: 'var(--red)' }}>*</span></label>
           <CustomSelect
@@ -139,7 +139,7 @@ export function Step1Besoin({ form, services, propertyTypes, onNext, files, onFi
       {services.some(s => selectedServices?.includes(s.id) && s.code === 'diagnostic_amiante') && (
         <div style={{ marginBottom: 32 }} className="fade-in">
           <label className="label" style={{ marginBottom: 12 }}>Phase du projet (Diagnostic) <span style={{ color: 'var(--red)' }}>*</span></label>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 10 }}>
+          <div className="step-grid-3" style={{ display: 'grid', gap: 10, marginBottom: 10 }}>
             {SITUATIONS_PHASE.map(s => (
               <motion.button key={s.id} type="button" 
                 whileHover={{ scale: 1.02 }}
@@ -153,7 +153,7 @@ export function Step1Besoin({ form, services, propertyTypes, onNext, files, onFi
                 }}>{s.label}</motion.button>
             ))}
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+          <div className="step-grid-3" style={{ display: 'grid', gap: 10 }}>
             {SITUATIONS_CONTEXT.map(s => {
               const active = situationContext?.includes(s.id)
               return (
@@ -175,8 +175,8 @@ export function Step1Besoin({ form, services, propertyTypes, onNext, files, onFi
 
       {services.some(s => selectedServices?.includes(s.id) && s.code === 'desamiantage') && (
         <div style={{ marginBottom: 32 }} className="fade-in">
-          <label className="label" style={{ marginBottom: 12 }}>Type d'intervention (Désamiantage) <span style={{ color: 'var(--red)' }}>*</span></label>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
+          <label className="label" style={{ marginBottom: 12 }}>Type d&apos;intervention (Désamiantage) <span style={{ color: 'var(--red)' }}>*</span></label>
+          <div className="step-grid-2" style={{ display: 'grid', gap: 10 }}>
             {INTERVENTION_TYPES_SS3.map(s => {
               const active = interventionTypes?.includes(s.id)
               return (
@@ -199,7 +199,7 @@ export function Step1Besoin({ form, services, propertyTypes, onNext, files, onFi
       {services.some(s => selectedServices?.includes(s.id) && s.code === 'moe_amiante_plomb') && (
         <div style={{ marginBottom: 32 }} className="fade-in">
           <label className="label" style={{ marginBottom: 12 }}>Mission MOE / AMO <span style={{ color: 'var(--red)' }}>*</span></label>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+          <div className="step-grid-3" style={{ display: 'grid', gap: 10 }}>
             {PHASES_MOE.map(s => (
               <motion.button key={s.id} type="button" 
                 whileHover={{ scale: 1.02 }}
@@ -218,8 +218,8 @@ export function Step1Besoin({ form, services, propertyTypes, onNext, files, onFi
 
       {services.some(s => selectedServices?.includes(s.id) && s.code === 'preleveur_air_materiaux') && (
         <div style={{ marginBottom: 32 }} className="fade-in">
-          <label className="label" style={{ marginBottom: 12 }}>Besoins d'analyse (Laboratoire) <span style={{ color: 'var(--red)' }}>*</span></label>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
+          <label className="label" style={{ marginBottom: 12 }}>Besoins d&apos;analyse (Laboratoire) <span style={{ color: 'var(--red)' }}>*</span></label>
+          <div className="step-grid-2" style={{ display: 'grid', gap: 10 }}>
             {ACCREDITATIONS_LABO.map(s => {
               const active = accreditations?.includes(s.id)
               return (
@@ -244,7 +244,7 @@ export function Step1Besoin({ form, services, propertyTypes, onNext, files, onFi
       {/* Timing & Budget */}
       <div style={{ marginBottom: 32 }}>
         <label className="label" style={{ marginBottom: 12 }}>Quand est prévue la prestation ? <span style={{ color: 'var(--red)' }}>*</span></label>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+        <div className="step-grid-4" style={{ display: 'grid', gap: 10 }}>
           {TIMINGS.map(t => (
             <motion.button key={t.id} type="button" 
               whileHover={{ scale: 1.02 }}
@@ -304,7 +304,7 @@ export function Step1Besoin({ form, services, propertyTypes, onNext, files, onFi
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <button type="button" className="btn btn-red" onClick={onNext} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '14px 28px' }}>
+        <button type="button" className="btn btn-red step-nav-btn" onClick={onNext} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           Étape suivante <ChevronRight size={18} />
         </button>
       </div>

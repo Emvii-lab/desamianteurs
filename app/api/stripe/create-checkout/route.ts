@@ -25,7 +25,7 @@ export async function POST(req: Request) {
 
   if (!partnerCheck) return NextResponse.json({ error: 'Partenaire introuvable' }, { status: 403 })
 
-  const origin = req.headers.get('origin') ?? 'http://localhost:3000'
+  const origin = req.headers.get('origin') ?? process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
   const cancelUrl = source === 'dashboard'
     ? `${origin}/espace-partenaire`
     : `${origin}/inscription?tab=partenaire&cancelled=1`
