@@ -40,13 +40,11 @@ export async function proxy(request: NextRequest) {
     const { data } = await supabase.auth.getUser()
     user = data.user
   } catch {
+    // Erreur réseau ou temporaire — on redirige sans effacer les cookies
+    // pour ne pas déconnecter l'utilisateur sur une simple erreur transitoire
     const redirectUrl = request.nextUrl.clone()
     redirectUrl.pathname = '/connexion'
-    const response = NextResponse.redirect(redirectUrl)
-    request.cookies.getAll()
-      .filter(c => c.name.startsWith('sb-'))
-      .forEach(c => response.cookies.delete(c.name))
-    return response
+    return NextResponse.redirect(redirectUrl)
   }
 
   if (!user) {
