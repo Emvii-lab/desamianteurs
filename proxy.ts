@@ -4,6 +4,8 @@ import { NextResponse, type NextRequest } from 'next/server'
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
+  // Le proxy ne fait QUE rafraîchir les cookies de session.
+  // Les redirections auth sont gérées par les pages elles-mêmes (Server Components).
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -20,7 +22,7 @@ export async function proxy(request: NextRequest) {
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, {
               ...options,
-              maxAge: 60 * 60 * 24 * 365, // persistant 1 an — évite les cookies éphémères dans le WebView
+              maxAge: 60 * 60 * 24 * 365,
               sameSite: 'lax',
               secure: true,
             })
@@ -30,33 +32,9 @@ export async function proxy(request: NextRequest) {
     }
   )
 
-  const { pathname } = request.nextUrl
-
-  const isPrefetch = request.headers.get('next-router-prefetch') === '1'
-    || request.headers.get('purpose') === 'prefetch'
-  if (isPrefetch) return supabaseResponse
-
-  if (!pathname.startsWith('/espace-')) {
-    return supabaseResponse
-  }
-
-  // getSession() lit les cookies sans appel réseau (rapide, pas de déco sur erreur réseau)
-  const { data: { session } } = await supabase.auth.getSession()
-
-  if (!session) {
-    // Pas de session locale → on essaie getUser() pour confirmer
-    try {
-      const { data } = await supabase.auth.getUser()
-      if (!data.user) {
-        const url = request.nextUrl.clone()
-        url.pathname = '/connexion'
-        return NextResponse.redirect(url)
-      }
-    } catch {
-      // Erreur réseau temporaire : on laisse passer plutôt que de déconnecter
-      return supabaseResponse
-    }
-  }
+  // Rafraîchit le token si nécessaire — ne jamais utiliser getSession() ici
+  // car il ne valide pas le token côté serveur.
+  await supabase.auth.getUser()
 
   return supabaseResponse
 }
