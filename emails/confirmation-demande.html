@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Votre demande a bien été envoyée — Désamianteurs.com</title>
+  <!--[if mso]>
+  <noscript>
+    <xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml>
+  </noscript>
+  <![endif]-->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background-color: #F5F5F5;
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      color: #111111;
+    }
+
+    .email-wrapper {
+      width: 100%;
+      background-color: #F5F5F5;
+      padding: 40px 16px;
+    }
+
+    .email-container {
+      max-width: 580px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .email-header {
+      text-align: center;
+      padding: 0 0 24px;
+    }
+
+    .logo {
+      font-family: 'DM Serif Display', Georgia, 'Times New Roman', serif;
+      font-size: 22px;
+      font-weight: 400;
+      color: #111111;
+      text-decoration: none;
+    }
+
+    .logo span { color: #C0392B; }
+
+    /* Hero */
+    .hero {
+      background-color: #111111;
+      border-radius: 12px 12px 0 0;
+      padding: 48px 40px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background-color: rgba(192, 57, 43, 0.18);
+      color: #C0392B;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+
+    .hero-icon {
+      width: 64px;
+      height: 64px;
+      background-color: rgba(192, 57, 43, 0.12);
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: #FFFFFF;
+      line-height: 1.25;
+      margin-bottom: 12px;
+    }
+
+    .hero-title span { color: #C0392B; }
+
+    .hero-subtitle {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.55);
+      line-height: 1.65;
+    }
+
+    /* Card */
+    .card {
+      background-color: #FFFFFF;
+      padding: 40px;
+      border-left: 1px solid #E5E7EB;
+      border-right: 1px solid #E5E7EB;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #111111;
+      margin-bottom: 12px;
+    }
+
+    .card-text {
+      font-size: 14px;
+      color: #6B7280;
+      line-height: 1.7;
+      margin-bottom: 28px;
+    }
+
+    /* Récap demande */
+    .recap {
+      background-color: #F9FAFB;
+      border: 1px solid #F3F4F6;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+
+    .recap-header {
+      background-color: #111111;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .recap-header-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #C0392B;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .recap-header-title {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: rgba(255,255,255,0.6);
+    }
+
+    .recap-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 14px 20px;
+      border-bottom: 1px solid #F3F4F6;
+      gap: 16px;
+    }
+
+    .recap-row:last-child { border-bottom: none; }
+
+    .recap-label {
+      font-size: 12px;
+      color: #9CA3AF;
+      font-weight: 500;
+      white-space: nowrap;
+      padding-top: 1px;
+      min-width: 100px;
+    }
+
+    .recap-value {
+      font-size: 13px;
+      font-weight: 600;
+      color: #111111;
+      text-align: right;
+      line-height: 1.4;
+    }
+
+    /* Étapes */
+    .steps {
+      margin-bottom: 28px;
+    }
+
+    .step {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 16px;
+      align-items: flex-start;
+    }
+
+    .step:last-child { margin-bottom: 0; }
+
+    .step-number {
+      width: 28px;
+      height: 28px;
+      background-color: rgba(192, 57, 43, 0.08);
+      color: #C0392B;
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .step-content { padding-top: 4px; }
+
+    .step-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #111111;
+      margin-bottom: 2px;
+    }
+
+    .step-desc {
+      font-size: 12px;
+      color: #9CA3AF;
+      line-height: 1.5;
+    }
+
+    /* Button */
+    .btn-container {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .btn-red {
+      display: inline-block;
+      background-color: #C0392B;
+      color: #FFFFFF !important;
+      font-family: 'DM Sans', Arial, sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      text-decoration: none;
+      padding: 16px 40px;
+      border-radius: 8px;
+      letter-spacing: 0.2px;
+    }
+
+    /* Divider */
+    .divider {
+      border: none;
+      border-top: 1px solid #F3F4F6;
+      margin: 24px 0;
+    }
+
+    /* Security note */
+    .info-note {
+      background-color: #F9FAFB;
+      border: 1px solid #F3F4F6;
+      border-radius: 8px;
+      padding: 16px 20px;
+    }
+
+    .info-note p {
+      font-size: 12px;
+      color: #9CA3AF;
+      line-height: 1.6;
+    }
+
+    /* Footer */
+    .email-footer {
+      background-color: #111111;
+      border-radius: 0 0 12px 12px;
+      padding: 28px 40px;
+      border: 1px solid #111111;
+    }
+
+    .footer-logo {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 16px;
+      font-weight: 400;
+      color: #FFFFFF;
+      margin-bottom: 12px;
+    }
+
+    .footer-logo span { color: #C0392B; }
+
+    .footer-links { margin-bottom: 16px; }
+
+    .footer-links a {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.45);
+      text-decoration: none;
+      margin-right: 16px;
+    }
+
+    .footer-copy {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.25);
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .hero { padding: 36px 24px 32px; }
+      .card { padding: 28px 24px; }
+      .email-footer { padding: 24px; }
+      .hero-title { font-size: 22px; }
+      .btn-red { padding: 14px 28px; font-size: 14px; }
+      .recap-row { flex-direction: column; gap: 4px; }
+      .recap-value { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+  <div class="email-wrapper">
+    <div class="email-container">
+
+      <!-- Header logo -->
+      <div class="email-header">
+        <span class="logo">Désamianteurs<span>.com</span></span>
+      </div>
+
+      <!-- Hero -->
+      <div class="hero">
+        <div class="hero-badge">Demande confirmée</div>
+        <!-- Icône check -->
+        <table width="64" style="margin: 0 auto 20px; background: rgba(192,57,43,0.12); border-radius: 50%;">
+          <tr><td style="padding: 16px; text-align: center;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C0392B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </td></tr>
+        </table>
+        <h1 class="hero-title">
+          Votre demande a<br />
+          <span>bien été envoyée !</span>
+        </h1>
+        <p class="hero-subtitle">
+          Des professionnels certifiés de votre zone<br />
+          vont vous envoyer leurs devis sous <strong style="color: rgba(255,255,255,0.8);">48h</strong>.
+        </p>
+      </div>
+
+      <!-- Card principale -->
+      <div class="card">
+        <h2 class="card-title">Bonjour {{prenom}},</h2>
+        <p class="card-text">
+          Votre demande a bien été transmise à des professionnels certifiés dans votre zone.
+          Vous recevrez leurs devis directement dans votre espace client.
+        </p>
+
+        <!-- Récap demande -->
+        <div class="recap">
+          <div class="recap-header">
+            <span class="recap-header-dot"></span>
+            <span class="recap-header-title">Récapitulatif de votre demande</span>
+          </div>
+          <div class="recap-row">
+            <span class="recap-label">Prestation</span>
+            <span class="recap-value">{{service}}</span>
+          </div>
+          <div class="recap-row">
+            <span class="recap-label">Type de bien</span>
+            <span class="recap-value">{{type_bien}}</span>
+          </div>
+          <div class="recap-row">
+            <span class="recap-label">Localisation</span>
+            <span class="recap-value">{{ville}} ({{code_postal}})</span>
+          </div>
+          <div class="recap-row">
+            <span class="recap-label">Délai souhaité</span>
+            <span class="recap-value">{{delai}}</span>
+          </div>
+          <div class="recap-row">
+            <span class="recap-label">Référence</span>
+            <span class="recap-value" style="color: #9CA3AF; font-weight: 500; font-size: 11px; font-family: monospace;">{{ref_demande}}</span>
+          </div>
+        </div>
+
+        <!-- Étapes suivantes -->
+        <p style="font-size: 13px; font-weight: 700; color: #111; margin-bottom: 16px;">La suite :</p>
+        <div class="steps">
+          <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <div class="step-title">Les pros vous contactent sous 48h</div>
+              <div class="step-desc">Les professionnels certifiés de votre zone reçoivent votre demande et préparent leur devis.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <div class="step-title">Comparez et choisissez</div>
+              <div class="step-desc">Consultez les devis, les avis clients et choisissez le professionnel qui vous convient.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <div class="step-title">Laissez un avis</div>
+              <div class="step-desc">Après les travaux, partagez votre expérience pour aider la communauté.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="btn-container">
+          <a href="https://www.desamianteurs.com/espace-client/demandes" class="btn-red" target="_blank">
+            Suivre ma demande
+          </a>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- Note info -->
+        <div class="info-note">
+          <p>
+            <strong style="color: #6B7280;">Vous n'avez pas soumis cette demande ?</strong>
+            Contactez-nous immédiatement à
+            <a href="mailto:info@desamianteurs.com" style="color: #C0392B; text-decoration: none;">info@desamianteurs.com</a>
+            afin que nous puissions sécuriser votre compte.
+          </p>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="email-footer">
+        <div class="footer-logo">Désamianteurs<span>.com</span></div>
+        <div class="footer-links">
+          <a href="https://www.desamianteurs.com">Site web</a>
+          <a href="https://www.desamianteurs.com/cgu">CGU</a>
+          <a href="https://www.desamianteurs.com/confidentialite">Confidentialité</a>
+          <a href="mailto:info@desamianteurs.com">Nous contacter</a>
+        </div>
+        <p class="footer-copy">
+          © 2026 Désamianteurs.com — Tous droits réservés<br />
+          Cet e-mail a été envoyé automatiquement, merci de ne pas y répondre.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

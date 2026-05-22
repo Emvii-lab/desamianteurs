@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.desamianteurs.app",
+    "sha256_cert_fingerprints": [
+      "7B:79:91:3F:D8:CA:56:59:E0:75:D0:D1:50:D9:64:D1:F0:9E:83:45:3A:3E:8F:B5:A3:F6:B5:D0:3A:52:68:FF"
+    ]
+  }
+}]

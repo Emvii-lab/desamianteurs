@@ -199,6 +199,23 @@ export const demandeService = {
     const quoteId  = await createQuote(supabase, clientId, submissionData)
     await linkServiceTypes(supabase, quoteId, submissionData.serviceTypes)
     await uploadQuoteFiles(supabase, quoteId, files)
+
+    // Envoi email de confirmation (non bloquant)
+    fetch('/api/notifications/confirmation-demande', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        prenom:      submissionData.prenom,
+        email:       submissionData.email,
+        service:     submissionData.serviceTypes?.join(', ') || '',
+        type_bien:   submissionData.propertyType || '',
+        ville:       submissionData.city || '',
+        code_postal: submissionData.postalCode || '',
+        delai:       submissionData.timing || '',
+        ref_demande: quoteId,
+      }),
+    }).catch(err => console.error('[email confirmation]', err))
+
     return { success: true, quoteId }
   },
 }
