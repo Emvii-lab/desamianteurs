@@ -2,8 +2,9 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Shield, ChevronDown, ChevronUp, X } from 'lucide-react'
+import { Shield, X } from 'lucide-react'
 import { useCookieConsent } from '@/lib/hooks/useCookieConsent'
+import { useIsMobile } from '@/lib/hooks/useIsMobile'
 
 const SERIF = 'var(--font-serif, "DM Serif Display", Georgia, serif)'
 
@@ -11,6 +12,7 @@ export default function CookieConsent() {
   const { consent, ready, acceptAll, declineAll, saveCustom } = useCookieConsent()
   const [showModal, setShowModal] = useState(false)
   const [mapsEnabled, setMapsEnabled] = useState(true)
+  const isMobile = useIsMobile()
 
   if (!ready || consent?.decided) return null
 
@@ -83,14 +85,20 @@ export default function CookieConsent() {
         <div style={{
           position: 'fixed', inset: 0, zIndex: 9999,
           background: 'rgba(0,0,0,0.5)',
-          display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
-          padding: '0 0 0 0',
+          display: 'flex',
+          alignItems: isMobile ? 'flex-end' : 'center',
+          justifyContent: 'center',
+          padding: isMobile ? 0 : '24px',
         }}>
           <div style={{
-            background: 'white', width: '100%', maxWidth: 600,
-            borderRadius: '16px 16px 0 0',
-            maxHeight: '85vh', overflowY: 'auto',
-            padding: '28px 24px 32px',
+            background: 'white',
+            width: '100%',
+            maxWidth: isMobile ? undefined : 520,
+            borderRadius: isMobile ? '16px 16px 0 0' : 'var(--radius)',
+            maxHeight: isMobile ? '85vh' : '90vh',
+            overflowY: 'auto',
+            padding: isMobile ? '28px 24px 32px' : '32px',
+            boxShadow: isMobile ? undefined : '0 20px 60px rgba(0,0,0,0.2)',
           }}>
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
