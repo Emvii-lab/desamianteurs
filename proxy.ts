@@ -32,13 +32,9 @@ export async function proxy(request: NextRequest) {
     }
   )
 
-  // Ne rafraîchir le token que pour les routes privées
-  // pour éviter de spammer l'API Supabase sur chaque page publique
-  const { pathname } = request.nextUrl
-  if (pathname.startsWith('/espace-')) {
-    await supabase.auth.getUser()
-  }
-
+  // Le proxy ne fait AUCUN appel auth — le browser client gère le refresh.
+  // Appeler getUser() ici crée une compétition sur le refresh token
+  // entre le serveur et le browser, ce qui invalide la session.
   return supabaseResponse
 }
 
