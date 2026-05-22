@@ -201,7 +201,10 @@ export const demandeService = {
     await uploadQuoteFiles(supabase, quoteId, files)
 
     // Envoi email de confirmation (non bloquant)
-    fetch('/api/notifications/confirmation-demande', {
+    const baseUrl = typeof window !== 'undefined'
+      ? window.location.origin
+      : (process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.desamianteurs.com')
+    fetch(`${baseUrl}/api/notifications/confirmation-demande`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

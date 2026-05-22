@@ -96,7 +96,7 @@ describe('POST /api/admin/user (reset password)', () => {
     const admin = makeAdminClient()
     vi.mocked(createClient).mockReturnValue(admin as any)
 
-    await POST(makeReq('POST', { email: 'user@example.com' }, 'https://desamianteurs.fr'))
+    await POST(makeReq('POST', { email: 'user@example.com' }, 'https://desamianteurs.com'))
 
     expect(admin.auth.admin.generateLink).toHaveBeenCalledWith(expect.objectContaining({
       type: 'recovery',
@@ -105,7 +105,7 @@ describe('POST /api/admin/user (reset password)', () => {
     }))
   })
 
-  it('retourne ok:true et le lien de réinitialisation', async () => {
+  it('retourne ok:true (sans le lien — envoyé par email uniquement)', async () => {
     vi.mocked(createServerSupabase).mockResolvedValue(makeServerSupabase() as any)
     vi.mocked(createClient).mockReturnValue(makeAdminClient() as any)
 
@@ -114,7 +114,8 @@ describe('POST /api/admin/user (reset password)', () => {
 
     expect(res.status).toBe(200)
     expect(json.ok).toBe(true)
-    expect(json.link).toBe('https://reset.link')
+    // Le lien n'est plus retourné dans la réponse (fix sécurité)
+    expect(json.link).toBeUndefined()
   })
 
   it('retourne 400 si Supabase renvoie une erreur', async () => {
