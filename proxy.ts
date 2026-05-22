@@ -35,22 +35,22 @@ export async function proxy(request: NextRequest) {
     return supabaseResponse
   }
 
-  let user = null
-  try {
-    const { data } = await supabase.auth.getUser()
-    user = data.user
-  } catch {
-    // Erreur réseau ou temporaire — on redirige sans effacer les cookies
-    // pour ne pas déconnecter l'utilisateur sur une simple erreur transitoire
-    const redirectUrl = request.nextUrl.clone()
-    redirectUrl.pathname = '/connexion'
-    return NextResponse.redirect(redirectUrl)
-  }
+  // getSession() lit les cookies sans appel réseau (rapide, pas de déco sur erreur réseau)
+  const { data: { session } } = await supabase.auth.getSession()
 
-  if (!user) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/connexion'
-    return NextResponse.redirect(url)
+  if (!session) {
+    // Pas de session locale → on essaie getUser() pour confirmer
+    try {
+      const { data } = await supabase.auth.getUser()
+      if (!data.user) {
+        const url = request.nextUrl.clone()
+        url.pathname = '/connexion'
+        return NextResponse.redirect(url)
+      }
+    } catch {
+      // Erreur réseau temporaire : on laisse passer plutôt que de déconnecter
+      return supabaseResponse
+    }
   }
 
   return supabaseResponse
