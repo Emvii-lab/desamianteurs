@@ -153,7 +153,7 @@ export default function DashboardSidebar({ role, userId, userName = 'Utilisateur
   useEffect(() => {
     if (!userId) return
     const supabase = createClient()
-    
+
     const fetchUnreadCount = async () => {
       const { count } = await supabase
         .from('messages')
@@ -171,7 +171,7 @@ export default function DashboardSidebar({ role, userId, userName = 'Utilisateur
       .subscribe()
 
     return () => { supabase.removeChannel(channel) }
-  }, [userId])
+  }, [userId, pathname])
 
   return (
     <>
