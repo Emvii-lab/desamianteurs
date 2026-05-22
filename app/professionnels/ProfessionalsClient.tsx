@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
+import { useCookieConsent } from '@/lib/hooks/useCookieConsent'
 import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
@@ -29,6 +30,7 @@ interface ProfessionalsClientProps {
 
 
 export default function ProfessionalsClient({ initialPros, initialType, initialLocation }: ProfessionalsClientProps) {
+  const { consent } = useCookieConsent()
   const [allPros] = useState<Pro[]>(initialPros)
   const [search, setSearch]     = useState(initialLocation || '')
   const [typeFilter, setTypeFilter] = useState<string[]>(initialType ? [initialType] : [])
@@ -196,6 +198,13 @@ export default function ProfessionalsClient({ initialPros, initialType, initialL
               ) : filtered.map(pro => (
                 <ProCard key={pro.id} pro={pro} />
               ))}
+            </div>
+          ) : consent?.maps === false ? (
+            <div className="pros-map" style={{ height: 600, width: '100%', borderRadius: 12, border: '1px solid var(--gray-200)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, background: '#F9FAFB' }}>
+              <MapIcon size={32} color="#D1D5DB" />
+              <p style={{ fontSize: 14, color: '#6B7280', textAlign: 'center', maxWidth: 300, margin: 0 }}>
+                Activez les cookies de cartes dans vos préférences pour afficher la carte.
+              </p>
             </div>
           ) : (
             <div className="pros-map" style={{ height: 600, width: '100%', borderRadius: 12, overflow: 'hidden', border: '1px solid var(--gray-200)', position: 'relative' }}>
