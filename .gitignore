@@ -85,3 +85,11 @@ Cahier_des_charges_Desamianteurs.docx
 DOC_ALGORITHME_MATCHING.md
 tests/api/admin/user.test.ts
 public/icon-preview.html
+
+# fichiers temp Stripe (générés par les scripts de setup)
+C:temp*.json
+*stripe_asso.json
+
+# source logo (fichier de travail, non nécessaire au déploiement)
+public/icons/source-logo.png
+public/icons/source-cropped.png
