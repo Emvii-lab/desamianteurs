@@ -571,18 +571,4 @@ Les jointures Supabase (`!inner`, alias) sont souvent typées en tableau même p
 const data: QuoteData = Array.isArray(raw.quotes) ? raw.quotes[0] : raw.quotes
 ```
 
-### Données de test
-
-Les comptes de test (environnement Supabase) ont le mot de passe `Demo2026!`.
-
-| Email | Rôle |
-|---|---|
-| `admin@desamianteurs.com` | Administrateur |
-| `contact@sarl-desamiante-pro.fr` | Partenaire (Performance) |
-| `info@diagnostic-habitat69.fr` | Partenaire (Premium) |
-| `martin.dupont@gmail.com` | Client |
-| `agnes.fontaine@orange.fr` | Client |
-
----
-
 *Documentation générée le 07/05/2026 — version courante du projet.*
