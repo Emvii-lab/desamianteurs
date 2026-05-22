@@ -27,14 +27,16 @@ export default function Navbar() {
 
     async function loadUser() {
       try {
-        const { data } = await supabase.auth.getUser()
-        if (!data.user) { setUser(null); return }
+        // getSession() lit les cookies localement sans appel réseau → instantané
+        const { data: { session } } = await supabase.auth.getSession()
+        if (!session?.user) { setUser(null); return }
 
-        const meta     = data.user.user_metadata ?? {}
+        const user     = session.user
+        const meta     = user.user_metadata ?? {}
         const fullName = meta.full_name || meta.name || ''
         const prenom   = meta.prenom || (fullName ? fullName.split(' ')[0] : '')
         const nom      = meta.nom    || (fullName ? fullName.split(' ').slice(1).join(' ') : '')
-        const email    = data.user.email ?? ''
+        const email    = user.email ?? ''
 
         const initials = prenom && nom
           ? `${prenom[0]}${nom[0]}`.toUpperCase()
@@ -43,10 +45,10 @@ export default function Navbar() {
         let href = '/espace-client'
         try {
           const [adminRes, partnerRes] = await Promise.all([
-            supabase.from('admins').select('id').eq('user_id', data.user.id).maybeSingle(),
-            supabase.from('partners').select('id').eq('user_id', data.user.id).maybeSingle(),
+            supabase.from('admins').select('id').eq('user_id', user.id).maybeSingle(),
+            supabase.from('partners').select('id').eq('user_id', user.id).maybeSingle(),
           ])
-          if (adminRes?.data)   href = '/espace-admin'
+          if (adminRes?.data)        href = '/espace-admin'
           else if (partnerRes?.data) href = '/espace-partenaire'
         } catch { /* fallback */ }
 
