@@ -12,7 +12,12 @@ export async function createServerSupabase() {
         setAll: (cookiesToSet) => {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
+              cookieStore.set(name, value, {
+                ...options,
+                maxAge: 60 * 60 * 24 * 365,
+                sameSite: 'lax',
+                secure: true,
+              })
             )
           } catch {
             // Ignoré depuis un Server Component — le middleware gère le refresh
