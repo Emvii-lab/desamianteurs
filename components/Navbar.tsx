@@ -25,39 +25,45 @@ export default function Navbar() {
   useEffect(() => {
     const supabase = createClient()
 
-    async function loadUser() {
+    async function updateFromSession(sessionUser: { id: string; email?: string; user_metadata?: any } | null) {
+      if (!sessionUser) return // ne jamais mettre user=null depuis onAuthStateChange
+
+      const meta     = sessionUser.user_metadata ?? {}
+      const fullName = meta.full_name || meta.name || ''
+      const prenom   = meta.prenom || (fullName ? fullName.split(' ')[0] : '')
+      const nom      = meta.nom    || (fullName ? fullName.split(' ').slice(1).join(' ') : '')
+      const email    = sessionUser.email ?? ''
+
+      const initials = prenom && nom
+        ? `${prenom[0]}${nom[0]}`.toUpperCase()
+        : prenom ? prenom.slice(0, 2).toUpperCase() : email.slice(0, 2).toUpperCase()
+
+      // Affiche l'avatar immédiatement — le lien sera mis à jour après la vérification du rôle
+      setUser({ initials, href: '/espace-client' })
+
       try {
-        // getSession() lit les cookies localement sans appel réseau → instantané
-        const { data: { session } } = await supabase.auth.getSession()
-        if (!session?.user) { setUser(null); return }
-
-        const user     = session.user
-        const meta     = user.user_metadata ?? {}
-        const fullName = meta.full_name || meta.name || ''
-        const prenom   = meta.prenom || (fullName ? fullName.split(' ')[0] : '')
-        const nom      = meta.nom    || (fullName ? fullName.split(' ').slice(1).join(' ') : '')
-        const email    = user.email ?? ''
-
-        const initials = prenom && nom
-          ? `${prenom[0]}${nom[0]}`.toUpperCase()
-          : prenom ? prenom.slice(0, 2).toUpperCase() : email.slice(0, 2).toUpperCase()
-
-        let href = '/espace-client'
-        try {
-          const [adminRes, partnerRes] = await Promise.all([
-            supabase.from('admins').select('id').eq('user_id', user.id).maybeSingle(),
-            supabase.from('partners').select('id').eq('user_id', user.id).maybeSingle(),
-          ])
-          if (adminRes?.data)        href = '/espace-admin'
-          else if (partnerRes?.data) href = '/espace-partenaire'
-        } catch { /* fallback */ }
-
+        const [adminRes, partnerRes] = await Promise.all([
+          supabase.from('admins').select('id').eq('user_id', sessionUser.id).maybeSingle(),
+          supabase.from('partners').select('id').eq('user_id', sessionUser.id).maybeSingle(),
+        ])
+        const href = adminRes?.data ? '/espace-admin'
+          : partnerRes?.data ? '/espace-partenaire'
+          : '/espace-client'
         setUser({ initials, href })
-      } catch { setUser(null) }
+      } catch { /* garde le fallback /espace-client */ }
     }
 
-    loadUser()
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => loadUser())
+    // Chargement initial
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) updateFromSession(session.user)
+    })
+
+    // Écoute les changements — on ne met user=null QUE sur SIGNED_OUT explicite
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') { setUser(null); return }
+      if (session?.user) updateFromSession(session.user)
+    })
+
     return () => subscription.unsubscribe()
   }, [])
 
