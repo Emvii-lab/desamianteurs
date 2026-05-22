@@ -184,6 +184,7 @@ export default function FormulaireClient({ initialServices, initialPropertyTypes
     try {
       await demandeService.submitDemande(getValues(), files, isLoggedIn, authMode)
       setSubmitted(true)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Une erreur est survenue.')
     } finally {
