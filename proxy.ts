@@ -32,9 +32,12 @@ export async function proxy(request: NextRequest) {
     }
   )
 
-  // Rafraîchit le token si nécessaire — ne jamais utiliser getSession() ici
-  // car il ne valide pas le token côté serveur.
-  await supabase.auth.getUser()
+  // Ne rafraîchir le token que pour les routes privées
+  // pour éviter de spammer l'API Supabase sur chaque page publique
+  const { pathname } = request.nextUrl
+  if (pathname.startsWith('/espace-')) {
+    await supabase.auth.getUser()
+  }
 
   return supabaseResponse
 }
