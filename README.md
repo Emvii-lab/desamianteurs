@@ -1,4 +1,4 @@
-# Désamianteurs.fr — Documentation technique complète
+# Désamianteurs.com — Documentation technique complète
 
 > Plateforme de mise en relation entre clients et professionnels certifiés du secteur amiante/plomb.
 
@@ -24,7 +24,7 @@
 
 ## 1. Vue d'ensemble
 
-Désamianteurs.fr est une marketplace B2B/B2C spécialisée dans le secteur amiante et plomb en France. La plateforme connecte :
+Désamianteurs.com est une marketplace B2B/B2C spécialisée dans le secteur amiante et plomb en France. La plateforme connecte :
 
 - **Clients** (particuliers, professionnels, public / collectivités) qui soumettent des demandes de devis
 - **Partenaires** (désamianteurs, diagnostiqueurs, laboratoires, MOE, avocats, expert judiciaire) qui répondent aux demandes
@@ -577,7 +577,7 @@ Les comptes de test (environnement Supabase) ont le mot de passe `Demo2026!`.
 
 | Email | Rôle |
 |---|---|
-| `admin@desamianteurs.fr` | Administrateur |
+| `admin@desamianteurs.com` | Administrateur |
 | `contact@sarl-desamiante-pro.fr` | Partenaire (Performance) |
 | `info@diagnostic-habitat69.fr` | Partenaire (Premium) |
 | `martin.dupont@gmail.com` | Client |

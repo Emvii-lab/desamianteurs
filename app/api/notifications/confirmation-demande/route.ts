@@ -19,10 +19,18 @@ function buildHtml(template: string, vars: Record<string, string>): string {
 
 export async function POST(req: NextRequest) {
   try {
+    // Vérification que l'appelant est un utilisateur authentifié
+    const { createServerSupabase } = await import('@/lib/supabase-server')
+    const supabase = await createServerSupabase()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+
     const body = await req.json()
     const { prenom, email, service, type_bien, ville, code_postal, delai, ref_demande } = body
 
     if (!email) return NextResponse.json({ error: 'email requis' }, { status: 400 })
+    // L'email doit correspondre à celui de l'utilisateur connecté
+    if (email !== user.email) return NextResponse.json({ error: 'Email non autorisé' }, { status: 403 })
 
     const template = readFileSync(
       join(process.cwd(), 'emails', 'confirmation-demande.html'),

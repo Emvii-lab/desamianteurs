@@ -28,17 +28,18 @@ export async function POST(req: Request) {
   const { email } = await req.json()
   if (!email) return NextResponse.json({ error: 'Email requis' }, { status: 400 })
 
-  const origin = req.headers.get('origin') ?? process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.desamianteurs.com'
   const admin  = getAdminClient()
 
-  const { data, error } = await admin.auth.admin.generateLink({
+  const { error } = await admin.auth.admin.generateLink({
     type: 'recovery',
     email,
-    options: { redirectTo: `${origin}/reinitialiser-mot-de-passe` },
+    options: { redirectTo: `${appUrl}/reinitialiser-mot-de-passe` },
   })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })
-  return NextResponse.json({ ok: true, link: data.properties?.action_link })
+  // Ne pas retourner le lien au client — Supabase l'envoie par email directement
+  return NextResponse.json({ ok: true })
 }
 
 // ── DELETE : supprimer un utilisateur en cascade ─────────────────────────────

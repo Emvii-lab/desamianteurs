@@ -83,3 +83,5 @@ public/videos/
 # project docs
 Cahier_des_charges_Desamianteurs.docx
 DOC_ALGORITHME_MATCHING.md
+tests/api/admin/user.test.ts
+public/icon-preview.html
