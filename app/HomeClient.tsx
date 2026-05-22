@@ -418,7 +418,7 @@ export default function HomeClient({ kpis, pros }: { kpis: KpiData; pros: ProCar
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        scrollMarginTop: 100,
+        scrollMarginTop: 110,
       }}>
         {/* Étapes */}
         <div style={{ width: '100%', padding: isMobile ? `40px ${px} 24px` : `72px ${px} 40px` }}>

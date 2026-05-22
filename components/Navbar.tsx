@@ -130,7 +130,22 @@ export default function Navbar() {
           <Link
             key={href}
             href={href}
-            onClick={() => setMenuOpen(false)}
+            onClick={(e) => {
+              setMenuOpen(false)
+              // Ancre sur la même page : scroll manuel après fermeture du menu
+              if (href.startsWith('/#')) {
+                e.preventDefault()
+                const id = href.slice(2)
+                setTimeout(() => {
+                  const el = document.getElementById(id)
+                  if (el) {
+                    const offset = 110 // navbar + promobar
+                    const top = el.getBoundingClientRect().top + window.scrollY - offset
+                    window.scrollTo({ top, behavior: 'smooth' })
+                  }
+                }, 50)
+              }
+            }}
             style={{
               fontSize: 15, fontWeight: 500, color: '#111111',
               padding: '13px 0', borderBottom: '1px solid #F3F4F6',
