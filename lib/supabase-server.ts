@@ -25,9 +25,9 @@ export async function createServerSupabase() {
         },
       },
       auth: {
-        // Les Server Components ne peuvent pas écrire de cookies
-        // → le refresh doit être géré uniquement par le middleware
-        autoRefreshToken: false,
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: false,
       },
     }
   )
