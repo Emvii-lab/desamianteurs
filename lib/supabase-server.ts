@@ -25,8 +25,8 @@ export async function createServerSupabase() {
         },
       },
       auth: {
-        autoRefreshToken: true,
-        persistSession: true,
+        autoRefreshToken: false,
+        persistSession: false,
         detectSessionInUrl: false,
       },
     }
