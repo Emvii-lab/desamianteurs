@@ -186,10 +186,10 @@ export default function HomeClient({ kpis, pros }: { kpis: KpiData; pros: ProCar
         <section style={{
           background: '#111111',
           color: 'white',
-          minHeight: isMobile ? 'calc(100svh - 48px)' : '100vh',
+          minHeight: isMobile ? '100svh' : '100vh',
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'center',
+          justifyContent: isMobile ? 'flex-start' : 'center',
           padding: isMobile ? '160px 20px 60px' : '140px 40px 160px',
           position: 'relative',
           overflow: 'hidden',
