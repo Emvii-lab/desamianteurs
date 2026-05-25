@@ -13,32 +13,51 @@ const src   = join(root, 'public/icons/source-logo.png')
 
 // Trim whitespace + supersampling 4x → downsample pour anti-aliasing naturel
 const trimmed = await sharp(src).trim({ background: '#FFFFFF', threshold: 10 }).toBuffer()
-async function resizeTo(size) {
+
+const LOGO_PADDING = 0.10  // 10% de marge de chaque côté
+
+async function resizeTo(size, { rounded = false } = {}) {
+  const inner = Math.round(size * (1 - LOGO_PADDING * 2))
   const fitted = await sharp(trimmed)
-    .resize(size * 4, size * 4, { fit: 'inside', kernel: 'lanczos3' })
-    .resize(size, size, { fit: 'inside', kernel: 'lanczos3' })
+    .resize(inner * 4, inner * 4, { fit: 'inside', kernel: 'lanczos3' })
+    .resize(inner, inner, { fit: 'inside', kernel: 'lanczos3' })
     .toBuffer()
-  return sharp({ create: { width: size, height: size, channels: 3, background: { r: 255, g: 255, b: 255 } } })
+
+  const withBg = await sharp({ create: { width: size, height: size, channels: 4, background: { r: 255, g: 255, b: 255, alpha: 1 } } })
     .composite([{ input: fitted, gravity: 'center' }])
+    .png()
+    .toBuffer()
+
+  if (!rounded) {
+    return sharp(withBg).png()
+  }
+
+  // Coins arrondis ~22% (style iOS/Android)
+  const r = Math.round(size * 0.22)
+  const mask = Buffer.from(
+    `<svg width="${size}" height="${size}"><rect x="0" y="0" width="${size}" height="${size}" rx="${r}" ry="${r}" fill="white"/></svg>`
+  )
+  return sharp(withBg)
+    .composite([{ input: mask, blend: 'dest-in' }])
     .png()
 }
 
 const ICONS = [
-  { name: 'icon-72.png',   size: 72  },
-  { name: 'icon-96.png',   size: 96  },
-  { name: 'icon-128.png',  size: 128 },
-  { name: 'icon-144.png',  size: 144 },
-  { name: 'icon-152.png',  size: 152 },
-  { name: 'icon-192.png',  size: 192 },
-  { name: 'icon-384.png',  size: 384 },
-  { name: 'icon-512.png',  size: 512 },
-  { name: 'apple-touch-icon.png', size: 180 },
-  { name: 'favicon-32.png', size: 32 },
-  { name: 'favicon-16.png', size: 16 },
+  { name: 'icon-72.png',          size: 72,  rounded: true  },
+  { name: 'icon-96.png',          size: 96,  rounded: true  },
+  { name: 'icon-128.png',         size: 128, rounded: true  },
+  { name: 'icon-144.png',         size: 144, rounded: true  },
+  { name: 'icon-152.png',         size: 152, rounded: true  },
+  { name: 'icon-192.png',         size: 192, rounded: true  },
+  { name: 'icon-384.png',         size: 384, rounded: true  },
+  { name: 'icon-512.png',         size: 512, rounded: true  },
+  { name: 'apple-touch-icon.png', size: 180, rounded: false }, // iOS arrondit lui-même
+  { name: 'favicon-32.png',       size: 32,  rounded: false },
+  { name: 'favicon-16.png',       size: 16,  rounded: false },
 ]
 
-for (const { name, size } of ICONS) {
-  await (await resizeTo(size)).toFile(join(root, 'public/icons', name))
+for (const { name, size, rounded } of ICONS) {
+  await (await resizeTo(size, { rounded })).toFile(join(root, 'public/icons', name))
   console.log(`✓ ${name} (${size}×${size})`)
 }
 
