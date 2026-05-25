@@ -30,12 +30,14 @@ for (const { name, size } of ICONS) {
   console.log(`✓ ${name} (${size}×${size})`)
 }
 
-// Maskable : fond blanc + icône centrée avec 12% de padding
+// Maskable : logo centré sur canvas blanc 512×512 avec 12% de padding
 const pad = Math.round(512 * 0.12)
-await sharp(src)
-  .resize(512 - pad * 2, 512 - pad * 2)
-  .extend({ top: pad, bottom: pad, left: pad, right: pad, background: '#FFFFFF' })
-  .resize(512, 512)
+const innerSize = 512 - pad * 2
+const innerBuffer = await sharp(src)
+  .resize(innerSize, innerSize, { fit: 'contain', background: { r: 255, g: 255, b: 255, alpha: 1 } })
+  .toBuffer()
+await sharp({ create: { width: 512, height: 512, channels: 3, background: { r: 255, g: 255, b: 255 } } })
+  .composite([{ input: innerBuffer, gravity: 'center' }])
   .png()
   .toFile(join(root, 'public/icons/maskable-512.png'))
 console.log('✓ maskable-512.png (512×512)')
