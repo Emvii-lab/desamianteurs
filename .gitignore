@@ -90,6 +90,12 @@ public/icon-preview.html
 C:temp*.json
 *stripe_asso.json
 
+# backups base de données
+*.sql
+
+# supabase CLI (état local, non nécessaire au déploiement)
+supabase/.temp/
+
 # source logo (fichier de travail, non nécessaire au déploiement)
 public/icons/source-logo.png
 public/icons/source-cropped.png
