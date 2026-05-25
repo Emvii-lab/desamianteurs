@@ -30,11 +30,11 @@ for (const { name, size } of ICONS) {
   console.log(`✓ ${name} (${size}×${size})`)
 }
 
-// Maskable : fond rouge uni + icône centrée avec 10% de padding
+// Maskable : fond blanc + icône centrée avec 12% de padding
 const pad = Math.round(512 * 0.12)
 await sharp(src)
   .resize(512 - pad * 2, 512 - pad * 2)
-  .extend({ top: pad, bottom: pad, left: pad, right: pad, background: '#0A0A0A' })
+  .extend({ top: pad, bottom: pad, left: pad, right: pad, background: '#FFFFFF' })
   .resize(512, 512)
   .png()
   .toFile(join(root, 'public/icons/maskable-512.png'))
