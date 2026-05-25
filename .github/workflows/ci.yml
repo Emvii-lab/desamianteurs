@@ -11,6 +11,7 @@ on:
 jobs:
   quality:
     runs-on: ubuntu-latest
+    if: github.server_url == 'https://github.com'
     steps:
       - uses: actions/checkout@v4
 
