@@ -17,8 +17,14 @@ const dmSerifDisplay = DM_Serif_Display({
   display: 'swap',
 })
 
+const BASE_URL = 'https://www.desamianteurs.com'
+
 export const metadata: Metadata = {
-  title: 'Désamianteurs.com – Trouvez un professionnel certifié amiante',
+  metadataBase: new URL(BASE_URL),
+  title: {
+    default: 'Désamianteurs.com – Trouvez un professionnel certifié amiante',
+    template: '%s | Désamianteurs.com',
+  },
   description: "Mettez en relation particuliers, entreprises et professionnels certifiés du secteur de l'amiante. Devis gratuits, pros vérifiés.",
   manifest: '/manifest.webmanifest',
   appleWebApp: {
@@ -32,6 +38,21 @@ export const metadata: Metadata = {
       { url: '/icons/favicon-16.png', sizes: '16x16', type: 'image/png' },
     ],
     apple: [{ url: '/icons/apple-touch-icon.png', sizes: '180x180' }],
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'fr_FR',
+    url: BASE_URL,
+    siteName: 'Désamianteurs.com',
+    title: 'Désamianteurs.com – Trouvez un professionnel certifié amiante',
+    description: "Trouvez un professionnel certifié amiante. Devis gratuits, pros vérifiés.",
+    images: [{ url: '/icons/icon-512.png', width: 512, height: 512, alt: 'Désamianteurs.com' }],
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Désamianteurs.com',
+    description: "Trouvez un professionnel certifié amiante. Devis gratuits, pros vérifiés.",
+    images: ['/icons/icon-512.png'],
   },
 }
 
@@ -50,6 +71,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
           }
         `}} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'Organization',
+          name: 'Désamianteurs.com',
+          url: BASE_URL,
+          logo: `${BASE_URL}/icons/icon-512.png`,
+          description: "Annuaire de professionnels certifiés pour le désamiantage. Devis gratuits, pros vérifiés.",
+          sameAs: [],
+        })}} />
       </head>
       <body style={{ fontFamily: 'var(--font-sans), DM Sans, sans-serif', margin: 0 }}>
         {children}

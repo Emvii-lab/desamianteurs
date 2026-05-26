@@ -18,13 +18,38 @@ const PLAN_BADGE: Record<string, { label: string; bg: string; color: string } | 
 
 interface Props { params: Promise<{ id: string }> }
 
+const BASE_URL = 'https://www.desamianteurs.com'
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params
   const supabase = await createServerSupabase()
-  const { data } = await supabase.from('partners').select('company_name, description').eq('id', id).maybeSingle()
+  const { data } = await supabase
+    .from('partners')
+    .select('company_name, description, city, logo_url, avatar_url')
+    .eq('id', id)
+    .maybeSingle()
+
+  const title = data ? data.company_name : 'Profil professionnel'
+  const description = data?.description?.slice(0, 155) ?? 'Professionnel certifié sur Désamianteurs.com'
+  const image = data?.logo_url ?? data?.avatar_url ?? `${BASE_URL}/icons/icon-512.png`
+  const url = `${BASE_URL}/professionnels/${id}`
+
   return {
-    title: data ? `${data.company_name} | Désamianteurs.com` : 'Profil professionnel | Désamianteurs.com',
-    description: data?.description?.slice(0, 155) ?? 'Professionnel certifié sur Désamianteurs.com',
+    title,
+    description,
+    openGraph: {
+      type: 'profile',
+      url,
+      title: `${title} | Désamianteurs.com`,
+      description,
+      images: [{ url: image, alt: title }],
+    },
+    twitter: {
+      card: 'summary',
+      title: `${title} | Désamianteurs.com`,
+      description,
+      images: [image],
+    },
   }
 }
 
@@ -80,8 +105,31 @@ export default async function ProfilProPage({ params }: Props) {
 
   const hasDocsSection = certItems.length > 0 || documents.length > 0 || !!p.siret
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    name: p.company_name,
+    description: p.description ?? undefined,
+    url: `${BASE_URL}/professionnels/${p.id}`,
+    image: p.logo_url ?? p.avatar_url ?? undefined,
+    address: p.city ? {
+      '@type': 'PostalAddress',
+      addressLocality: p.city,
+      postalCode: p.zip_code ?? undefined,
+      addressCountry: 'FR',
+    } : undefined,
+    aggregateRating: p.review_count > 0 ? {
+      '@type': 'AggregateRating',
+      ratingValue: p.average_rating,
+      reviewCount: p.review_count,
+      bestRating: 5,
+      worstRating: 1,
+    } : undefined,
+  }
+
   return (
     <div style={{ background: '#F3F4F6', minHeight: '100vh' }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Navbar />
 
       {/* ── Hero fond noir ── */}
