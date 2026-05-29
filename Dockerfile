@@ -71,6 +71,9 @@ ENV STRIPE_PRICE_ESSENTIEL=${STRIPE_PRICE_ESSENTIEL}
 ENV STRIPE_PRICE_PERFORMANCE=${STRIPE_PRICE_PERFORMANCE}
 ENV STRIPE_PRICE_PREMIUM=${STRIPE_PRICE_PREMIUM}
 
+# APP
+ENV NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
+
 # Build Next.js application
 # If you want to speed up Docker rebuilds, you can cache the build artifacts
 # by adding: --mount=type=cache,target=/app/.next/cache
