@@ -85,7 +85,7 @@ export function InscriptionContent({
                 Désamianteurs
               </span>
               <span style={{ fontFamily: 'var(--font-serif, "DM Serif Display", Georgia, serif)', fontSize: 52, fontWeight: 400, color: 'var(--red)' }}>
-                .fr
+                .com
               </span>
             </h1>
 
