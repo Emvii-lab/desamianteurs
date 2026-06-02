@@ -113,9 +113,9 @@ export const PLANS = [
 
 export const COMPARISON = [
   { label: 'Freemium', zone: '—', leads: '1 affaire', reception: '—', engagement: 'Sans' },
-  { label: 'Essentiel', zone: '1', leads: 'Illimité (restantes)', reception: 'Différé', engagement: '3 mois' },
-  { label: 'Performance', zone: '3', leads: '5 simultanés', reception: '2ème vague', engagement: '3 mois' },
-  { label: 'Premium', zone: 'Illimité', leads: 'Illimités', reception: '1ère vague - Temps réel', engagement: '3 mois' },
+  { label: 'Essentiel', zone: 'Au choix', leads: 'Illimité (restantes)', reception: 'Différé', engagement: 'Sans' },
+  { label: 'Performance', zone: 'Au choix', leads: '5 simultanés', reception: '2ème vague', engagement: 'Sans' },
+  { label: 'Premium', zone: 'Au choix', leads: 'Illimités', reception: '1ère vague - Temps réel', engagement: 'Sans' },
 ]
 
 export const STEPS_PRICE = [

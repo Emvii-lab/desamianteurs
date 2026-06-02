@@ -1,7 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import nodemailer from 'nodemailer'
-import { readFileSync } from 'fs'
-import { join } from 'path'
 
 const TIMELINE_LABELS: Record<string, string> = {
   emergency:       'Urgent',
@@ -10,16 +7,8 @@ const TIMELINE_LABELS: Record<string, string> = {
   over_3_months:   'Plus de 3 mois',
 }
 
-function buildHtml(template: string, vars: Record<string, string>): string {
-  return Object.entries(vars).reduce(
-    (html, [key, val]) => html.replaceAll(`{{${key}}}`, val),
-    template
-  )
-}
-
 export async function POST(req: NextRequest) {
   try {
-    // Vérification que l'appelant est un utilisateur authentifié
     const { createServerSupabase } = await import('@/lib/supabase-server')
     const supabase = await createServerSupabase()
     const { data: { user } } = await supabase.auth.getUser()
@@ -29,40 +18,27 @@ export async function POST(req: NextRequest) {
     const { prenom, email, service, type_bien, ville, code_postal, delai, ref_demande } = body
 
     if (!email) return NextResponse.json({ error: 'email requis' }, { status: 400 })
-    // L'email doit correspondre à celui de l'utilisateur connecté
     if (email !== user.email) return NextResponse.json({ error: 'Email non autorisé' }, { status: 403 })
 
-    const template = readFileSync(
-      join(process.cwd(), 'emails', 'confirmation-demande.html'),
-      'utf-8'
-    )
+    const webhookUrl = process.env.N8N_WEBHOOK_CONFIRMATION_DEMANDE
+    if (!webhookUrl) throw new Error('N8N_WEBHOOK_CONFIRMATION_DEMANDE non configuré')
 
-    const html = buildHtml(template, {
-      prenom:       prenom || 'Client',
-      service:      service || '—',
-      type_bien:    type_bien || '—',
-      ville:        ville || '—',
-      code_postal:  code_postal || '—',
-      delai:        TIMELINE_LABELS[delai] || delai || '—',
-      ref_demande:  ref_demande?.slice(0, 8).toUpperCase() || '—',
+    const res = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        to:          email,
+        prenom:      prenom || 'Client',
+        service:     service || '—',
+        type_bien:   type_bien || '—',
+        ville:       ville || '—',
+        code_postal: code_postal || '—',
+        delai:       TIMELINE_LABELS[delai] || delai || '—',
+        ref_demande: ref_demande?.slice(0, 8).toUpperCase() || '—',
+      }),
     })
 
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'smtp-mail.outlook.com',
-      port: parseInt(process.env.SMTP_PORT || '587'),
-      secure: false,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    })
-
-    await transporter.sendMail({
-      from: `"Désamianteurs.com" <${process.env.SMTP_USER}>`,
-      to: email,
-      subject: 'Votre demande a bien été envoyée — Désamianteurs.com',
-      html,
-    })
+    if (!res.ok) throw new Error(`n8n webhook error: ${res.status}`)
 
     return NextResponse.json({ success: true })
   } catch (err: any) {

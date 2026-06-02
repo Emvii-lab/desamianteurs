@@ -59,8 +59,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'SIRET invalide — 14 chiffres requis' }, { status: 400 })
   }
 
-  const edgeUrl = process.env.SUPABASE_EDGE_URL
-  if (!edgeUrl) {
+  const webhookUrl = process.env.N8N_WEBHOOK_VERIFY_SIRET
+  if (!webhookUrl) {
     return NextResponse.json({ error: 'Configuration serveur manquante' }, { status: 500 })
   }
 
@@ -70,12 +70,9 @@ export async function POST(req: NextRequest) {
 
     let res: Response
     try {
-      res = await fetch(`${edgeUrl}/verify-siret`, {
+      res = await fetch(webhookUrl, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ siret: clean }),
         signal: controller.signal,
       })
@@ -85,7 +82,7 @@ export async function POST(req: NextRequest) {
 
     if (!res.ok) {
       const text = await res.text().catch(() => '')
-      console.error('[verify-siret] Edge function error:', res.status, text)
+      console.error('[verify-siret] n8n webhook error:', res.status, text)
       return NextResponse.json({ error: 'SIRET introuvable ou service indisponible' }, { status: res.status })
     }
 
