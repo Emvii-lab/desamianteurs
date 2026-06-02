@@ -1,10 +1,14 @@
 [{
-  "relation": ["delegate_permission/common.handle_all_urls"],
+  "relation": [
+    "delegate_permission/common.handle_all_urls",
+    "delegate_permission/common.get_login_creds"
+  ],
   "target": {
     "namespace": "android_app",
     "package_name": "com.desamianteurs.app",
     "sha256_cert_fingerprints": [
-      "7B:79:91:3F:D8:CA:56:59:E0:75:D0:D1:50:D9:64:D1:F0:9E:83:45:3A:3E:8F:B5:A3:F6:B5:D0:3A:52:68:FF"
+      "7B:79:91:3F:D8:CA:56:59:E0:75:D0:D1:50:D9:64:D1:F0:9E:83:45:3A:3E:8F:B5:A3:F6:B5:D0:3A:52:68:FF",
+      "CC:F9:A9:DB:F6:38:8C:8B:25:1E:C8:6F:BE:BC:E8:71:D6:14:8F:CB:46:CB:93:9E:0A:64:1E:3C:A4:D4"
     ]
   }
 }]
