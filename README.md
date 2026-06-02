@@ -52,7 +52,7 @@ Le **score de réactivité** (0–24 pts) est calculé sur les 10–20 derniers 
 | Langage | TypeScript | 5 |
 | Styles | TailwindCSS + inline styles | 4 |
 | Animations | Framer Motion | 12.38.0 |
-| Base de données | Supabase (PostgreSQL 17) | — |
+| Base de données | Supabase self-hosted (PostgreSQL 17, OVH VPS) | — |
 | Auth | Supabase Auth (GoTrue v2) | — |
 | Stockage | Supabase Storage (S3) | — |
 | Temps réel | Supabase Realtime (WebSocket) | — |
@@ -60,7 +60,7 @@ Le **score de réactivité** (0–24 pts) est calculé sur les 10–20 derniers 
 | Cartographie | Google Maps API + @vis.gl/react-google-maps | 1.8.3 |
 | Géocodage | API Adresse data.gouv.fr | — |
 | Formulaires | React Hook Form + Zod | 7.74 / 4.4 |
-| Emails | Nodemailer (SMTP) | — |
+| Emails | n8n + Microsoft Outlook (webhook hook GoTrue) | — |
 | Déploiement | Vercel (prod) + VPS Docker (mirror) | — |
 
 ---
@@ -101,9 +101,6 @@ desamianteurs/
 │   └── animations.ts           # Presets Framer Motion
 ├── services/
 │   └── demandeService.ts       # Soumission formulaire
-├── emails/                     # Templates HTML emails
-│   ├── reset-password.html
-│   └── confirmation-demande.html
 ├── public/
 │   ├── icons/                  # Icônes PWA (12 tailles)
 │   ├── sw.js                   # Service Worker
@@ -312,11 +309,9 @@ STRIPE_PROMO_ASSO=promo_...
 # Google Maps
 NEXT_PUBLIC_GOOGLE_MAPS_KEY=AIza...
 
-# SMTP (emails transactionnels)
-SMTP_HOST=smtp-mail.outlook.com
-SMTP_PORT=587
-SMTP_USER=...
-SMTP_PASS=...
+# n8n (emails transactionnels via hook GoTrue)
+GOTRUE_HOOK_SEND_EMAIL_ENABLED=true
+GOTRUE_HOOK_SEND_EMAIL_URI=https://n8n.emvii.fr/webhook/...
 
 # App
 NEXT_PUBLIC_APP_URL=https://www.desamianteurs.com
@@ -369,7 +364,9 @@ npm run build
 - [ ] Webhook Stripe configuré avec l'URL de production
 - [ ] `NEXT_PUBLIC_APP_URL=https://www.desamianteurs.com`
 
-### VPS Docker (mirror)
+### VPS OVH (Supabase self-hosted + mirror)
+
+Le VPS OVH héberge **Supabase** (GoTrue, PostgreSQL, Storage, Realtime) via Docker, ainsi qu'un mirror du site Next.js.
 
 Le projet inclut un `Dockerfile` multi-stage optimisé pour la production.
 
@@ -437,4 +434,4 @@ bubblewrap build
 
 ---
 
-*Documentation mise à jour le 22/05/2026*
+*Documentation mise à jour le 02/06/2026*
