@@ -99,3 +99,6 @@ supabase/.temp/
 # source logo (fichier de travail, non nécessaire au déploiement)
 public/icons/source-logo.png
 public/icons/source-cropped.png
+
+# email templates (contiennent des variables n8n, gérés hors git)
+emails/
