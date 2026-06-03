@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminSupabase } from '@/lib/supabase-admin'
+import { notifyNewAssignments } from '@/lib/notify-partners'
 
 export async function POST(req: NextRequest) {
   const secret = req.headers.get('x-cron-secret')
@@ -23,6 +24,9 @@ export async function POST(req: NextRequest) {
       wave3: wave3.error?.message ?? 'ok',
     }, { status: 500 })
   }
+
+  // Notifier les partenaires nouvellement assignés en vagues 2 & 3
+  await notifyNewAssignments()
 
   return NextResponse.json({ ok: true })
 }

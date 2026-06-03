@@ -200,10 +200,18 @@ export const demandeService = {
     await linkServiceTypes(supabase, quoteId, submissionData.serviceTypes)
     await uploadQuoteFiles(supabase, quoteId, files)
 
-    // Envoi email de confirmation (non bloquant)
     const baseUrl = typeof window !== 'undefined'
       ? window.location.origin
       : (process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.desamianteurs.com')
+
+    // Notifier les partenaires assignés en vague 1 (non bloquant)
+    fetch(`${baseUrl}/api/notifications/notify-partners`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ quoteId }),
+    }).catch(err => console.error('[notify-partners]', err))
+
+    // Envoi email de confirmation au client (non bloquant)
     fetch(`${baseUrl}/api/notifications/confirmation-demande`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
