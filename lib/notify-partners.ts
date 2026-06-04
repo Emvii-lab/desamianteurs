@@ -1,24 +1,5 @@
 import { createAdminSupabase } from './supabase-admin'
 
-interface Assignment {
-  id: string
-  quote_id: string
-  wave: number
-  partners: {
-    email: string
-    first_name: string
-    last_name: string
-    company_name: string
-    alert_channels: string[]
-  } | null
-  quotes: {
-    address_city: string | null
-    address_department: string | null
-    timeline: string | null
-    client_type: string | null
-  } | null
-}
-
 export async function notifyNewAssignments(quoteId?: string) {
   const webhookUrl = process.env.N8N_WEBHOOK_NOTIFY_PARTNER
   if (!webhookUrl) {
@@ -28,7 +9,10 @@ export async function notifyNewAssignments(quoteId?: string) {
 
   const supabase = createAdminSupabase()
 
-  let query = supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const db = supabase as any
+
+  let query = db
     .from('quote_assignments')
     .select(`
       id,
@@ -46,8 +30,8 @@ export async function notifyNewAssignments(quoteId?: string) {
   if (error) { console.error('[notify-partners] query error:', error.message); return }
   if (!assignments?.length) return
 
-  const quoteIds = [...new Set((assignments as Assignment[]).map(a => a.quote_id))]
-  const { data: serviceRows, error: serviceError } = await supabase
+  const quoteIds = [...new Set((assignments as any[]).map((a: any) => a.quote_id as string))]
+  const { data: serviceRows, error: serviceError } = await db
     .from('quote_service_types')
     .select('quote_id, ref_service_types!service_type_id ( code )')
     .in('quote_id', quoteIds)
@@ -63,22 +47,22 @@ export async function notifyNewAssignments(quoteId?: string) {
     if (code) (servicesByQuote[qid] ??= []).push(code)
   }
 
-  for (const a of assignments as Assignment[]) {
+  for (const a of assignments as any[]) {
     const partner = a.partners
     const quote   = a.quotes
     if (!partner?.email) continue
     if (!partner.alert_channels?.includes('email')) continue
 
     const payload = {
-      partner_email:  partner.email,
-      partner_prenom: partner.first_name,
-      company_name:   partner.company_name,
-      wave:           a.wave,
-      quote_id:       a.quote_id,
-      ville:          quote?.address_city,
-      departement:    quote?.address_department,
-      timeline:       quote?.timeline,
-      client_type:    quote?.client_type,
+      partner_email:  partner.email as string,
+      partner_prenom: partner.first_name as string,
+      company_name:   partner.company_name as string,
+      wave:           a.wave as number,
+      quote_id:       a.quote_id as string,
+      ville:          quote?.address_city as string | null,
+      departement:    quote?.address_department as string | null,
+      timeline:       quote?.timeline as string | null,
+      client_type:    quote?.client_type as string | null,
       services:       servicesByQuote[a.quote_id] ?? [],
     }
 
@@ -89,7 +73,7 @@ export async function notifyNewAssignments(quoteId?: string) {
         body: JSON.stringify(payload),
       })
       if (res.ok) {
-        await supabase
+        await db
           .from('quote_assignments')
           .update({ notified_at: new Date().toISOString() })
           .eq('id', a.id)
