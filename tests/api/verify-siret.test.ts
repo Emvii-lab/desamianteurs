@@ -6,10 +6,12 @@ const fetchMock = vi.fn()
 beforeEach(() => {
   vi.stubGlobal('fetch', fetchMock)
   fetchMock.mockReset()
+  process.env.N8N_WEBHOOK_VERIFY_SIRET = 'https://n8n.test/webhook/verify-siret'
 })
 
 afterEach(() => {
   vi.unstubAllGlobals()
+  delete process.env.N8N_WEBHOOK_VERIFY_SIRET
 })
 
 function makeReq(body: unknown) {
@@ -59,14 +61,12 @@ describe('POST /api/verify-siret', () => {
     expect(fetchMock).toHaveBeenCalledOnce()
   })
 
-  it('retourne 500 si SUPABASE_EDGE_URL est absent', async () => {
-    const saved = process.env.SUPABASE_EDGE_URL
-    delete process.env.SUPABASE_EDGE_URL
+  it('retourne 500 si N8N_WEBHOOK_VERIFY_SIRET est absent', async () => {
+    delete process.env.N8N_WEBHOOK_VERIFY_SIRET
     const res = await POST(makeReq({ siret: '12345678901234' }) as any)
     expect(res.status).toBe(500)
     const json = await res.json()
     expect(json.error).toMatch(/configuration/i)
-    process.env.SUPABASE_EDGE_URL = saved
   })
 
   it('traduit le code NAF connu en libellé français', async () => {

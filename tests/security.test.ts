@@ -76,11 +76,13 @@ const fetchMock = vi.fn()
 beforeEach(() => {
   vi.stubGlobal('fetch', fetchMock)
   fetchMock.mockReset()
+  process.env.N8N_WEBHOOK_VERIFY_SIRET = 'https://n8n.test/webhook/verify-siret'
 })
 
 afterEach(() => {
   vi.unstubAllGlobals()
   vi.clearAllMocks()
+  delete process.env.N8N_WEBHOOK_VERIFY_SIRET
 })
 
 // ─────────────────────────────────────────────────────────────────────────────
