@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase'
 import { CATEGORY_MAP } from '@/lib/constants'
+import { getBaseUrl } from '@/lib/config'
 import type { DemandeFormData } from '@/lib/types'
 
 type SupabaseClient = ReturnType<typeof createClient>
@@ -202,9 +203,7 @@ export const demandeService = {
     await linkServiceTypes(supabase, quoteId, submissionData.serviceTypes)
     await uploadQuoteFiles(supabase, quoteId, files)
 
-    const baseUrl = typeof window !== 'undefined'
-      ? window.location.origin
-      : (process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.desamianteurs.com')
+    const baseUrl = getBaseUrl()
 
     // Notifier les partenaires assignés en vague 1 (non bloquant)
     fetch(`${baseUrl}/api/notifications/notify-partners`, {

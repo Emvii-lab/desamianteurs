@@ -1,16 +1,7 @@
 import { headers } from 'next/headers'
 import { getStripe } from '@/lib/stripe'
-import { createClient } from '@supabase/supabase-js'
+import { createAdminSupabase } from '@/lib/supabase-admin'
 import Stripe from 'stripe'
-
-// Client admin (service_role) — bypass RLS pour les updates du webhook
-function getAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } }
-  )
-}
 
 export async function POST(req: Request) {
   const body = await req.text()
@@ -29,7 +20,7 @@ export async function POST(req: Request) {
     return new Response(`Webhook error: ${e.message}`, { status: 400 })
   }
 
-  const admin = getAdmin()
+  const admin = createAdminSupabase()
 
   switch (event.type) {
     case 'checkout.session.completed': {

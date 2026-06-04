@@ -1,11 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 vi.mock('@/lib/supabase-server', () => ({ createServerSupabase: vi.fn() }))
-vi.mock('@supabase/supabase-js',  () => ({ createClient: vi.fn() }))
+vi.mock('@/lib/supabase-admin',  () => ({ createAdminSupabase: vi.fn() }))
+vi.mock('@/lib/auth-helpers',    () => ({ verifyAdmin: vi.fn() }))
 
 import { POST, DELETE } from '@/app/api/admin/user/route'
 import { createServerSupabase } from '@/lib/supabase-server'
-import { createClient }         from '@supabase/supabase-js'
+import { createAdminSupabase }  from '@/lib/supabase-admin'
+import { verifyAdmin }          from '@/lib/auth-helpers'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -73,28 +75,31 @@ function makeReq(method: string, body: unknown, origin = 'http://localhost:3000'
   })
 }
 
-beforeEach(() => vi.clearAllMocks())
+beforeEach(() => {
+  vi.clearAllMocks()
+  vi.mocked(createServerSupabase).mockResolvedValue({} as any)
+})
 
 // ─── POST — réinitialisation mot de passe ────────────────────────────────────
 
 describe('POST /api/admin/user (reset password)', () => {
   it('retourne 403 si non admin', async () => {
-    vi.mocked(createServerSupabase).mockResolvedValue(makeServerSupabase(false) as any)
+    vi.mocked(verifyAdmin).mockResolvedValue(null)
     const res = await POST(makeReq('POST', { email: 'test@example.com' }))
     expect(res.status).toBe(403)
   })
 
   it('retourne 400 si email absent', async () => {
-    vi.mocked(createServerSupabase).mockResolvedValue(makeServerSupabase() as any)
-    vi.mocked(createClient).mockReturnValue(makeAdminClient() as any)
+    vi.mocked(verifyAdmin).mockResolvedValue({ id: 'admin-1' } as any)
+    vi.mocked(createAdminSupabase).mockReturnValue(makeAdminClient() as any)
     const res = await POST(makeReq('POST', {}))
     expect(res.status).toBe(400)
   })
 
   it('appelle generateLink avec l\'email et le bon redirectTo', async () => {
-    vi.mocked(createServerSupabase).mockResolvedValue(makeServerSupabase() as any)
+    vi.mocked(verifyAdmin).mockResolvedValue({ id: 'admin-1' } as any)
     const admin = makeAdminClient()
-    vi.mocked(createClient).mockReturnValue(admin as any)
+    vi.mocked(createAdminSupabase).mockReturnValue(admin as any)
 
     await POST(makeReq('POST', { email: 'user@example.com' }, 'https://desamianteurs.com'))
 
@@ -106,21 +111,20 @@ describe('POST /api/admin/user (reset password)', () => {
   })
 
   it('retourne ok:true (sans le lien — envoyé par email uniquement)', async () => {
-    vi.mocked(createServerSupabase).mockResolvedValue(makeServerSupabase() as any)
-    vi.mocked(createClient).mockReturnValue(makeAdminClient() as any)
+    vi.mocked(verifyAdmin).mockResolvedValue({ id: 'admin-1' } as any)
+    vi.mocked(createAdminSupabase).mockReturnValue(makeAdminClient() as any)
 
     const res  = await POST(makeReq('POST', { email: 'user@example.com' }))
     const json = await res.json()
 
     expect(res.status).toBe(200)
     expect(json.ok).toBe(true)
-    // Le lien n'est plus retourné dans la réponse (fix sécurité)
     expect(json.link).toBeUndefined()
   })
 
   it('retourne 400 si Supabase renvoie une erreur', async () => {
-    vi.mocked(createServerSupabase).mockResolvedValue(makeServerSupabase() as any)
-    vi.mocked(createClient).mockReturnValue(makeAdminClient({ generateLinkError: { message: 'User not found' } }) as any)
+    vi.mocked(verifyAdmin).mockResolvedValue({ id: 'admin-1' } as any)
+    vi.mocked(createAdminSupabase).mockReturnValue(makeAdminClient({ generateLinkError: { message: 'User not found' } }) as any)
 
     const res = await POST(makeReq('POST', { email: 'unknown@example.com' }))
     expect(res.status).toBe(400)
@@ -133,22 +137,22 @@ describe('POST /api/admin/user (reset password)', () => {
 
 describe('DELETE /api/admin/user', () => {
   it('retourne 403 si non admin', async () => {
-    vi.mocked(createServerSupabase).mockResolvedValue(makeServerSupabase(false) as any)
+    vi.mocked(verifyAdmin).mockResolvedValue(null)
     const res = await DELETE(makeReq('DELETE', { userId: 'u1', role: 'client' }))
     expect(res.status).toBe(403)
   })
 
   it('retourne 400 si userId absent', async () => {
-    vi.mocked(createServerSupabase).mockResolvedValue(makeServerSupabase() as any)
-    vi.mocked(createClient).mockReturnValue(makeAdminClient() as any)
+    vi.mocked(verifyAdmin).mockResolvedValue({ id: 'admin-1' } as any)
+    vi.mocked(createAdminSupabase).mockReturnValue(makeAdminClient() as any)
     const res = await DELETE(makeReq('DELETE', { role: 'client' }))
     expect(res.status).toBe(400)
   })
 
   it('supprime un utilisateur client et appelle deleteUser', async () => {
-    vi.mocked(createServerSupabase).mockResolvedValue(makeServerSupabase() as any)
+    vi.mocked(verifyAdmin).mockResolvedValue({ id: 'admin-1' } as any)
     const admin = makeAdminClient({ clientData: { id: 'client-row' }, quotesData: [] })
-    vi.mocked(createClient).mockReturnValue(admin as any)
+    vi.mocked(createAdminSupabase).mockReturnValue(admin as any)
 
     const res = await DELETE(makeReq('DELETE', { userId: 'auth-1', role: 'client' }))
     expect(res.status).toBe(200)
@@ -156,21 +160,19 @@ describe('DELETE /api/admin/user', () => {
   })
 
   it('supprime toutes les tables liées au partenaire avant deleteUser', async () => {
-    vi.mocked(createServerSupabase).mockResolvedValue(makeServerSupabase() as any)
+    vi.mocked(verifyAdmin).mockResolvedValue({ id: 'admin-1' } as any)
     const admin = makeAdminClient({ partnerData: { id: 'partner-row' } })
-    vi.mocked(createClient).mockReturnValue(admin as any)
+    vi.mocked(createAdminSupabase).mockReturnValue(admin as any)
 
     const res = await DELETE(makeReq('DELETE', { userId: 'auth-2', role: 'partenaire' }))
     expect(res.status).toBe(200)
 
     const tables = (admin.from as ReturnType<typeof vi.fn>).mock.calls.map(([t]: string[]) => t)
-    // Toutes les tables de la cascade partenaire doivent être touchées
     expect(tables).toContain('partners')
     expect(tables).toContain('quote_assignments')
     expect(tables).toContain('partner_domains')
     expect(tables).toContain('target_markets')
     expect(tables).toContain('intervention_zones')
-    // deleteUser doit être appelé EN DERNIER (après les prédélétions)
     expect(admin.auth.admin.deleteUser).toHaveBeenCalledWith('auth-2')
     const deleteUserCallIndex = admin.auth.admin.deleteUser.mock.invocationCallOrder[0]
     const lastFromCallOrder = Math.max(
@@ -180,9 +182,9 @@ describe('DELETE /api/admin/user', () => {
   })
 
   it('supprime un admin et appelle deleteUser', async () => {
-    vi.mocked(createServerSupabase).mockResolvedValue(makeServerSupabase() as any)
+    vi.mocked(verifyAdmin).mockResolvedValue({ id: 'admin-1' } as any)
     const admin = makeAdminClient()
-    vi.mocked(createClient).mockReturnValue(admin as any)
+    vi.mocked(createAdminSupabase).mockReturnValue(admin as any)
 
     const res = await DELETE(makeReq('DELETE', { userId: 'auth-3', role: 'admin' }))
     expect(res.status).toBe(200)
@@ -192,8 +194,8 @@ describe('DELETE /api/admin/user', () => {
   })
 
   it('retourne 500 si deleteUser échoue', async () => {
-    vi.mocked(createServerSupabase).mockResolvedValue(makeServerSupabase() as any)
-    vi.mocked(createClient).mockReturnValue(
+    vi.mocked(verifyAdmin).mockResolvedValue({ id: 'admin-1' } as any)
+    vi.mocked(createAdminSupabase).mockReturnValue(
       makeAdminClient({ deleteUserError: { message: 'User does not exist' } }) as any
     )
 

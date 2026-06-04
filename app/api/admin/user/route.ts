@@ -1,21 +1,7 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { createServerSupabase } from '@/lib/supabase-server'
-
-function getAdminClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } },
-  )
-}
-
-async function verifyAdmin(supabase: Awaited<ReturnType<typeof createServerSupabase>>) {
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return null
-  const { data: admin } = await supabase.from('admins').select('id').eq('user_id', user.id).single()
-  return admin ? user : null
-}
+import { createAdminSupabase } from '@/lib/supabase-admin'
+import { verifyAdmin } from '@/lib/auth-helpers'
 
 // ── POST : envoyer un email de réinitialisation du mot de passe ──────────────
 
@@ -29,7 +15,7 @@ export async function POST(req: Request) {
   if (!email) return NextResponse.json({ error: 'Email requis' }, { status: 400 })
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.desamianteurs.com'
-  const admin  = getAdminClient()
+  const admin  = createAdminSupabase()
 
   const { error } = await admin.auth.admin.generateLink({
     type: 'recovery',
@@ -53,7 +39,7 @@ export async function DELETE(req: Request) {
   const { userId, role } = await req.json()
   if (!userId) return NextResponse.json({ error: 'userId requis' }, { status: 400 })
 
-  const admin = getAdminClient()
+  const admin = createAdminSupabase()
 
   try {
     if (role === 'partenaire') {

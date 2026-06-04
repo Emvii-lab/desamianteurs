@@ -1,12 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerSupabase } from '@/lib/supabase-server'
-
-async function verifyAdmin(supabase: Awaited<ReturnType<typeof createServerSupabase>>) {
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return null
-  const { data: admin } = await supabase.from('admins').select('id').eq('user_id', user.id).single()
-  return admin ? user : null
-}
+import { verifyAdmin } from '@/lib/auth-helpers'
 
 export async function PATCH(req: Request) {
   const supabase = await createServerSupabase()
