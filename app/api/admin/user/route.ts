@@ -45,22 +45,24 @@ export async function DELETE(req: Request) {
     if (role === 'partenaire') {
       const { data: partner } = await admin.from('partners').select('id').eq('user_id', userId).maybeSingle()
       if (partner) {
-        await admin.from('quote_assignments').delete().eq('partner_id', partner.id)
-        await admin.from('partner_domains').delete().eq('partner_id', partner.id)
-        await admin.from('target_markets').delete().eq('partner_id', partner.id)
-        await admin.from('intervention_zones').delete().eq('partner_id', partner.id)
+        const pid = (partner as { id: string }).id
+        await admin.from('quote_assignments').delete().eq('partner_id', pid)
+        await admin.from('partner_domains').delete().eq('partner_id', pid)
+        await admin.from('target_markets').delete().eq('partner_id', pid)
+        await admin.from('intervention_zones').delete().eq('partner_id', pid)
       }
       await admin.from('partners').delete().eq('user_id', userId)
 
     } else if (role === 'client') {
       const { data: client } = await admin.from('clients').select('id').eq('user_id', userId).maybeSingle()
       if (client) {
-        const { data: quotes } = await admin.from('quotes').select('id').eq('client_id', client.id)
+        const cid = (client as { id: string }).id
+        const { data: quotes } = await admin.from('quotes').select('id').eq('client_id', cid)
         if (quotes?.length) {
-          const ids = quotes.map(q => q.id)
+          const ids = (quotes as { id: string }[]).map(q => q.id)
           await admin.from('quote_service_types').delete().in('quote_id', ids)
           await admin.from('quote_assignments').delete().in('quote_id', ids)
-          await admin.from('quotes').delete().eq('client_id', client.id)
+          await admin.from('quotes').delete().eq('client_id', cid)
         }
       }
       await admin.from('clients').delete().eq('user_id', userId)
