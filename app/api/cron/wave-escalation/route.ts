@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminSupabase } from '@/lib/supabase-admin'
+import { verifyCronSecret } from '@/lib/cron-auth'
 import { notifyNewAssignments } from '@/lib/notify-partners'
 
 export async function POST(req: NextRequest) {
-  const secret = req.headers.get('x-cron-secret')
-  if (!secret || secret !== process.env.CRON_SECRET) {
+  if (!verifyCronSecret(req)) {
     return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
   }
 
@@ -20,12 +20,11 @@ export async function POST(req: NextRequest) {
 
   if (wave2.error || wave3.error) {
     return NextResponse.json({
-      wave2: wave2.error?.message ?? 'ok',
-      wave3: wave3.error?.message ?? 'ok',
+      wave2: wave2.error ? 'error' : 'ok',
+      wave3: wave3.error ? 'error' : 'ok',
     }, { status: 500 })
   }
 
-  // Notifier les partenaires nouvellement assignés en vagues 2 & 3
   await notifyNewAssignments()
 
   return NextResponse.json({ ok: true })

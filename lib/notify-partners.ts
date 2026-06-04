@@ -1,5 +1,24 @@
 import { createAdminSupabase } from './supabase-admin'
 
+interface Assignment {
+  id: string
+  quote_id: string
+  wave: number
+  partners: {
+    email: string
+    first_name: string
+    last_name: string
+    company_name: string
+    alert_channels: string[]
+  } | null
+  quotes: {
+    address_city: string | null
+    address_department: string | null
+    timeline: string | null
+    client_type: string | null
+  } | null
+}
+
 export async function notifyNewAssignments(quoteId?: string) {
   const webhookUrl = process.env.N8N_WEBHOOK_NOTIFY_PARTNER
   if (!webhookUrl) {
@@ -27,11 +46,15 @@ export async function notifyNewAssignments(quoteId?: string) {
   if (error) { console.error('[notify-partners] query error:', error.message); return }
   if (!assignments?.length) return
 
-  const quoteIds = [...new Set(assignments.map((a: any) => a.quote_id))]
-  const { data: serviceRows } = await supabase
+  const quoteIds = [...new Set((assignments as Assignment[]).map(a => a.quote_id))]
+  const { data: serviceRows, error: serviceError } = await supabase
     .from('quote_service_types')
     .select('quote_id, ref_service_types!service_type_id ( code )')
     .in('quote_id', quoteIds)
+
+  if (serviceError) {
+    console.error('[notify-partners] serviceRows error:', serviceError.message)
+  }
 
   const servicesByQuote: Record<string, string[]> = {}
   for (const row of (serviceRows ?? []) as any[]) {
@@ -40,7 +63,7 @@ export async function notifyNewAssignments(quoteId?: string) {
     if (code) (servicesByQuote[qid] ??= []).push(code)
   }
 
-  for (const a of assignments as any[]) {
+  for (const a of assignments as Assignment[]) {
     const partner = a.partners
     const quote   = a.quotes
     if (!partner?.email) continue

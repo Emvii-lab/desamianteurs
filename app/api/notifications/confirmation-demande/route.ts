@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { TIMINGS } from '@/lib/constants'
 
-const TIMELINE_LABELS: Record<string, string> = {
-  emergency:       'Urgent',
-  within_1_month:  'Sous 1 mois',
-  within_3_months: 'Sous 3 mois',
-  over_3_months:   'Plus de 3 mois',
-}
+const TIMELINE_LABELS: Record<string, string> = Object.fromEntries(
+  TIMINGS.map(t => [t.id, t.label])
+)
 
 export async function POST(req: NextRequest) {
   try {
@@ -43,6 +41,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true })
   } catch (err: any) {
     console.error('[confirmation-demande]', err)
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    return NextResponse.json({ error: 'Erreur interne' }, { status: 500 })
   }
 }

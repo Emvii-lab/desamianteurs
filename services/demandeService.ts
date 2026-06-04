@@ -154,10 +154,12 @@ async function uploadQuoteFiles(
   for (const file of files) {
     if (!ALLOWED_FILE_TYPES.test(file.type)) { console.warn('[upload] type rejeté:', file.type); continue }
     if (file.size > MAX_FILE_SIZE) { console.warn('[upload] fichier trop lourd:', file.name); continue }
+    const ext = file.name.split('.').pop()?.toLowerCase() ?? 'bin'
+    const safeName = `${crypto.randomUUID()}.${ext}`
     const { error } = await supabase.storage
       .from('quote-documents')
-      .upload(`${quoteId}/${file.name}`, file)
-    if (!error) uploadedPaths.push(`${quoteId}/${file.name}`)
+      .upload(`${quoteId}/${safeName}`, file)
+    if (!error) uploadedPaths.push(`${quoteId}/${safeName}`)
   }
 
   if (uploadedPaths.length > 0) {

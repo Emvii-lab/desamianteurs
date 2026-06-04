@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminSupabase } from '@/lib/supabase-admin'
+import { verifyCronSecret } from '@/lib/cron-auth'
 
 export async function POST(req: NextRequest) {
-  const secret = req.headers.get('x-cron-secret')
-  if (!secret || secret !== process.env.CRON_SECRET) {
+  if (!verifyCronSecret(req)) {
     return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
   }
 
@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
 
   if (error) {
     console.error('[cron/gap-alerts]', error.message)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: 'Erreur interne' }, { status: 500 })
   }
 
   return NextResponse.json({ ok: true })
