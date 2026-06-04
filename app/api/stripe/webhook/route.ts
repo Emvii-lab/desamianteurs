@@ -42,9 +42,10 @@ export async function POST(req: Request) {
         update.subscription = plan
       }
 
-      const { error } = await admin
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (admin as any)
         .from('partners')
-        .update(update as any)
+        .update(update)
         .eq('user_id', userId)
 
       if (error) console.error('[Stripe webhook] Erreur update partner:', error.message)
