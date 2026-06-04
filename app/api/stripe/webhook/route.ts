@@ -44,7 +44,7 @@ export async function POST(req: Request) {
 
       const { error } = await admin
         .from('partners')
-        .update(update)
+        .update(update as any)
         .eq('user_id', userId)
 
       if (error) console.error('[Stripe webhook] Erreur update partner:', error.message)
