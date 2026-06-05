@@ -21,8 +21,12 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // Rafraîchit la session — NE PAS supprimer cet appel
-  await supabase.auth.getUser()
+  // Rafraîchit la session sans invalider en cas d'erreur réseau
+  try {
+    await supabase.auth.getSession()
+  } catch {
+    // Erreur réseau → on laisse passer la requête sans toucher à la session
+  }
 
   return supabaseResponse
 }
