@@ -14,7 +14,14 @@ export async function middleware(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
           supabaseResponse = NextResponse.next({ request })
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
+            // Mêmes options que les clients navigateur/serveur — sinon le cookie
+            // devient éphémère et est supprimé dans les WebViews mobiles (session perdue).
+            supabaseResponse.cookies.set(name, value, {
+              ...options,
+              maxAge: 60 * 60 * 24 * 365,
+              sameSite: 'lax',
+              secure: true,
+            })
           )
         },
       },
