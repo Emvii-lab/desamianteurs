@@ -127,6 +127,7 @@ export const STEPS_PRICE = [
 ]
 
 export const STATUS_STYLE: Record<string, { bg: string; color: string }> = {
+  submitted:  { bg: '#FEF3C7',                   color: '#D97706' },
   open:       { bg: 'rgba(52,211,153,0.1)',    color: '#059669' },
   in_progress:{ bg: 'rgba(52,211,153,0.1)',    color: '#059669' },
   closed:     { bg: 'var(--gray-100)',          color: 'var(--gray-400)' },
@@ -135,7 +136,7 @@ export const STATUS_STYLE: Record<string, { bg: string; color: string }> = {
 }
 
 export const STATUS_LABEL: Record<string, string> = {
-  open: 'En cours', in_progress: 'En cours', closed: 'Clôturée',
+  submitted: 'Envoyée', open: 'En cours', in_progress: 'En cours', closed: 'Clôturée',
   cancelled: 'Annulée', published: 'Publiée',
 }
 
