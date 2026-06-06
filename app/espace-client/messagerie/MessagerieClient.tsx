@@ -121,27 +121,31 @@ export default function MessagerieClient({
       .select(`
         id,
         quote_id,
+        status,
         partner:partners!partner_id(company_name),
-        quote:quotes!quote_id(id, client_id),
+        quotes!inner(client_id),
         messages(content, created_at, is_read, sender_id)
       `)
       .eq('quotes.client_id', clientId)
 
     if (data) {
-      const formatted: Conversation[] = data.map((item: any) => {
-        const msgs = item.messages || []
-        const lastMsg = msgs.length > 0 ? msgs[msgs.length - 1] : null
-        const unread = msgs.filter((m: any) => !m.is_read && m.sender_id !== userId).length
+      const formatted: Conversation[] = data
+        // Conversation visible si elle a des messages OU partenaire engagé (accepté / devis envoyé)
+        .filter((item: any) => (item.messages?.length > 0) || ['accepted', 'quote_sent'].includes(item.status))
+        .map((item: any) => {
+          const msgs = item.messages || []
+          const lastMsg = msgs.length > 0 ? msgs[msgs.length - 1] : null
+          const unread = msgs.filter((m: any) => !m.is_read && m.sender_id !== userId).length
 
-        return {
-          assignment_id: item.id,
-          partner_name: item.partner?.company_name || 'Partenaire',
-          last_message: lastMsg?.content,
-          last_message_at: lastMsg?.created_at,
-          unread_count: unread,
-          quote_id: item.quote_id
-        }
-      })
+          return {
+            assignment_id: item.id,
+            partner_name: item.partner?.company_name || 'Partenaire',
+            last_message: lastMsg?.content,
+            last_message_at: lastMsg?.created_at,
+            unread_count: unread,
+            quote_id: item.quote_id
+          }
+        })
       setConversations(formatted)
       if (!activeConv && formatted.length > 0) setActiveConv(formatted[0].assignment_id)
     }

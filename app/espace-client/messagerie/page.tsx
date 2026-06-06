@@ -19,6 +19,7 @@ export default async function MessageriePage() {
   if (!client) redirect('/')
 
   // Récupère les assignments + partenaires + infos devis en une seule requête
+  // (tous statuts : une conversation peut exister dès qu'un partenaire écrit, même en 'pending')
   const { data: assignments } = await supabase
     .from('quote_assignments')
     .select(`
@@ -27,7 +28,6 @@ export default async function MessageriePage() {
       quotes!inner(id, address_city, property_type_id, client_id)
     `)
     .eq('quotes.client_id', client.id)
-    .in('status', ['accepted', 'quote_sent'])
 
   const [propertyTypesRes, messagesRes] = await Promise.all([
     supabase.from('ref_property_types').select('id, label'),
@@ -60,6 +60,8 @@ export default async function MessageriePage() {
   }
 
   const conversations = (assignments || [])
+    // Une conversation s'affiche si elle a des messages OU si le partenaire est engagé (accepté / devis envoyé)
+    .filter(a => msgStats.has(a.id) || ['accepted', 'quote_sent'].includes(a.status))
     .map(a => {
       const stats = msgStats.get(a.id) ?? { last_message: null, last_message_at: null, unread_count: 0 }
       const propertyType = propertyTypesRes.data?.find(pt => pt.id === (a.quotes as any)?.property_type_id)

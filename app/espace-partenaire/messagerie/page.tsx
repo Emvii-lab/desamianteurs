@@ -32,8 +32,7 @@ export default async function MessageriePartenairePage() {
         quotes(id, address_city, property_type_id, clients(first_name, last_name)),
         messages(content, created_at, is_read, sender_id)
       `)
-      .eq('partner_id', partner.id)
-      .in('status', ['accepted', 'quote_sent']),
+      .eq('partner_id', partner.id),
     supabase.from('ref_property_types').select('id, label'),
   ])
 
@@ -41,7 +40,10 @@ export default async function MessageriePartenairePage() {
   const propertyTypes = propertyTypesRes.data || []
 
   // Agréger en JS (plus de requêtes N+1)
-  const conversations = assignments.map(a => {
+  const conversations = assignments
+    // Conversation visible si elle a des messages OU partenaire engagé (accepté / devis envoyé)
+    .filter(a => (a.messages?.length ?? 0) > 0 || ['accepted', 'quote_sent'].includes(a.status))
+    .map(a => {
     const quote = a.quotes as any
     const client = quote?.clients
     const propertyType = propertyTypes.find((pt: any) => pt.id === quote?.property_type_id)
