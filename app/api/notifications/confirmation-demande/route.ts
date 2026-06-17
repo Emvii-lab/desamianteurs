@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { TIMINGS } from '@/lib/constants'
+import { rateLimit } from '@/lib/rate-limit'
 
 const TIMELINE_LABELS: Record<string, string> = Object.fromEntries(
   TIMINGS.map(t => [t.id, t.label])
@@ -10,6 +11,12 @@ export async function POST(req: NextRequest) {
     const { getRequestUser } = await import('@/lib/auth-request')
     const { user, supabase } = await getRequestUser(req)
     if (!user) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+
+    // Rate-limit : 5 mails de confirmation / 10 min / utilisateur
+    const rl = rateLimit(`confirmation-demande:${user.id}`, 5, 10 * 60 * 1000)
+    if (!rl.ok) {
+      return NextResponse.json({ error: 'Trop de requêtes' }, { status: 429, headers: { 'Retry-After': String(rl.retryAfter) } })
+    }
 
     const body = await req.json()
     const { prenom, email, serviceTypeIds, propertyTypeId, ville, code_postal, delai, ref_demande } = body
