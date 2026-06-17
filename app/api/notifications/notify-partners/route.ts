@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerSupabase } from '@/lib/supabase-server'
+import { getRequestUser } from '@/lib/auth-request'
 import { notifyNewAssignments } from '@/lib/notify-partners'
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 export async function POST(req: NextRequest) {
-  const supabase = await createServerSupabase()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { user } = await getRequestUser(req)
   if (!user) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
 
   let body: unknown

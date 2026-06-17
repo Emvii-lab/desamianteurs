@@ -7,9 +7,8 @@ const TIMELINE_LABELS: Record<string, string> = Object.fromEntries(
 
 export async function POST(req: NextRequest) {
   try {
-    const { createServerSupabase } = await import('@/lib/supabase-server')
-    const supabase = await createServerSupabase()
-    const { data: { user } } = await supabase.auth.getUser()
+    const { getRequestUser } = await import('@/lib/auth-request')
+    const { user, supabase } = await getRequestUser(req)
     if (!user) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
 
     const body = await req.json()
