@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Eye, EyeOff } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
@@ -19,6 +19,24 @@ export default function ReinitialiserMotDePassePage() {
   const [loading, setLoading]             = useState(false)
   const [error, setError]                 = useState('')
   const [done, setDone]                   = useState(false)
+  const [linkInvalid, setLinkInvalid]     = useState(false)
+
+  // Établit la session à partir du token_hash présent dans le lien de l'e-mail
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const token_hash = params.get('token_hash')
+    const type = params.get('type')
+    if (!token_hash || !type) return
+    const supabase = createClient()
+    supabase.auth.verifyOtp({ token_hash, type: type as 'recovery' }).then(({ error: err }) => {
+      if (err) {
+        setLinkInvalid(true)
+        setError('Lien invalide ou expiré. Veuillez redemander un lien de réinitialisation.')
+      }
+      // Nettoie l'URL (retire le token de la barre d'adresse)
+      window.history.replaceState({}, '', '/reinitialiser-mot-de-passe')
+    })
+  }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -104,9 +122,15 @@ export default function ReinitialiserMotDePassePage() {
 
                   {error && <div className="form-error">{error}</div>}
 
-                  <button type="submit" className="btn btn-red" style={{ width: '100%', padding: 16, textTransform: 'none', letterSpacing: 0, fontWeight: 600 }} disabled={loading}>
+                  <button type="submit" className="btn btn-red" style={{ width: '100%', padding: 16, textTransform: 'none', letterSpacing: 0, fontWeight: 600, opacity: (loading || linkInvalid) ? 0.6 : 1 }} disabled={loading || linkInvalid}>
                     {loading ? 'Mise à jour...' : 'Mettre à jour le mot de passe'}
                   </button>
+
+                  {linkInvalid && (
+                    <Link href="/mot-de-passe-oublie" style={{ textAlign: 'center', fontFamily: SANS, fontSize: 14, color: '#C0392B', fontWeight: 600, textDecoration: 'none' }}>
+                      Redemander un lien de réinitialisation
+                    </Link>
+                  )}
                 </form>
               </>
             )}

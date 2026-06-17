@@ -37,18 +37,21 @@ export async function POST(req: NextRequest) {
 
   // Email inconnu (ou autre erreur) : on répond OK sans envoyer, pour ne pas divulguer
   // l'existence du compte.
-  const actionLink = data?.properties?.action_link
-  if (error || !actionLink) {
+  const tokenHash = data?.properties?.hashed_token
+  if (error || !tokenHash) {
     return NextResponse.json({ ok: true })
   }
 
+  // Lien vers NOTRE page avec le token_hash : la page établit la session via verifyOtp.
+  // Plus robuste (les scanners d'e-mail ne consomment pas le jeton car la vérif est en JS).
+  const confirmationUrl = `${appUrl}/reinitialiser-mot-de-passe?token_hash=${encodeURIComponent(tokenHash)}&type=recovery`
   const prenom = (data.user?.user_metadata as { prenom?: string } | undefined)?.prenom || 'Client'
 
   try {
     const res = await fetch(webhookUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ to: email, prenom, confirmationUrl: actionLink }),
+      body: JSON.stringify({ to: email, prenom, confirmationUrl }),
     })
     if (!res.ok) throw new Error(`n8n webhook error: ${res.status}`)
   } catch (err) {
