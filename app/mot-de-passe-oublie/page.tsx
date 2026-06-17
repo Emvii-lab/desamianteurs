@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, Mail } from 'lucide-react'
-import { createClient } from '@/lib/supabase'
 import Footer from '@/components/Footer'
 import Navbar from '@/components/Navbar'
 
@@ -20,13 +19,22 @@ export default function MotDePasseOubliePage() {
     e.preventDefault()
     setError('')
     setLoading(true)
-    const supabase = createClient()
-    const { error: err } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reinitialiser-mot-de-passe`,
-    })
-    setLoading(false)
-    if (err) { setError(err.message); return }
-    setSent(true)
+    try {
+      const res = await fetch('/api/notifications/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+      if (!res.ok && res.status !== 200) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || 'Une erreur est survenue. Réessayez.')
+      }
+      setSent(true)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Une erreur est survenue.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
