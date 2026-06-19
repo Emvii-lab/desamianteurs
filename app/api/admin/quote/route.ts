@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server'
-import { createServerSupabase } from '@/lib/supabase-server'
-import { verifyAdmin } from '@/lib/auth-helpers'
+import { verifyAdminRequest } from '@/lib/auth-request'
 
 export async function PATCH(req: Request) {
-  const supabase = await createServerSupabase()
-  if (!await verifyAdmin(supabase)) {
+  const { user, supabase } = await verifyAdminRequest(req)
+  if (!user) {
     return NextResponse.json({ error: 'Non autorisé' }, { status: 403 })
   }
 
