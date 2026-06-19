@@ -75,10 +75,10 @@ export default function Footer() {
       <div className="footer-grid" style={{ maxWidth: 1200, margin: '0 auto' }}>
         {/* Brand */}
         <div>
-          <div style={{ marginBottom: 12 }}>
+          <Link href="/" style={{ display: 'inline-block', marginBottom: 12, textDecoration: 'none' }}>
             <span style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 700, fontSize: 16, color: 'white' }}>Désamianteurs</span>
             <span style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 700, fontSize: 16, color: 'var(--red)' }}>.com</span>
-          </div>
+          </Link>
           <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', lineHeight: 1.7, maxWidth: 220, fontFamily: 'DM Sans, sans-serif' }}>
             La plateforme de référence pour tous vos besoins liés à l'amiante.
           </p>
